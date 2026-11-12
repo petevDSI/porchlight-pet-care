@@ -72,6 +72,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="/assets/app.js"></script>
+<script src="/assets/address.js"></script>
 <script>
 (function () {
   var P = window.Porchlight, h = P.h;
@@ -83,6 +84,17 @@
     home: P.renderFields(P.FIELDS.home)
   };
   Object.keys(sections).forEach(function (k) { document.getElementById('s-' + k).appendChild(sections[k].el); });
+
+  // Address suggestions; the exact spot is saved so drive times to this home are accurate.
+  var place = null;
+  var addrIn = sections.household.inputs.address && sections.household.inputs.address.input;
+  var townIn = sections.household.inputs.town_id && sections.household.inputs.town_id.input;
+  if (addrIn && window.PorchlightAddress) {
+    PorchlightAddress.attach(addrIn, function (p) {
+      place = p && !p.outside ? p : null;
+      if (place && townIn && place.town) townIn.value = place.town;
+    });
+  }
 
   var petsBox = document.getElementById('pets');
   var pets = [];
@@ -128,7 +140,8 @@
     var payload = Object.assign({},
       sections.household.read(), sections.vet.read(), sections.access.read(), sections.home.read(),
       { how_heard: document.getElementById('how_heard').value.trim() || null, agreed: true,
-        pets: pets.map(function (p) { return p.form.read(); }) });
+        pets: pets.map(function (p) { return p.form.read(); }) },
+      place ? { lat: place.lat, lng: place.lng } : {});
 
     var btn = document.getElementById('submit');
     btn.disabled = true; btn.textContent = 'Sending…';

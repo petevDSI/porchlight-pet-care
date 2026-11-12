@@ -101,3 +101,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy)}
 .item.group{border-color:#F3D69C}
 .group-items{flex:1 1 100%;margin-top:4px}
 .group-items summary{cursor:pointer;font-weight:700;font-size:15px}
+.addr-wrap{position:relative}
+.addr-list{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);list-style:none;margin:0;padding:6px;background:var(--white);border:1px solid var(--line-2);border-radius:14px;box-shadow:0 12px 30px rgba(20,35,59,.14)}
+.addr-list li{padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;line-height:1.3}
+.addr-list li span{font-size:14px;color:var(--muted)}
+.addr-list li[aria-selected="true"],.addr-list li:hover{background:var(--mist)}

@@ -114,6 +114,11 @@ textarea{min-height:88px;resize:vertical}
 .slot-status{font-size:15px;color:var(--muted)}
 .summary{background:var(--mist);border-radius:16px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
 .summary strong{font-size:18px}
+.addr-wrap{position:relative}
+.addr-list{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);list-style:none;margin:0;padding:6px;background:var(--white);border:1px solid var(--line-2);border-radius:14px;box-shadow:0 12px 30px rgba(20,35,59,.14)}
+.addr-list li{padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;line-height:1.3}
+.addr-list li span{font-size:14px;color:var(--muted)}
+.addr-list li[aria-selected="true"],.addr-list li:hover{background:var(--mist)}
 .day-row{margin-top:12px}.day-row .choice{min-height:42px;padding:8px 14px;font-size:15px}
 .row-gap{margin-top:16px}
 .cart-list{list-style:none;margin:10px 0 0;padding:0;border:1px solid var(--line);border-radius:16px;max-height:340px;overflow:auto}
@@ -310,6 +315,12 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 </fieldset>
 
+<div>
+<label class="field-label" for="where">Your street address</label>
+<input id="where" maxlength="300" placeholder="Start typing, like 123 Main St, Belmont">
+<p class="hint" id="where-msg">Optional, but it lets us check real drive times to your door. Or just pick your town below.</p>
+</div>
+
 <div class="two-col">
 <div><label class="field-label" for="town">Your town</label>
 <select id="town" required>
@@ -486,6 +497,7 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 </footer>
 
+<script src="/assets/address.js"></script>
 <script>
 (function(){
   var SUPABASE_URL = 'https://ngiwnyoxdcycwotxargm.supabase.co';
@@ -516,6 +528,27 @@ details p{margin-top:12px;color:var(--ink)}
   var townSel = el('town'), dateIn = el('date'), slotsBox = el('slots'), untilIn = el('until');
   var details = el('details'), submitBtn = el('submit'), summary = el('summary'), errBox = el('form-error');
   var addBtn = el('add-btn'), addMsg = el('add-msg'), cartBox = el('cart'), cartList = el('cart-list');
+  var whereMsg = el('where-msg'), WHERE_HINT = whereMsg.textContent;
+  state.place = null;
+  function withGeo(o){ if (state.place) { o.p_lat = state.place.lat; o.p_lng = state.place.lng; } return o; }
+  if (window.PorchlightAddress) {
+    PorchlightAddress.attach(el('where'), function(place){
+      if (place && place.outside) {
+        state.place = null;
+        whereMsg.textContent = 'That address looks outside our area (Belmont and about 25 minutes around). Call us and we’ll see what we can do.';
+      } else if (place) {
+        state.place = place;
+        if (place.town) townSel.value = place.town;
+        whereMsg.textContent = '✓ Checking real drive times to ' + place.address + '.';
+        el('address').value = place.address;
+      } else {
+        state.place = null;
+        whereMsg.textContent = WHERE_HINT;
+      }
+      if (state.cart.length) { state.cart = []; renderCart(); addMsg.textContent = 'Your list was cleared because the address changed.'; }
+      loadSlots();
+    });
+  }
 
   el('year').textContent = new Date().getFullYear();
 
@@ -654,7 +687,10 @@ details p{margin-top:12px;color:var(--ink)}
       job = Promise.resolve(picked.map(function(p){ return { day: dateIn.value, slot_label: p.label, start_at: p.start_at, available: true }; }));
     } else {
       addBtn.disabled = true; addMsg.textContent = 'Checking ' + dates.length + ' day' + (dates.length > 1 ? 's' : '') + '…';
-      job = api('rpc/porchlight_check_slots', { body: { p_service: svc, p_town: townSel.value, p_dates: dates, p_times: picked.map(function(p){ return p.label; }) } });
+      var primeAll = state.place && window.PorchlightAddress ? PorchlightAddress.prime(dates[0], state.place, dates.length) : Promise.resolve();
+      job = primeAll.then(function(){
+        return api('rpc/porchlight_check_slots', { body: withGeo({ p_service: svc, p_town: townSel.value, p_dates: dates, p_times: picked.map(function(p){ return p.label; }) }) });
+      });
     }
     return job.then(function(rows){
       var added = 0, skipped = [];
@@ -688,7 +724,10 @@ details p{margin-top:12px;color:var(--ink)}
     errBox.hidden = true;
     if (!dateIn.value) { slotsBox.innerHTML = ''; return; }
     slotsBox.innerHTML = '<p class="slot-status">Checking the schedule…</p>';
-    api('rpc/porchlight_available_slots', { body: { p_date: dateIn.value, p_service: state.service, p_town: townSel.value } })
+    var primed = state.place && window.PorchlightAddress ? PorchlightAddress.prime(dateIn.value, state.place) : Promise.resolve();
+    primed.then(function(){
+      return api('rpc/porchlight_available_slots', { body: withGeo({ p_date: dateIn.value, p_service: state.service, p_town: townSel.value }) });
+    })
       .then(function(rows){
         if (token !== loadToken) return;
         slotsBox.innerHTML = '';
@@ -754,13 +793,13 @@ details p{margin-top:12px;color:var(--ink)}
     }
     var what = summary.textContent;
     submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
-    api('rpc/porchlight_request_bookings', { body: {
+    api('rpc/porchlight_request_bookings', { body: withGeo({
       p_town: townSel.value,
       p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series }; }),
       p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
       p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
       p_new_client: el('new-client').checked
-    }}).then(function(){
+    })}).then(function(){
       var isNew = el('new-client').checked;
       el('success-text').textContent = 'Your request for ' + what + ' is in. ' +
         (isNew ? "Since you're new, we'll reach out first to set up a free meet-and-greet before your first visit." :

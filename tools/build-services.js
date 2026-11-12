@@ -249,6 +249,141 @@ const SERVICES = [
     ]
   },
   {
+    slug: 'cat-sitting', id: 'visit', name: 'Cat sitting', short: 'Cat sitting',
+    title: 'Cat Sitting in Belmont, NC',
+    metaTitle: 'Cat Sitting in Belmont, NC | Porchlight Pet & Home Care',
+    metaDesc: 'In-home cat sitting in Belmont, Mt. Holly, Cramerton and Lake Wylie. Your cat stays home: meals, litter, medication, play and a photo update every visit. $25 per 30-minute visit.',
+    h1: 'Cat sitting that keeps your cat at home.',
+    lede: 'Most cats are happiest in their own space. We come to you for 30 minutes of real care: fresh food and water, a clean litter box, medication if needed, play, and a note and photos so you know how they are.',
+    price: 25, unit: 'per 30-minute visit',
+    includesTitle: 'Every cat visit includes',
+    hero: img('photo-1764045929730-8f2a490616c5', 1200), heroAlt: 'A tabby cat on the back of a chair by a sunny window',
+    gallery: [
+      [img('photo-1768859336207-3c3ba2027cca', 1200, 800), 'A fluffy orange cat playing with a toy on a bed'],
+      [img('photo-1638826595775-e2eae86cda8e', 1200, 800), 'A cat playing with a toy on the floor'],
+      ['/assets/img/pack/akita-cat.jpg', 'Shamus and Pepper the cat meeting nose to nose on the porch']
+    ],
+    cta: 'Book a cat visit',
+    included: [
+      ['bowl', 'Meals and fresh water', 'Wet food, dry food or a special diet, measured as you direct. Bowls washed and water refreshed.'],
+      ['litter', 'Litter box scooped', 'Every visit, with extra scooping or a full change on longer trips if you’d like.'],
+      ['pill', 'Medication given', 'Pills, liquids, eye drops and injections such as insulin, on your schedule. We go over dose and timing at the meet-and-greet.'],
+      ['ball', 'Play and company', 'Wand toys, laser time, a brush, or just sitting nearby with a shy cat. Always on their terms.'],
+      ['heart', 'A health check', 'Appetite, water, litter box output and mood noted every visit, so small changes get caught early.'],
+      ['camera', 'Photos and a note', 'Sent to your client portal after every visit. Even a cat who hides gets found and checked on.']
+    ],
+    timelineTitle: 'How a cat visit goes',
+    timeline: [
+      ['Arrive', 'Find your cat', 'A calm hello, then a look around, including under the bed and behind the couch.'],
+      ['10 min', 'Meals, water and meds', 'Exactly as you’ve written it down. Bowls washed.'],
+      ['5 min', 'Litter box', 'Scooped, stray litter swept up, any accidents cleaned.'],
+      ['15 min', 'Play and company', 'A wand toy, a brush, or quiet time, whichever your cat prefers.'],
+      ['Before leaving', 'Update sent', 'A photo and a note, doors and windows checked, house locked up.']
+    ],
+    needs: {
+      title: 'Before the first visit',
+      sub: 'We go over all of this at the free meet-and-greet.',
+      items: [
+        ['Food, treats and meds laid out', 'Enough for the whole trip, plus a little extra in case you’re delayed.'],
+        ['Litter, scoop and bags', 'Where they live and where used litter goes.'],
+        ['Hiding spots and quirks', 'So we can find a shy cat quickly and without stress.'],
+        ['Indoor or outdoor rules', 'Whether your cat is indoor-only, and which doors and windows need to stay shut.'],
+        ['Carrier, vet and a way in', 'Where the carrier is, your vet’s number, an emergency contact, and a lockbox, door code or key.']
+      ]
+    },
+    brings: {
+      title: 'Why cats do better at home',
+      sub: 'Staying put beats boarding for many cats.',
+      items: [
+        ['No carrier ride, no strange place', 'Their own smells, their own spots to hide and perch, their own routine.'],
+        ['Their own food and litter', 'Fewer changes to their diet and their box while you’re gone.'],
+        ['A watched-over house', 'We bring in the mail and look around while we’re there. Add a home check-in if you’d like more.']
+      ]
+    },
+    pricing: [
+      ['Cat visit', 'About 30 minutes, one or two cats', '$25'],
+      ['Each additional pet', 'Per visit', '+$5'],
+      ['Holidays', 'Per visit', '+$10'],
+      ['Overnight stay', 'Your sitter stays the night, for cats who do best with company', '$95', 'overnight']
+    ],
+    faq: [
+      ['How often should someone visit my cat?', 'Once a day works for most healthy adult cats on a short trip. Twice a day is better for kittens, seniors, cats on medication, and trips longer than a few days.'],
+      ['Can you give insulin or other medication?', 'Yes. We’ll go over the dose, timing and storage at the meet-and-greet, and note each dose in your visit report.'],
+      ['My cat is shy and hides. Is that a problem?', 'No, that’s common. We take our time, confirm that your cat is eating, drinking and using the litter box, and find them to check on them every visit.'],
+      ['Do you need my cat’s vaccination records?', 'We ask for a current rabies certificate for every cat before the first visit. You can upload it on the new client form or later from your client portal.'],
+      ['What if my cat seems sick while I’m away?', 'We call you right away. With your permission we contact your vet, and our pet taxi can take your cat in if needed.'],
+      ['Can you care for my cat and my dog on the same trip?', 'Yes. Each additional pet is +$5 per visit, and you get one report covering everyone.']
+    ]
+  },
+  {
+    slug: 'exotic-pet-sitting', id: 'visit', name: 'Birds, reptiles, fish and small pets', short: 'Birds, reptiles and fish',
+    title: 'Bird, Reptile, Fish and Small Pet Sitting in Belmont, NC',
+    metaTitle: 'Bird, Reptile & Fish Pet Sitting in Belmont, NC | Porchlight',
+    metaDesc: 'In-home care for birds, reptiles, fish, rabbits and other small pets in Belmont, Mt. Holly, Cramerton and Lake Wylie. Feeding, habitat checks, medication and photo updates. $25 per visit.',
+    h1: 'Care for birds, reptiles, fish and small pets.',
+    lede: 'Habitats are hard to travel with and easy to get wrong. We come to your home, follow your care notes exactly, check the habitat, and send photos so you know everyone is fine.',
+    price: 25, unit: 'per 30-minute visit',
+    includesTitle: 'Every visit includes',
+    hero: img('photo-1758206411649-1e4e76ac0e1d', 1200), heroAlt: 'A bearded dragon resting on a branch',
+    gallery: [
+      [img('photo-1636045466232-539c7bd7817e', 1200, 800), 'A home aquarium with colorful fish'],
+      [img('photo-1714993654469-5224dd8670dc', 700, 700), 'A blue parakeet perched on a branch in its cage'],
+      [img('photo-1555634819-ce681c6e258c', 1200, 800), 'A gray and white rabbit resting indoors']
+    ],
+    cta: 'Book a visit',
+    included: [
+      ['bowl', 'Feeding on your schedule', 'Pellets, seed, fresh produce, insects, frozen-thawed prey or fish food, exactly as you direct.'],
+      ['water', 'Fresh water', 'Dishes cleaned and refilled, bottles and misters checked.'],
+      ['thermo', 'A habitat check', 'Temperature, heat and UV lamps, humidity, filters and lighting timers checked and noted every visit.'],
+      ['shield', 'Secure and careful', 'Lids, latches and doors checked and locked back up. Handled only as you direct.'],
+      ['pill', 'Medication and supplements', 'Oral medication, drops and supplements given on schedule and logged.'],
+      ['heart', 'Spot cleaning', 'Cages, tanks and bedding spot-cleaned, uneaten food removed. Ask us about deeper cleanings.'],
+      ['ball', 'Company for social pets', 'Talk, treats and gentle attention for birds, rabbits, guinea pigs and the like.'],
+      ['camera', 'Photos and a note', 'Sent to your client portal so you can see everyone is eating and active.']
+    ],
+    timelineTitle: 'How a visit goes',
+    timeline: [
+      ['Arrive', 'Check every habitat', 'A look at each enclosure first, so anything wrong is spotted right away.'],
+      ['10 min', 'Feeding and water', 'Exactly as written in your care notes.'],
+      ['10 min', 'Habitat and health check', 'Temperatures, lamps, filters and timers. A look at each animal for appetite, activity and anything unusual.'],
+      ['5 min', 'Clean-up and company', 'Spot-clean, remove uneaten food, and some time with social pets.'],
+      ['Before leaving', 'Update sent', 'Photos and a note, enclosures secured, house locked up.']
+    ],
+    needs: {
+      title: 'Before the first visit',
+      sub: 'We go over everything at the free meet-and-greet and look at the setup in person.',
+      items: [
+        ['A written care sheet', 'What each pet eats and when, how much, heat and light settings, and anything that’s normal for them.'],
+        ['Food and supplies laid out', 'Enough for the whole trip, plus extra. Frozen food labeled and stored where we can reach it.'],
+        ['Habitat settings and what to watch for', 'The right temperature and humidity ranges, and what to do if a lamp, heater or filter fails.'],
+        ['Species, age and handling', 'What kind of animal each one is, how old, and whether they may be handled at all.'],
+        ['An exotic vet and a backup contact', 'Not every vet sees birds and reptiles, so keep yours handy, along with an emergency contact.']
+      ]
+    },
+    brings: {
+      title: 'What we do and don’t take on',
+      sub: 'So there are no surprises.',
+      items: [
+        ['Birds, reptiles, fish and small mammals', 'Parakeets and parrots, lizards and geckos, non-venomous snakes, aquarium fish, rabbits, guinea pigs, hamsters and similar small pets.'],
+        ['No venomous animals', 'We don’t care for venomous animals or any species that needs a permit or a specialist handler.'],
+        ['Live feeding by request only', 'Frozen-thawed feeding is fine. If your pet eats live prey, please talk to us before you book.']
+      ]
+    },
+    pricing: [
+      ['Visit', 'About 30 minutes, one or two pets or habitats', '$25'],
+      ['Each additional pet or habitat', 'Per visit', '+$5'],
+      ['Holidays', 'Per visit', '+$10']
+    ],
+    faq: [
+      ['Which animals do you care for?', 'Birds, reptiles, aquarium fish, and small mammals such as rabbits and guinea pigs. If you have something not on that list, ask us and we’ll tell you honestly whether we’re the right fit.'],
+      ['Do you care for snakes?', 'We care for non-venomous snakes such as ball pythons and corn snakes, following your feeding and handling notes. We do not care for venomous snakes.'],
+      ['How often do my pets need a visit?', 'It depends on the species. Birds and small mammals generally need a visit every day, while fish and some reptiles may need less. We set the schedule with you at the meet-and-greet.'],
+      ['What if a heat lamp, heater or filter stops working?', 'We check them every visit. If something fails, we call you right away, fix what we safely can, such as a reset timer or a spare you’ve left out, and contact your vet if your pet needs it.'],
+      ['Do you need vaccination records for my pets?', 'Not for birds, reptiles, fish or most small pets. We ask for a current rabies certificate for dogs, cats and ferrets only.'],
+      ['Is the price different from a regular visit?', 'No. Visits for these pets are the same $25 as any 30-minute visit, with +$5 for each additional pet or habitat.']
+    ]
+  },
+  {
     slug: 'home-check-ins', id: 'home', name: 'Home check-ins', short: 'Home check-ins',
     title: 'House Sitting and Home Check-Ins in Belmont, NC',
     metaTitle: 'House Sitting & Home Check-Ins in Belmont, NC | Porchlight',
@@ -752,7 +887,7 @@ ${t.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}
 
 function hubPage() {
   const url = `${SITE}/services`;
-  const desc = 'Overnight pet sitting, dog walking, drop-in visits, home check-ins, pet taxi, flight companions and pet transport in Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo, Clover, York and Lake Wylie, west of the Catawba River.';
+  const desc = 'Overnight pet sitting, dog walking, drop-in visits, cat sitting, bird, reptile and fish care, home check-ins, pet taxi, flight companions and pet transport in Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo, Clover, York and Lake Wylie, west of the Catawba River.';
   const schema = ld({ '@context': 'https://schema.org', '@graph': [business, { '@type': 'ItemList', itemListElement: SERVICES.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/${s.slug}`, name: s.title })) }] });
   return head('Pet Sitting &amp; Home Care Services in Belmont, NC | Porchlight', desc, url, schema, 'services') + `
 <main>

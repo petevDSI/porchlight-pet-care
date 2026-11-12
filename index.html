@@ -322,7 +322,7 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 <ol class="steps">
 <li><span class="step-num">1</span><div><h3>Tell us where you are</h3><p>Pick your town so we can confirm you're in our service area and plan the drive.</p></div></li>
-<li><span class="step-num">2</span><div><h3>Meet us first, free</h3><p>New clients fill out a <a href="/intake" style="color:#F2B33D">short form about your pets and home</a>, then we do a meet-and-greet at your house and sort out keys.</p></div></li>
+<li><span class="step-num">2</span><div><h3>Meet us first, free</h3><p>New clients fill out a <a href="/intake" style="color:#F2B33D">short form about your pets and home</a>, then <a href="/?service=meet#booking" style="color:#F2B33D">book a free meet-and-greet</a> at your house, where we sort out keys.</p></div></li>
 <li><span class="step-num">3</span><div><h3>We confirm by text or email</h3><p>Every request is reviewed and confirmed personally, usually within a few hours. Then you get a photo update after every visit.</p></div></li>
 </ol>
 </div>
@@ -335,12 +335,14 @@ details p{margin-top:12px;color:var(--ink)}
 <fieldset style="border:0;margin:0;padding:0">
 <legend class="field-label">Service</legend>
 <div class="choice-row" id="service-row">
+<button type="button" class="choice" data-service="meet" aria-pressed="false">Free meet &amp; greet</button>
 <button type="button" class="choice" data-service="walk" aria-pressed="true">Dog walk</button>
 <button type="button" class="choice" data-service="visit" aria-pressed="false">Drop-in visit</button>
 <button type="button" class="choice" data-service="overnight" aria-pressed="false">Overnight</button>
 <button type="button" class="choice" data-service="home" aria-pressed="false">Home check-in</button>
 <button type="button" class="choice" data-service="taxi" aria-pressed="false">Pet taxi</button>
 </div>
+<p class="hint" id="meet-note" hidden>New to Porchlight? Pick a time for a free 30-minute visit at your home. Your pets meet us, we go over their routine and sort out keys. No cost, no commitment.</p>
 <div id="taxi-box" hidden style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
 <div class="choice-row" id="taxi-trip" role="group" aria-label="Trip type">
 <button type="button" class="choice" data-trip="taxi" aria-pressed="true">One way</button>
@@ -384,7 +386,7 @@ details p{margin-top:12px;color:var(--ink)}
 <p class="hint" id="slot-hint">Each time is an arrival window: we arrive within 30 minutes of it. Crossed-out times are booked, or too far from our previous stop to reach you on time.</p>
 </div>
 
-<div id="repeat-box">
+<div id="repeat-box" data-repeat>
 <p class="field-label" id="often-label">How often</p>
 <div class="choice-row" role="group" aria-labelledby="often-label" id="often-row">
 <button type="button" class="choice" data-often="once" aria-pressed="true">Just this day</button>
@@ -448,7 +450,8 @@ details p{margin-top:12px;color:var(--ink)}
 <p class="pill">Request received</p>
 <h3 class="display">Thanks, we've got it.</h3>
 <p id="success-text">We'll confirm by text or email, usually within a few hours.</p>
-<button class="btn btn-ghost" type="button" id="book-another">Request another visit</button>
+<div class="cta-row"><button class="btn btn-navy" type="button" id="book-meet" hidden>Schedule your free meet &amp; greet</button>
+<button class="btn btn-ghost" type="button" id="book-another">Book another visit</button></div>
 </div>
 </div>
 </div>
@@ -499,7 +502,7 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="wrap">
 <div class="section-head">
 <p class="eyebrow">Service area</p>
-<h2 class="display">Within a short drive of downtown Belmont.</h2>
+<h2 class="display">West of the lake, close to home.</h2>
 <p class="lede">We serve the area west of the Catawba River and Lake Wylie, from Mt. Holly down to the Celanese Rd area of Rock Hill. Just outside that line? Tell us your situation and we'll tell you honestly whether we can reach you reliably.</p>
 <div class="cta-row"><a class="btn btn-navy" href="/quote?type=local">Request a quote</a><a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a></div>
 </div>
@@ -507,6 +510,8 @@ details p{margin-top:12px;color:var(--ink)}
 <li class="home">Belmont <span>Home base</span></li>
 <li>Mt. Holly</li><li>Cramerton</li><li>McAdenville</li><li>Lake Wylie</li><li>East Gastonia</li><li>Lowell</li><li>Ranlo</li><li>Clover</li><li>York</li><li>India Hook</li><li>Newport</li>
 </ul>
+<div id="area-map" role="img" aria-label="Map of the Porchlight service area, west of the Catawba River and Lake Wylie, from Mt. Holly south to the Celanese Rd area of Rock Hill" style="height:600px;max-height:75vh;margin-top:28px;border-radius:20px;overflow:hidden;background:#e9e5dc"></div>
+<p class="small" style="margin-top:8px;color:var(--muted)">The shaded area is where we work. Map data &copy; OpenStreetMap contributors.</p>
 </div>
 </section>
 
@@ -582,7 +587,7 @@ details p{margin-top:12px;color:var(--ink)}
   var TZ = 'America/New_York';
   var state = { service: 'walk', picked: [], cart: [], often: 'once', dows: {}, prices: {}, labels: {
     walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in',
-    taxi: 'Pet taxi, one way', taxi_rt: 'Pet taxi, round trip' } };
+    taxi: 'Pet taxi, one way', taxi_rt: 'Pet taxi, round trip', meet: 'Free meet & greet' } };
 
   var el = function(id){ return document.getElementById(id); };
   var serviceButtons = document.querySelectorAll('#service-row .choice');
@@ -646,6 +651,9 @@ details p{margin-top:12px;color:var(--ink)}
     var isTaxi = id === 'taxi' || id === 'taxi_rt';
     serviceButtons.forEach(function(b){ b.setAttribute('aria-pressed', (b.dataset.service === id || (isTaxi && b.dataset.service === 'taxi')) ? 'true' : 'false'); });
     el('taxi-box').hidden = !isTaxi;
+    el('meet-note').hidden = id !== 'meet';
+    el('often-label').hidden = el('often-row').hidden = id === 'meet';
+    if (id === 'meet' && state.often !== 'once') { state.often = 'once'; oftenButtons.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.often === 'once' ? 'true' : 'false'); }); syncRepeat(true); }
     document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.trip === id ? 'true' : 'false'); });
     loadSlots();
   }
@@ -770,7 +778,7 @@ details p{margin-top:12px;color:var(--ink)}
       var li = document.createElement('li');
       var info = document.createElement('div');
       var top = document.createElement('span');
-      top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (unitPrice(c.service) ? ' · ' + money(unitPrice(c.service)) + (isTaxiSvc(c.service) && state.route ? ' est.' : isTaxiSvc(c.service) ? ' and up' : '') : '');
+      top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (c.service === 'meet' ? ' · Free' : unitPrice(c.service) ? ' · ' + money(unitPrice(c.service)) + (isTaxiSvc(c.service) && state.route ? ' est.' : isTaxiSvc(c.service) ? ' and up' : '') : '');
       info.appendChild(top);
       if (c.series) { var sm = document.createElement('small'); sm.textContent = c.series; info.appendChild(sm); }
       var x = document.createElement('button');
@@ -795,7 +803,7 @@ details p{margin-top:12px;color:var(--ink)}
     return Math.round(cartTotal() * parseInt(state.tip, 10) / 100);
   }
   function renderTip(){
-    tipBox.hidden = !state.cart.length;
+    tipBox.hidden = !state.cart.length || !cartTotal();
     tipRow.querySelectorAll('.choice').forEach(function(b){
       b.setAttribute('aria-pressed', b.dataset.tip === state.tip ? 'true' : 'false');
       var amt = b.querySelector('.tipamt');
@@ -819,7 +827,7 @@ details p{margin-top:12px;color:var(--ink)}
       summary.textContent = n + ' visit' + (n > 1 ? 's' : '') + (total ? ' · ' + money(total) : '') + (tp ? ' + ' + money(tp) + ' tip' : '');
     }
     submitBtn.disabled = !(n || (hasPick && weeklyOk));
-    submitBtn.textContent = details.hidden ? 'Continue' : 'Send request';
+    submitBtn.textContent = details.hidden ? 'Continue' : 'Book visit';
   }
 
   // Adds the picked times (on the picked days) to the list. Returns a promise.
@@ -964,9 +972,10 @@ details p{margin-top:12px;color:var(--ink)}
       p_tip_cents: tipCents()
     })}).then(function(){
       var isNew = el('new-client').checked;
-      el('success-text').textContent = 'Your request for ' + what + ' is in. ' +
-        (isNew ? "Since you're new, we'll reach out first to set up a free meet-and-greet before your first visit." :
-                 "We'll confirm by text or email, usually within a few hours.");
+      var hadMeet = state.cart.some(function(c){ return c.service === 'meet'; });
+      el('success-text').textContent = 'Your request for ' + what + ' is in. You will receive a confirmation by text or email, usually within a few hours.' +
+        (isNew && !hadMeet ? ' Since you are new, we also do a free meet-and-greet before your first visit. Pick a time below, or we will reach out to set one up.' : '');
+      el('book-meet').hidden = !(isNew && !hadMeet);
       el('book-form').hidden = true;
       el('success').hidden = false;
       el('success').focus();
@@ -977,6 +986,11 @@ details p{margin-top:12px;color:var(--ink)}
     });
   }
 
+  el('book-meet').addEventListener('click', function(){
+    state.cart = []; renderCart(); addMsg.textContent = '';
+    el('success').hidden = true; el('book-form').hidden = false; details.hidden = true;
+    setService('meet'); el('booking').scrollIntoView({ behavior: 'smooth' });
+  });
   el('book-another').addEventListener('click', function(){
     state.cart = []; renderCart(); addMsg.textContent = '';
     el('success').hidden = true;
@@ -988,6 +1002,28 @@ details p{margin-top:12px;color:var(--ink)}
   var preset = new URLSearchParams(location.search).get('service');
   syncRepeat(true);
   if (preset && state.labels[preset]) setService(preset); else loadSlots();
+})();
+</script>
+<script>
+(function(){
+  var box = document.getElementById('area-map'); if (!box) return;
+  var started = false;
+  function load(){
+    if (started) return; started = true;
+    var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'; document.head.appendChild(css);
+    var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
+    sc.onload = function(){
+      var AREA = [[35.340,-81.000],[35.300,-81.002],[35.260,-81.008],[35.230,-81.012],[35.200,-81.005],[35.170,-81.005],[35.150,-81.020],[35.120,-81.033],[35.100,-81.036],[35.060,-81.040],[35.020,-81.037],[35.005,-81.030],[34.995,-81.000],[34.975,-80.975],[34.975,-81.270],[35.340,-81.270]];
+      var T = [['Belmont',35.2429,-81.0373],['Mt. Holly',35.2982,-81.0159],['Cramerton',35.239,-81.0751],['McAdenville',35.2601,-81.0784],['East Gastonia',35.2615,-81.136],['Lowell',35.268,-81.0994],['Ranlo',35.2863,-81.1305],['Clover',35.1112,-81.2265],['York',34.9943,-81.242],['India Hook',35.0097,-81.0368],['Newport',34.9899,-81.1009],['Lake Wylie',35.1076,-81.0423]];
+      var map = L.map(box, { scrollWheelZoom: false, zoomSnap: 0.1 });
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '&copy; OpenStreetMap' }).addTo(map);
+      var poly = L.polygon(AREA, { color: '#14233B', weight: 3, fillColor: '#F2B33D', fillOpacity: .25 }).addTo(map);
+      map.fitBounds(poly.getBounds(), { padding: [10, 10] });
+      T.forEach(function(t){ L.circleMarker([t[1], t[2]], { radius: t[0] === 'Belmont' ? 9 : 6, color: '#fff', weight: 2, fillColor: t[0] === 'Belmont' ? '#14233B' : '#1f7a4d', fillOpacity: 1 }).addTo(map).bindTooltip(t[0], { permanent: false, direction: 'right', offset: [7, 0] }); });
+    };
+    document.head.appendChild(sc);
+  }
+  if ('IntersectionObserver' in window) { new IntersectionObserver(function(e, o){ if (e[0].isIntersecting) { load(); o.disconnect(); } }, { rootMargin: '300px' }).observe(box); } else load();
 })();
 </script>
 </body>

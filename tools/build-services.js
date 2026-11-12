@@ -11,7 +11,8 @@ const path = require('path');
 const SITE = 'https://porchlightpetcare.com';
 const ROOT = path.join(__dirname, '..');
 const img = (id, w, h) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}${h ? '&h=' + h : ''}&q=75`;
-const TOWNS = ['Belmont', 'Mt. Holly', 'Cramerton', 'McAdenville', 'Lake Wylie', 'Steele Creek', 'East Gastonia'];
+const SC_TOWNS = ['Lake Wylie', 'Clover', 'York', 'India Hook', 'Newport'];
+const TOWNS = ['Belmont', 'Mt. Holly', 'Cramerton', 'McAdenville', 'Lake Wylie', 'East Gastonia', 'Lowell', 'Ranlo', 'Clover', 'York', 'India Hook', 'Newport'];
 
 /* Small line icons (stroke uses currentColor). */
 const ICONS = {
@@ -565,7 +566,7 @@ fetch('https://ngiwnyoxdcycwotxargm.supabase.co/rest/v1/porchlight_services?sele
 const business = {
   '@type': 'LocalBusiness', '@id': SITE + '/#business', name: 'Porchlight Pet & Home Care', url: SITE,
   address: { '@type': 'PostalAddress', addressLocality: 'Belmont', addressRegion: 'NC', postalCode: '28012', addressCountry: 'US' },
-  areaServed: TOWNS.map(t => ({ '@type': 'City', name: t + ', NC' })), priceRange: '$$'
+  areaServed: TOWNS.map(t => ({ '@type': 'City', name: t + (SC_TOWNS.includes(t) ? ', SC' : ', NC') })), priceRange: '$$'
 };
 const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>\n`;
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -660,7 +661,7 @@ ${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gal
 
 function hubPage() {
   const url = `${SITE}/services`;
-  const desc = 'Overnight pet sitting, dog walking, drop-in visits, home check-ins, pet taxi, flight companions and pet transport in Belmont, Mt. Holly, Cramerton, McAdenville, Lake Wylie and Steele Creek, NC.';
+  const desc = 'Overnight pet sitting, dog walking, drop-in visits, home check-ins, pet taxi, flight companions and pet transport in Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo, Clover, York and Lake Wylie, west of the Catawba River.';
   const schema = ld({ '@context': 'https://schema.org', '@graph': [business, { '@type': 'ItemList', itemListElement: SERVICES.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/${s.slug}`, name: s.title })) }] });
   return head('Pet Sitting &amp; Home Care Services in Belmont, NC | Porchlight', desc, url, schema, 'services') + `
 <main>

@@ -11,7 +11,8 @@
 
   P.TOWNS = [
     ['belmont', 'Belmont'], ['mt-holly', 'Mt. Holly'], ['cramerton', 'Cramerton'], ['mcadenville', 'McAdenville'],
-    ['lake-wylie', 'Lake Wylie'], ['steele-creek', 'Steele Creek'], ['east-gastonia', 'East Gastonia']
+    ['lake-wylie', 'Lake Wylie'], ['east-gastonia', 'East Gastonia'], ['lowell', 'Lowell'], ['ranlo', 'Ranlo'],
+    ['clover', 'Clover'], ['york', 'York'], ['india-hook', 'India Hook'], ['newport', 'Newport']
   ];
   P.townName = function (id) { for (var i = 0; i < P.TOWNS.length; i++) if (P.TOWNS[i][0] === id) return P.TOWNS[i][1]; return ''; };
 

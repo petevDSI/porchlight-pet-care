@@ -14,9 +14,25 @@
   var HOME = { lat: 35.2429, lng: -81.0373 };
   var TOWNS = [
     ['belmont', 35.2429, -81.0373], ['mt-holly', 35.2982, -81.0159], ['cramerton', 35.2390, -81.0751],
-    ['mcadenville', 35.2601, -81.0784], ['lake-wylie', 35.1076, -81.0423], ['steele-creek', 35.1300, -80.9590],
-    ['east-gastonia', 35.2615, -81.1360]
+    ['mcadenville', 35.2601, -81.0784], ['lake-wylie', 35.1076, -81.0423],
+    ['east-gastonia', 35.2615, -81.1360], ['lowell', 35.2680, -81.0994], ['ranlo', 35.2863, -81.1305],
+    ['clover', 35.1112, -81.2265], ['york', 34.9943, -81.2420], ['india-hook', 35.0097, -81.0368],
+    ['newport', 34.9899, -81.1009]
   ];
+
+  // Service-area border, [lat, lng]. West of the Catawba River / Lake Wylie, south to Celanese Rd.
+  // The database holds the authoritative copy (table porchlight_area); keep the two in step.
+  var AREA = [[35.340,-81.000],[35.300,-81.002],[35.260,-81.008],[35.230,-81.012],[35.200,-81.005],[35.170,-81.005],
+    [35.150,-81.020],[35.120,-81.033],[35.100,-81.036],[35.060,-81.040],[35.020,-81.037],[35.005,-81.030],
+    [34.995,-81.000],[34.975,-80.975],[34.975,-81.270],[35.340,-81.270]];
+  function inArea(lat, lng) {
+    var inside = false;
+    for (var i = 0, j = AREA.length - 1; i < AREA.length; j = i++) {
+      var yi = AREA[i][0], xi = AREA[i][1], yj = AREA[j][0], xj = AREA[j][1];
+      if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
 
   function nearestTown(lat, lng) {
     var best = null, bd = 1e9;
@@ -39,7 +55,7 @@
       headers: { 'Content-Type': 'application/json', apikey: ANON, Authorization: 'Bearer ' + ANON },
       body: JSON.stringify({ action: 'geocode', address: text })
     }).then(function (r) { return r.json(); }).then(function (j) {
-      if (!j || !j.ok || !j.in_area) return null;
+      if (!j || !j.ok || !j.in_area || !inArea(j.lat, j.lng)) return null;
       return { address: j.formatted.replace(/, USA$/, ''), lat: j.lat, lng: j.lng, town: nearestTown(j.lat, j.lng), exact: j.exact };
     }).catch(function () { return null; });
   }
@@ -129,8 +145,7 @@
     }
     function done(place) {
       if (place) {
-        var far = Math.hypot(place.lat - HOME.lat, (place.lng - HOME.lng) * 0.82) * 69;
-        if (far > 30) place = Object.assign({ outside: true }, place);
+        if (!inArea(place.lat, place.lng)) place = Object.assign({ outside: true }, place);
         input.value = place.address;
       }
       picked = place;

@@ -366,8 +366,13 @@ details p{margin-top:12px;color:var(--ink)}
 <option value="cramerton">Cramerton</option>
 <option value="mcadenville">McAdenville</option>
 <option value="lake-wylie">Lake Wylie</option>
-<option value="steele-creek">Steele Creek</option>
 <option value="east-gastonia">East Gastonia</option>
+<option value="lowell">Lowell</option>
+<option value="ranlo">Ranlo</option>
+<option value="clover">Clover</option>
+<option value="york">York</option>
+<option value="india-hook">India Hook</option>
+<option value="newport">Newport</option>
 </select></div>
 <div><label class="field-label" for="date">Day</label><input id="date" type="date" required></div>
 </div>
@@ -482,11 +487,11 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="section-head">
 <p class="eyebrow">Service area</p>
 <h2 class="display">Within a short drive of downtown Belmont.</h2>
-<p class="lede">Outside these towns? Call or email and we'll tell you honestly whether we can reach you reliably.</p>
+<p class="lede">We serve the area west of the Catawba River and Lake Wylie, from Mt. Holly down to the Celanese Rd area of Rock Hill. Just outside that line? Call or email and we'll tell you honestly whether we can reach you reliably.</p>
 </div>
 <ul class="towns">
 <li class="home">Belmont <span>Home base</span></li>
-<li>Mt. Holly</li><li>Cramerton</li><li>McAdenville</li><li>Lake Wylie</li><li>Steele Creek</li><li>East Gastonia</li>
+<li>Mt. Holly</li><li>Cramerton</li><li>McAdenville</li><li>Lake Wylie</li><li>East Gastonia</li><li>Lowell</li><li>Ranlo</li><li>Clover</li><li>York</li><li>India Hook</li><li>Newport</li>
 </ul>
 </div>
 </section>
@@ -579,7 +584,7 @@ details p{margin-top:12px;color:var(--ink)}
     PorchlightAddress.attach(el('where'), function(place){
       if (place && place.outside) {
         state.place = null;
-        whereMsg.textContent = 'That address looks outside our area (Belmont and about 25 minutes around). Call us and we’ll see what we can do.';
+        whereMsg.textContent = 'That address looks outside our area (we stay west of the Catawba River and Lake Wylie, north of Celanese Rd in Rock Hill). Call us and we’ll see what we can do.';
       } else if (place) {
         state.place = place;
         if (place.town) townSel.value = place.town;

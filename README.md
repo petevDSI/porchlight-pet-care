@@ -47,3 +47,7 @@ Prices come from the `porchlight_services` table (`price_cents`). Change them th
 - **Flight companion** and **pet transport** are quoted per trip. `/quote` sends a request to `porchlight_quotes` through the `porchlight_request_quote` function; Kraig sees them in the portal's **Quotes** tab, records the price he quoted, and moves each through new, quoted, booked, declined or closed.
 - **Payments** are recorded by hand in the portal's **Payments** tab (cash, check, Venmo, Zelle, other). Unpaid completed visits are grouped by client. One tap records a payment for all of a client's unpaid visits; an amount above or below the listed prices (extra pets, holiday fees) goes on the first visit, and a tip can be added. Clients see "Paid · Venmo" on their visits. Card payments can be added later with Stripe.
 - Page content for all seven services is in `tools/build-services.js`. Edit there and run `node tools/build-services.js`.
+
+## Service area border
+
+The border is one polygon stored in the database table `porchlight_area` (row `main`, vertices as `[lat, lng]`). It runs down the middle of the Catawba River and Lake Wylie and along Celanese Rd in Rock Hill, and it is enforced by `porchlight_in_area()` inside `porchlight_available_slots` (every booking) and `porchlight_submit_intake`. `assets/address.js` carries a copy (`AREA`) so the address box can warn right away; change both together. A 75-minute drive-time check remains as a second safety net.

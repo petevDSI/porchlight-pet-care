@@ -783,7 +783,7 @@ const footer = () => `
 <div style="max-width:340px"><p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p><p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p></div>
 <div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
 <div><h4>Areas</h4>${TOWN_PAGES.map(t => `<a href="/areas/${t.slug}">${t.name}, ${t.state}</a>`).join('')}</div>
-<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/blog">Blog</a><a href="/become-a-pet-sitter">Become a sitter</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">Our story</a><a href="/blog">Blog</a><a href="/become-a-pet-sitter">Become a sitter</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
 <div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© 2026 Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
@@ -1015,97 +1015,96 @@ ${SERVICES.map(s => `<a href="/services/${s.slug}"><img src="${s.hero.replace('w
 }
 
 /* ---------- About page ----------
- * Written in Kraig's voice. Anything in [brackets] is a placeholder for him to fill in.
- * Swap the photo placeholder for a real photo of Kraig with a dog as soon as there is one. */
+ * Written in Pete's voice, around the family's own boarding experience. */
 const ABOUT = {
   promises: [
-    ['shield', 'Insured and bonded', 'Pet-care liability insurance and a bond, and I’m happy to show you the paperwork.'],
-    ['heart', 'Pet first aid and CPR', '[Certification name and year, once completed.]'],
-    ['camera', 'You’ll always know how it went', 'A note and photos after every visit, straight to your phone and your client portal.'],
-    ['clock', 'I show up when I say I will', 'My booking calendar only offers times I can actually make, drive included.'],
-    ['paw', 'Your routine, not mine', 'Same food, same walk, same bedtime ritual. Pets do best when nothing changes.'],
-    ['mail', 'Your home, respected', 'No guests, no snooping, keys labeled with a code and never your address.']
+    ['paw', 'They stay in their own home', 'Their couch, their beds, their toys and bones, their routine. The only thing that changes is who is feeding them.'],
+    ['heart', 'Out of the small room', 'Walks, play and company in a space they know, not hours shut away on their own.'],
+    ['camera', 'You can check for yourself', 'A note and photos after every visit, straight to your phone and your client portal. No taking anyone’s word for it.'],
+    ['mail', 'A home that smells like home', 'Your pets live in your house, with their own bedding and a clean, familiar space. Your home is respected too: no guests, no snooping, keys labeled with a code and never your address.'],
+    ['clock', 'We show up when we say we will', 'The booking calendar only offers times a sitter can actually make, drive included.'],
+    ['shield', 'Insured and bonded', 'Pet-care liability insurance and a bond, and we’re happy to show you the paperwork.']
   ],
   facts: [
     ['Home base', 'Belmont, NC'],
-    ['Studied at', 'UNC Charlotte'],
-    ['Before Porchlight', 'Banking and customer service, where the job was getting every detail right and being someone people could trust with their money'],
-    ['Pets in my life', 'My dog Bowie, plus Oskar, Eden and Maizy, my mom and stepdad’s crew. Before them, Shamus, my first dog, and Pepper the cat'],
-    ['Favorite walk in town', '[e.g. the River Street loop, or Stowe Park]'],
+    ['Founded by', 'Pete Volk, a Belmont dog owner who got tired of hoping for the best'],
+    ['Our rule for sitters', 'Would we trust them with our own pets? If the answer isn’t an easy yes, they don’t join.'],
+    ['Pets in our lives', 'Oskar, Eden and Maizy at home, Kraig’s dog Bowie, and in loving memory Shamus and Pepper the cat'],
     ['Big dogs?', 'Love them. Strong pullers and all.']
   ]
 };
 
 const PACK = [
-  ['bowie-chair', 'Bowie', 'My dog', 'Black and white, all legs, and the first to claim the comfy chair. Walk buddy and official taste-tester.', 'Bowie mid-yawn, sprawled across an armchair'],
   ['oskar-portrait', 'Oskar', 'Family dog', 'A dapple dachshund who runs the window-perch neighborhood watch.', 'Oskar the dachshund looking at the camera on a deck'],
   ['eden-portrait', 'Eden', 'Family dog', 'Red, sweet and built for long walks, then long naps with Oskar on top of her.', 'Eden, a red hound mix, looking out from a porch railing'],
   ['maizy-grin', 'Maizy', 'Family dog', 'Small, loud about it, and never under the covers alone if she can help it.', 'Maizy, a small black-and-tan dog, grinning at the camera'],
-  ['akita-uptown', 'Shamus', 'In loving memory', 'My first dog, and later the family’s. Hiker, porch guardian, and Pepper the cat’s reluctant roommate.', 'Shamus sitting on a sidewalk in uptown Charlotte']
+  ['bowie-chair', 'Bowie', 'Kraig’s dog', 'Black and white, all legs, and the first to claim the comfy chair. Walk buddy and official taste-tester.', 'Bowie mid-yawn, sprawled across an armchair'],
+  ['akita-uptown', 'Shamus', 'In loving memory', 'Hiker, porch guardian, and Pepper the cat’s reluctant roommate. He’s a big part of why we do this.', 'Shamus sitting on a sidewalk in uptown Charlotte']
 ];
 
 function aboutPage() {
   const url = `${SITE}/about`;
-  const desc = 'Meet Kraig Harahus, the Belmont local behind Porchlight Pet & Home Care. Insured and bonded in-home pet sitting, dog walking and home check-ins in Belmont and nearby towns.';
+  const desc = 'Porchlight started when a kennel let our dogs down. Now we keep pets at home, with sitters you meet first, in Belmont, NC and nearby towns.';
   const schema = ld({ '@context': 'https://schema.org', '@graph': [
     business,
-    { '@type': 'AboutPage', url, name: 'About Porchlight Pet & Home Care', about: { '@id': SITE + '/#business' } },
-    { '@type': 'Person', name: 'Kraig Harahus', jobTitle: 'Owner and pet sitter', worksFor: { '@id': SITE + '/#business' },
-      homeLocation: { '@type': 'Place', name: 'Belmont, NC' }, alumniOf: { '@type': 'CollegeOrUniversity', name: 'University of North Carolina at Charlotte' } }
+    { '@type': 'AboutPage', url, name: 'Our story | Porchlight Pet & Home Care', about: { '@id': SITE + '/#business' } },
+    { '@type': 'Person', name: 'Pete Volk', jobTitle: 'Founder', worksFor: { '@id': SITE + '/#business' },
+      homeLocation: { '@type': 'Place', name: 'Belmont, NC' } }
   ] });
-  return head('About Kraig | Porchlight Pet &amp; Home Care, Belmont NC', esc(desc), url, schema, 'about') + `
+  return head('Our Story | Porchlight Pet &amp; Home Care, Belmont NC', esc(desc), url, schema, 'about') + `
 <main>
 <section class="svc-hero"><div class="wrap">
 <div class="svc-hero-copy">
-<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">About</li></ol></nav>
-<p class="eyebrow">Meet your sitter</p>
-<h1 class="display">Hi, I’m Kraig.</h1>
-<p class="lede">I started Porchlight because leaving a pet behind shouldn’t feel like a gamble. When you’re away, I’m the one at your door: same face every time, someone you’ve met in person, who treats your home and your animals the way you would.</p>
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Our story</li></ol></nav>
+<p class="eyebrow">Our story</p>
+<h1 class="display">We started Porchlight because we couldn’t find anywhere we’d trust our own pets.</h1>
+<p class="lede">Our pets are family. When we have to be away, handing them to someone else is the hardest part, and we’ve seen what it costs them when it goes wrong. Porchlight is the care we wished we’d found.</p>
 <div class="cta-row"><a class="btn btn-amber" href="/intake">Set up a free meet-and-greet</a><a class="btn btn-ghost" href="/services">See services</a></div>
 </div>
 <div class="svc-hero-media">
-<figure class="pack-hero"><img src="/assets/img/pack/kraig-bowie.jpg" alt="Kraig sitting at a table, scratching his dog Bowie under the chin" width="768" height="576" fetchpriority="high"><figcaption>Me and Bowie.</figcaption></figure>
+<figure class="pack-hero"><img src="/assets/img/pack/eden-maizy-couch.jpg" alt="Eden, Oskar and Maizy resting on the living room couch" width="768" height="1024" fetchpriority="high" style="object-position:50% 40%"><figcaption>Eden, Oskar and Maizy, right where they belong.</figcaption></figure>
 </div>
 </div>
 </div></section>
 
 <section class="section"><div class="wrap about-story">
-<div class="section-head"><p class="eyebrow">Why Porchlight</p><h2 class="display">Someone home when you can’t be.</h2></div>
+<div class="section-head"><p class="eyebrow">Why Porchlight</p><h2 class="display">The kennel that looked great on the tour.</h2></div>
 <div class="story">
-<p>I grew up in a family that runs its own businesses, so I learned early that you build a reputation one promise at a time. Before Porchlight I worked in banking, where the whole job was getting the details exactly right and being someone people trusted with what mattered to them. Pet care turns out to be the same job.</p>
-<p>The name comes from the porch light you leave on when someone’s coming home. That’s what I want Porchlight to feel like: the house isn’t empty, the dog got walked, the cat got her medicine on time, and you get a photo to prove it.</p>
-<p>I live right here in Belmont, so I’m minutes away, not driving in from across Charlotte. I’m small on purpose. When Porchlight grows, every new sitter will be someone I’d trust with my own pets, and you’ll always meet them first.</p>
-<p>My first dog was Shamus. When I left for college he stayed behind with my mom and Pete, and he became as much theirs as mine. He was part of every family hike, and he even shared the house with Pepper, my grandmother’s cat, without too much drama. Shamus is gone now, but he’s a big part of why I do this.</p>
-<p>[Kraig: add a sentence or two in your own words about why you love animals, or a favorite memory of Shamus.]</p>
-<figure class="story-photo"><img src="/assets/img/pack/family-hike-shamus.jpg" alt="Kraig with his mom Susan, his stepdad Pete and Shamus on a mountain hike" width="1024" height="768" loading="lazy"><figcaption>Mom, me, Pete and Shamus on one of our hikes.</figcaption></figure>
+<p>I’m Pete. Susan and I have four pets, and they aren’t pets in the way most people mean it. They’re our family. They have their couch, their beds, their toys and bones, and a routine they count on every day.</p>
+<p>A while back we needed to board our dogs, and we did our homework. The kennel talked a good game and had decent reviews. The people were friendly when we toured, and the facility had the things we looked for: a TV in the room, cameras, all of it.</p>
+<p>Then we found out what it was really like. The TV didn’t work. The dogs were kept shut in a small room almost the entire day. They went without their couch and their beds, and they weren’t allowed their toys or their bones. When we picked them up, they smelled like urine. We vowed we would never do that to them again.</p>
+<p>What stayed with us was how convincing the tour had been. A tour shows you the best fifteen minutes of a place. It doesn’t show you the other twenty-three hours. If we couldn’t tell, how is anyone supposed to?</p>
+<p>So Porchlight is built around things you can check for yourself. You meet your sitter in your own home before the first visit. Your pets stay where they’re comfortable, with their own things around them. And after every visit you get a note and photos, so you never have to take anyone’s word for it.</p>
+<p>The name comes from the porch light you leave on when someone’s coming home. We’re building a small, local network of people who love animals, and every one of them has to pass one test: would we trust them with our own pets? If the answer isn’t an easy yes, they don’t join.</p>
+<p>Shamus, who was Kraig’s first dog and later ours, is a big part of why we do this. He was on every family hike, and he even shared the house with Pepper, Susan’s mom’s cat, without too much drama. We lost him, but the way we cared for him is the standard we hold ourselves to.</p>
+<figure class="story-photo"><img src="/assets/img/pack/family-hike-shamus.jpg" alt="Susan, Kraig, Pete and Shamus on a mountain hike" width="1024" height="768" loading="lazy"><figcaption>Susan, Kraig, me and Shamus on one of our hikes.</figcaption></figure>
 </div>
 </div></section>
-
 
 <section class="section tint"><div class="wrap">
-<div class="section-head"><p class="eyebrow">Meet the pack</p><h2 class="display">The dogs I practice on every day</h2><p class="lede">Big and small, high-energy and couch-shaped. Between my dog and my family’s, I’ve handled just about every kind of walk, bedtime and mealtime routine.</p></div>
-<div class="pack">
-${PACK.map(([f, n, who, d, alt]) => `<figure class="pup"><img src="/assets/img/pack/${f}.jpg" alt="${esc(alt)}" loading="lazy" width="600" height="600"><figcaption><h3>${esc(n)}</h3><p class="who">${esc(who)}</p><p>${esc(d)}</p></figcaption></figure>`).join('\n')}
-</div>
-</div></section>
-
-<section class="section"><div class="wrap">
-<div class="section-head"><p class="eyebrow">My promises to you</p><h2 class="display">What you can count on</h2></div>
+<div class="section-head"><p class="eyebrow">What we do differently</p><h2 class="display">The care we wanted for our own</h2></div>
 <div class="included">
 ${ABOUT.promises.map(([ic, t, d]) => `<article class="inc"><span class="ic">${icon(ic)}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></article>`).join('\n')}
 </div>
 </div></section>
 
 <section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Meet the family</p><h2 class="display">The reason we’re so picky</h2><p class="lede">Big and small, high-energy and couch-shaped. Every sitter we bring on has to be someone we’d leave these faces with.</p></div>
+<div class="pack">
+${PACK.map(([f, n, who, d, alt]) => `<figure class="pup"><img src="/assets/img/pack/${f}.jpg" alt="${esc(alt)}" loading="lazy" width="600" height="600"><figcaption><h3>${esc(n)}</h3><p class="who">${esc(who)}</p><p>${esc(d)}</p></figcaption></figure>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section tint"><div class="wrap">
 <div class="two-lists">
-<div class="checklist"><h3>A few things about me</h3><p class="sub">The quick version.</p>
+<div class="checklist"><h3>A few things about us</h3><p class="sub">The quick version.</p>
 <dl class="facts">
 ${ABOUT.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('\n')}
 </dl></div>
 <div class="checklist featured"><h3>How we start</h3><p class="sub">Every new client, every time.</p><ul>
 <li>${tick('#F2B33D')}<div><b>Fill out the new client form</b><span>Ten minutes: your pets, your routine, how to get in.</span></div></li>
-<li>${tick('#F2B33D')}<div><b>Free meet-and-greet at your home</b><span>Your pets meet me, I learn the routine, we sort out keys.</span></div></li>
-<li>${tick('#F2B33D')}<div><b>Book online, any time</b><span>Pick a service and an open time. I confirm personally.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Free meet-and-greet at your home</b><span>Your pets meet your sitter, they learn the routine, we sort out keys.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Book online, any time</b><span>Pick a service and an open time. We confirm personally.</span></div></li>
 <li>${tick('#F2B33D')}<div><b>Updates after every visit</b><span>Notes and photos in your client portal.</span></div></li>
 </ul>
 <div class="cta-row" style="margin-top:22px"><a class="btn btn-amber" href="/intake">Start the new client form</a></div>

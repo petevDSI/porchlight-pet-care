@@ -552,7 +552,7 @@ const footer = () => `
 <h2 class="display">Heading out of town? We’ll leave the light on.</h2>
 <p style="font-size:19px">New here? Start with the <a href="/intake">new client form</a> and a free meet-and-greet.</p>
 </div>
-<div class="cta-row"><a class="btn btn-navy" href="/#booking">Book a visit</a><a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a></div>
+<div class="cta-row"><a class="btn btn-navy" href="/#booking">Book a visit</a><a class="btn btn-ghost" href="tel:+14704243183">Call 470-424-3183</a></div>
 </div></section>
 <footer class="site-footer"><div class="wrap">
 <div class="foot-cols">
@@ -560,7 +560,7 @@ const footer = () => `
 <div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
 <div><h4>Areas</h4>${TOWN_PAGES.map(t => `<a href="/areas/${t.slug}">${t.name}, ${t.state}</a>`).join('')}</div>
 <div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
-<div><h4>Contact</h4><a href="tel:[PHONE]">[PHONE]</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
+<div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© 2026 Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
 </div></footer>
@@ -578,7 +578,7 @@ fetch('https://ngiwnyoxdcycwotxargm.supabase.co/rest/v1/porchlight_services?sele
 const business = {
   '@type': 'LocalBusiness', '@id': SITE + '/#business', name: 'Porchlight Pet & Home Care', url: SITE,
   address: { '@type': 'PostalAddress', addressLocality: 'Belmont', addressRegion: 'NC', postalCode: '28012', addressCountry: 'US' },
-  areaServed: TOWNS.map(t => ({ '@type': 'City', name: t + (SC_TOWNS.includes(t) ? ', SC' : ', NC') })), priceRange: '$$'
+  areaServed: TOWNS.map(t => ({ '@type': 'City', name: t + (SC_TOWNS.includes(t) ? ', SC' : ', NC') })), priceRange: '$$', telephone: '+1-470-424-3183'
 };
 const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>\n`;
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /portal
+Sitemap: https://porchlightpetcare.com/sitemap.xml

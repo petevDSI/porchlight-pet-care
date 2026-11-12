@@ -6,6 +6,7 @@
 <title>Porchlight Pet &amp; Home Care | Dog Walking &amp; Pet Sitting in Belmont, NC</title>
 <meta name="description" content="Dog walking, pet sitting, overnight stays and home check-ins in Belmont, Mt. Holly, Cramerton and Lake Wylie, NC. Insured, bonded, and booked online.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M6 16 19 7l13 9z' fill='%2314233B'/%3E%3Crect x='9' y='16' width='20' height='21' rx='3' fill='%23F2B33D' stroke='%2314233B' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://porchlightpetcare.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
@@ -78,7 +79,11 @@ p{margin:0}
 .card-body p{color:var(--ink)}
 .card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:14px}
 .card-foot .price{font-size:24px}
-.card-foot a{font-weight:700;padding:10px 0}
+.card-foot a{font-weight:700;padding:10px 0;position:relative;z-index:1}
+.card{position:relative}
+.card-link{color:inherit;text-decoration:none}
+.card-link::after{content:"";position:absolute;inset:0}
+.card:hover .card-link{text-decoration:underline;text-decoration-color:var(--amber);text-decoration-thickness:3px}
 
 /* Booking */
 .booking{background:var(--navy);color:var(--white)}
@@ -178,7 +183,7 @@ details p{margin-top:12px;color:var(--ink)}
 <span class="brand-name"><b>Porchlight</b><span>Pet &amp; Home Care</span></span>
 </a>
 <nav class="nav" aria-label="Main">
-<a href="#services">Services</a>
+<a href="/services">Services</a>
 <a href="#booking">Booking</a>
 <a href="#pricing">Pricing</a>
 <a href="#area">Service area</a>
@@ -223,16 +228,17 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="section-head">
 <p class="eyebrow">What we do</p>
 <h2 class="display">Care for the pets, and the house they live in.</h2>
+<p><a href="/services" style="font-weight:700">See every service in detail →</a></p>
 </div>
 <article class="feature">
 <img src="https://images.unsplash.com/photo-1794067096725-f68ccca0c83f?auto=format&fit=crop&w=1200&q=75" alt="A beagle resting its head on the arm of a sofa at home" loading="lazy">
 <div class="feature-body">
 <p class="pill">Most requested for travel</p>
-<h3 class="display">Overnight stays</h3>
+<h3 class="display"><a href="/services/overnight-pet-sitting" style="color:inherit;text-decoration:none">Overnight stays</a></h3>
 <p class="copy">We sleep at your house, so your pets keep their own beds, their own yard and their own routine. Evening and morning walks, meals, and the mail brought in.</p>
 <div class="price-row">
 <p class="price"><span data-price="overnight">$95</span> <small>per night</small></p>
-<a class="btn" href="#booking" data-pick="overnight">Check overnight dates</a>
+<span class="cta-row" style="gap:10px"><a class="btn" href="#booking" data-pick="overnight">Check overnight dates</a><a class="btn" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5)" href="/services/overnight-pet-sitting">What’s included</a></span>
 </div>
 </div>
 </article>
@@ -240,25 +246,25 @@ details p{margin-top:12px;color:var(--ink)}
 <article class="card">
 <img src="https://images.unsplash.com/photo-1788876727679-fd88c2e84a2d?auto=format&fit=crop&w=800&h=560&q=75" alt="A husky on a leash out for a walk" loading="lazy">
 <div class="card-body">
-<h3>Dog walking</h3>
+<h3><a class="card-link" href="/services/dog-walking">Dog walking</a></h3>
 <p>A 30-minute walk at your dog's pace, fresh water after, and a photo so you know it happened. Big dogs welcome.</p>
-<div class="card-foot"><p class="price"><span data-price="walk">$26</span> <small>/ 30 min</small></p><a href="#booking" data-pick="walk">Book a walk</a></div>
+<div class="card-foot"><p class="price"><span data-price="walk">$26</span> <small>/ 30 min</small></p><a href="/services/dog-walking">What’s included</a></div>
 </div>
 </article>
 <article class="card">
 <img src="https://images.unsplash.com/photo-1777660554959-658d19a195fa?auto=format&fit=crop&w=800&h=560&q=75" alt="A fluffy cat looking out of a window" loading="lazy">
 <div class="card-body">
-<h3>Drop-in visits</h3>
+<h3><a class="card-link" href="/services/drop-in-visits">Drop-in visits</a></h3>
 <p>For cats, seniors and dogs who'd rather stay in. Meals, litter, playtime and medication given as you direct.</p>
-<div class="card-foot"><p class="price"><span data-price="visit">$25</span> <small>/ 30 min</small></p><a href="#booking" data-pick="visit">Book a visit</a></div>
+<div class="card-foot"><p class="price"><span data-price="visit">$25</span> <small>/ 30 min</small></p><a href="/services/drop-in-visits">What’s included</a></div>
 </div>
 </article>
 <article class="card">
 <img src="https://images.unsplash.com/photo-1605449669747-35d71b9436f8?auto=format&fit=crop&w=800&h=560&q=75" alt="Houseplants being watered on a wooden table" loading="lazy">
 <div class="card-body">
-<h3>Home check-ins</h3>
+<h3><a class="card-link" href="/services/home-check-ins">Home check-ins</a></h3>
 <p>No pets required. Mail and packages in, plants watered, lights and blinds changed so the house looks lived in.</p>
-<div class="card-foot"><p class="price"><span data-price="home">$30</span> <small>/ visit</small></p><a href="#booking" data-pick="home">Book a check-in</a></div>
+<div class="card-foot"><p class="price"><span data-price="home">$30</span> <small>/ visit</small></p><a href="/services/home-check-ins">What’s included</a></div>
 </div>
 </article>
 </div>
@@ -438,7 +444,7 @@ details p{margin-top:12px;color:var(--ink)}
 <p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p>
 </div>
 <div><h4>Clients</h4><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
-<div><h4>Services</h4><a href="#services">Dog walking</a><a href="#services">Drop-in visits</a><a href="#services">Overnight stays</a><a href="#services">Home check-ins</a></div>
+<div><h4>Services</h4><a href="/services/overnight-pet-sitting">Overnight stays</a><a href="/services/dog-walking">Dog walking</a><a href="/services/drop-in-visits">Drop-in visits</a><a href="/services/home-check-ins">Home check-ins</a></div>
 <div><h4>Contact</h4><a href="tel:[PHONE]">[PHONE]</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© <span id="year">2026</span> Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
@@ -604,7 +610,8 @@ details p{margin-top:12px;color:var(--ink)}
     loadSlots();
   });
 
-  loadSlots();
+  var preset = new URLSearchParams(location.search).get('service');
+  if (preset && state.labels[preset]) setService(preset); else loadSlots();
 })();
 </script>
 </body>

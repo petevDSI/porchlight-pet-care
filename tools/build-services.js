@@ -1,0 +1,488 @@
+#!/usr/bin/env node
+/*
+ * Builds the service pages (services/*.html) and the services hub (services.html)
+ * from the content below. Edit the content here, then run:
+ *   node tools/build-services.js
+ * and commit the generated HTML. The site itself has no build step.
+ */
+const fs = require('fs');
+const path = require('path');
+
+const SITE = 'https://porchlightpetcare.com';
+const ROOT = path.join(__dirname, '..');
+const img = (id, w, h) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}${h ? '&h=' + h : ''}&q=75`;
+const TOWNS = ['Belmont', 'Mt. Holly', 'Cramerton', 'McAdenville', 'Lake Wylie', 'Steele Creek', 'East Gastonia'];
+
+/* Small line icons (stroke uses currentColor). */
+const ICONS = {
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  bowl: '<path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 2-3M13 7c0-1.5 1-2 2-3"/>',
+  ball: '<circle cx="12" cy="12" r="8"/><path d="M5 9c4 1 10 1 14 0M5 15c4-1 10-1 14 0"/>',
+  heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+  tv: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  pill: '<rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-35 12 12)"/><path d="M9.5 8.5l5 7"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  plant: '<path d="M12 21v-8"/><path d="M12 13c0-4 3-7 7-7 0 4-3 7-7 7zM12 13c0-3-2-5-5-5 0 3 2 5 5 5z"/><path d="M7 21h10"/>',
+  bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/>',
+  trash: '<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>',
+  leash: '<circle cx="6" cy="6" r="3"/><path d="M8 8c4 4 6 7 9 13"/><path d="M15 17l4 2"/>',
+  water: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  paw: '<circle cx="7" cy="9" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="9" r="2"/><path d="M12 12c-3 0-5 3-5 5.5 0 1.5 1.5 2 2.5 1.5s1.5-.5 2.5-.5 1.5 0 2.5.5 2.5 0 2.5-1.5C17 15 15 12 12 12z"/>',
+  litter: '<path d="M3 11h18l-2 8H5z"/><path d="M8 11V8h8v3"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  thermo: '<path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  car: '<path d="M5 16l1.5-5h11L19 16"/><rect x="3" y="16" width="18" height="4" rx="1"/>'
+};
+const icon = (name, color) => `<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="${color || '#14233B'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`;
+const tick = (color) => `<svg aria-hidden="true" width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="10" fill="${color}"/><path d="m6.5 11.4 3 3 6-6" stroke="${color === '#F2B33D' ? '#14233B' : '#fff'}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const SERVICES = [
+  {
+    slug: 'overnight-pet-sitting', id: 'overnight', name: 'Overnight stays', short: 'Overnight stays',
+    title: 'Overnight Pet Sitting in Belmont, NC',
+    metaTitle: 'Overnight Pet Sitting in Belmont, NC | Porchlight Pet & Home Care',
+    metaDesc: 'In-home overnight pet sitting in Belmont, Mt. Holly, Cramerton and Lake Wylie. Your sitter stays the night: evening and morning walks, meals, meds, playtime and photo updates. $95 a night.',
+    h1: 'Overnight pet sitting, in your own home.',
+    lede: 'Your sitter arrives in the evening and stays until morning, so your pets keep their own beds, their own yard and their own routine, and your house never sits empty.',
+    price: 95, unit: 'per night',
+    hero: img('photo-1753685728517-99147e84978e', 1200), heroAlt: 'A dog resting on a bed beside a sleeping person',
+    gallery: [
+      [img('photo-1794071197004-a1275a3e0d09', 1200, 800), 'A man relaxing on a sofa with two dogs'],
+      [img('photo-1794067096725-f68ccca0c83f', 700, 700), 'A beagle resting on a sofa'],
+      [img('photo-1530700131180-d43d9b8cc41f', 700, 700), 'A golden retriever out for an evening walk']
+    ],
+    cta: 'Check overnight dates',
+    included: [
+      ['leash', 'Evening and morning walks', 'A proper walk at dusk and again first thing, at your dog’s pace and on their usual route.'],
+      ['bowl', 'Dinner and breakfast', 'Meals measured exactly as you leave them, fresh water topped up, bowls washed.'],
+      ['ball', 'Playtime', 'Fetch in the yard, tug, puzzle toys, or a good brush, whatever your pet loves.'],
+      ['tv', 'Couch time and a movie', 'An evening on the sofa together, TV on low, so the house feels like a normal night.'],
+      ['heart', 'Snuggles on request', 'Lap dogs get a lap. Cats who like their space get their space.'],
+      ['book', 'A bedtime routine', 'Last potty break, the treat they always get, their blanket, a story read aloud if that’s what they’re used to. We follow your routine.'],
+      ['pill', 'Medications on schedule', 'Pills, drops and injections given exactly when you say, logged so you can see it happened.'],
+      ['mail', 'Home care included', 'Mail and packages in, trash out on trash night, lights on and off so the house looks lived in.'],
+      ['camera', 'Evening and morning updates', 'A note and photos at night, another in the morning, in your client portal and by text.']
+    ],
+    timelineTitle: 'A typical overnight',
+    timeline: [
+      ['6:30 pm', 'Arrive and settle in', 'A calm hello, a look around, and a check that everything is as you left it.'],
+      ['6:45 pm', 'Evening walk', 'Their usual loop, or a longer one if they have energy to spare.'],
+      ['7:30 pm', 'Dinner and meds', 'Measured portions, medications, fresh water.'],
+      ['8:00 pm', 'Play, then couch time', 'Toys, a brush, and a quiet evening together.'],
+      ['9:30 pm', 'Evening update', 'Photos and a note sent to you.'],
+      ['10:00 pm', 'Bedtime routine', 'Last potty break, the bedtime treat, lights out on your schedule.'],
+      ['7:00 am', 'Morning walk and breakfast', 'Out first thing, then breakfast and morning meds.'],
+      ['8:00 am', 'Tidy up and head out', 'Bed made, dishes done, morning photo sent, house locked.']
+    ],
+    needs: {
+      title: 'What your sitter needs from you',
+      sub: 'Set these out before you leave and the night runs smoothly.',
+      items: [
+        ['A clean bed with fresh sheets', 'A guest room or made-up couch is fine. Let us know which.'],
+        ['Access to a bathroom and shower', 'Plus a clean towel, so your sitter can get ready in the morning.'],
+        ['Enough food, treats and meds for the whole stay', 'With a day or two extra in case your flight is delayed.'],
+        ['Wi-Fi name and password', 'So updates and photos reach you without a hitch.'],
+        ['Your pet’s routine, written down', 'Meal times, amounts, bedtime ritual, where they sleep. The client portal has a place for all of it.'],
+        ['A way in and a spare key', 'Lockbox or door code, plus a backup in case a battery dies.'],
+        ['Your vet and an emergency contact', 'Already on file if you’ve filled out the new client form.']
+      ]
+    },
+    brings: {
+      title: 'What your sitter brings',
+      sub: 'You don’t need to supply any of this.',
+      items: [
+        ['Their own toiletries', 'And a change of clothes. No need to stock anything extra.'],
+        ['Poop bags and a pet first-aid kit', 'Always in the car, always restocked.'],
+        ['A phone charger and a calm presence', 'Plus a strict no-guests, no-parties rule. It’s your home.']
+      ]
+    },
+    pricing: [
+      ['Overnight stay', 'About 6:30 pm to 8:00 am, one or two pets', '$95'],
+      ['Each additional pet', 'Per night', '+$5'],
+      ['Midday check-in during your trip', '30-minute visit on days you’re away', '$25'],
+      ['Holidays', 'Thanksgiving, Christmas, New Year’s, July 4th and similar', '+$20']
+    ],
+    faq: [
+      ['How many hours is an overnight?', 'Your sitter arrives around 6:30 pm and leaves around 8:00 am, roughly 13 hours. If your pets need a different window, tell us and we’ll match it.'],
+      ['Is my pet left alone during the day?', 'An overnight covers evening to morning. For dogs who can’t be alone all day, add a midday walk or drop-in while you’re away.'],
+      ['Will the sitter have guests over?', 'Never. No guests, no parties, no other pets brought along.'],
+      ['Can you sleep where my dog sleeps?', 'Yes. If your dog sleeps in your bedroom, tell us whether you’d like your sitter there, on the couch nearby, or in the guest room.'],
+      ['How far ahead should I book?', 'Two to three weeks for regular dates, and earlier for holidays, which fill first.']
+    ]
+  },
+  {
+    slug: 'dog-walking', id: 'walk', name: 'Dog walking', short: 'Dog walking',
+    title: 'Dog Walking in Belmont, NC',
+    metaTitle: 'Dog Walking in Belmont, NC | Porchlight Pet & Home Care',
+    metaDesc: 'Private 30-minute dog walks in Belmont, Mt. Holly, Cramerton and Lake Wylie. One dog or household at a time, fresh water after, photo update every walk. Big dogs welcome. $26 a walk.',
+    h1: 'Dog walks that fit your workday.',
+    lede: 'A private 30-minute walk at your dog’s pace, with fresh water after and a photo so you know it happened. One household at a time, never a pack.',
+    price: 26, unit: 'per 30-minute walk',
+    hero: img('photo-1569992274375-e56b14e234f1', 1200), heroAlt: 'A man walking his dog along a tree-lined path',
+    gallery: [
+      [img('photo-1530700131180-d43d9b8cc41f', 1200, 800), 'A golden retriever walking on a leash'],
+      [img('photo-1788876727679-fd88c2e84a2d', 700, 700), 'A husky on a leash'],
+      [img('photo-1504199098938-e4bbcee5e4a9', 700, 700), 'A black lab walking in a field']
+    ],
+    cta: 'Book a walk',
+    included: [
+      ['leash', 'A private 30-minute walk', 'Just your dog (or your dogs together). No group walks, no strangers’ dogs.'],
+      ['paw', 'Their pace, their route', 'Sniff walks for seniors, brisk loops for young dogs, your preferred route if you have one.'],
+      ['water', 'Fresh water after', 'Bowl rinsed and refilled when we get back.'],
+      ['bowl', 'A meal if it’s mealtime', 'Midday lunch or an afternoon snack, measured as you direct.'],
+      ['shield', 'Safety first', 'Your leash and harness, double-checked clips, and we steer clear of loose dogs.'],
+      ['camera', 'A photo and a note', 'How it went, how long, anything worth knowing, sent to your portal.']
+    ],
+    timelineTitle: 'How a walk goes',
+    timeline: [
+      ['Arrive', 'Hello and harness', 'Let ourselves in, a calm greeting, leash and harness on.'],
+      ['5 min', 'Potty break first', 'A quick stop in the yard before heading out.'],
+      ['25 min', 'The walk', 'Their usual loop or a new one, with time to sniff.'],
+      ['Back home', 'Water, paws, treat', 'Muddy paws wiped, water refilled, the treat you approved.'],
+      ['Before leaving', 'Update sent', 'A photo and a short note, then the door locked behind us.']
+    ],
+    needs: {
+      title: 'Before the first walk',
+      sub: 'We sort all of this out at the free meet-and-greet.',
+      items: [
+        ['Leash and harness by the door', 'The ones your dog is used to. We’ll check the fit.'],
+        ['Treats and poop bags', 'We bring bags too, but your dog’s favorite treats help.'],
+        ['A way in', 'Lockbox, door code, or a key on file.'],
+        ['Any walking quirks', 'Pulls toward squirrels, scared of trucks, doesn’t like other dogs: tell us everything.']
+      ]
+    },
+    brings: {
+      title: 'Every walker carries',
+      sub: 'On every walk, every time.',
+      items: [
+        ['Poop bags', 'And we always pick up.'],
+        ['Water for hot days', 'A collapsible bowl for summer walks.'],
+        ['Pet first-aid kit', 'In the car, restocked regularly.']
+      ]
+    },
+    pricing: [
+      ['30-minute walk', 'One dog, or two dogs from the same home walked together', '$26'],
+      ['Each additional dog', 'Walked together', '+$5'],
+      ['Holidays', 'Per walk', '+$10']
+    ],
+    faq: [
+      ['Do you walk big or strong dogs?', 'Yes. Labs, shepherds, doodles, Danes and strong pullers are all welcome. We’ll talk through handling at the meet-and-greet.'],
+      ['Will my dog be walked with other dogs?', 'No. Walks are private to your household.'],
+      ['What if it’s raining or very hot?', 'We still come. In heavy rain or extreme heat the walk is shorter and the indoor play is longer, and we say so in the note.'],
+      ['Can I book the same time every weekday?', 'Yes. Most walk clients have a standing midday slot. Book it once and it stays on the schedule.']
+    ]
+  },
+  {
+    slug: 'drop-in-visits', id: 'visit', name: 'Drop-in visits', short: 'Drop-in visits',
+    title: 'Cat Sitting and Drop-In Pet Visits in Belmont, NC',
+    metaTitle: 'Cat Sitting & Drop-In Pet Visits in Belmont, NC | Porchlight',
+    metaDesc: 'In-home drop-in visits for cats, senior dogs and small pets in Belmont, Mt. Holly, Cramerton and Lake Wylie. Meals, litter, medication and real company. $25 per 30-minute visit.',
+    h1: 'Drop-in visits for cats, seniors and homebodies.',
+    lede: 'Thirty minutes of real care in your home: meals, litter, medication and company, for pets who are happiest staying put.',
+    price: 25, unit: 'per 30-minute visit',
+    hero: img('photo-1777660554959-658d19a195fa', 1200), heroAlt: 'A fluffy cat looking out of a window',
+    gallery: [
+      [img('photo-1607539678863-ba64f95124bc', 1200, 800), 'A cat waiting on a table for its food'],
+      [img('photo-1605001550694-0f6323037433', 700, 700), 'A tabby cat at its bowl'],
+      [img('photo-1794067096725-f68ccca0c83f', 700, 700), 'A beagle resting on a sofa']
+    ],
+    cta: 'Book a visit',
+    included: [
+      ['bowl', 'Meals and fresh water', 'Wet food, dry food, special diets, all measured as you direct. Bowls washed.'],
+      ['litter', 'Litter box scooped', 'Every visit. Full changes on longer trips if you’d like.'],
+      ['pill', 'Medication given', 'Pills, liquids, eye drops and insulin, given exactly on schedule.'],
+      ['ball', 'Playtime and company', 'Wand toys, laser time, a brush, or just sitting quietly with a shy cat.'],
+      ['heart', 'A health check', 'Eating, drinking, litter output and mood, noted every visit so changes get caught early.'],
+      ['camera', 'Photos and a note', 'Sent to your portal so you can see they’re fine.']
+    ],
+    timelineTitle: 'How a drop-in goes',
+    timeline: [
+      ['Arrive', 'Find everyone', 'Including the cat under the bed. We check on every pet.'],
+      ['10 min', 'Meals, water and meds', 'Exactly as you’ve written it down.'],
+      ['5 min', 'Litter and tidy', 'Scoop, sweep stray litter, wipe up any accidents.'],
+      ['15 min', 'Play and company', 'On their terms.'],
+      ['Before leaving', 'Update sent', 'Photo and note, then everything locked up.']
+    ],
+    needs: {
+      title: 'Before the first visit',
+      sub: 'We go over all of this at the free meet-and-greet.',
+      items: [
+        ['Food, treats and meds laid out', 'Enough for the whole trip, plus a little extra.'],
+        ['Litter, scoop and bags', 'Where they live and where the used litter goes.'],
+        ['Hiding spots and quirks', 'So we can find and check on shy pets without stressing them.'],
+        ['A way in', 'Lockbox, door code, or a key on file.']
+      ]
+    },
+    brings: {
+      title: 'Good for',
+      sub: 'Drop-ins work well when:',
+      items: [
+        ['Cats of any age', 'Most cats are far happier at home than boarded.'],
+        ['Senior dogs', 'Who need a potty break and company more than a long walk.'],
+        ['Small pets', 'Rabbits, guinea pigs, birds, fish and reptiles too.']
+      ]
+    },
+    pricing: [
+      ['30-minute visit', 'One or two pets', '$25'],
+      ['Each additional pet', 'Per visit', '+$5'],
+      ['Holidays', 'Per visit', '+$10']
+    ],
+    faq: [
+      ['How many visits a day does my cat need?', 'Most cats do well with one visit a day. Twice a day is better for kittens, seniors, cats on medication, or trips longer than a few days.'],
+      ['Can you give insulin or other injections?', 'Yes. We’ll go over dose, timing and storage at the meet-and-greet.'],
+      ['What if my cat hides the whole time?', 'That’s normal. We still confirm they’re eating, drinking and using the box, and we’ll find them to lay eyes on them.'],
+      ['Do you care for pets other than cats and dogs?', 'Yes: rabbits, guinea pigs, birds, fish and reptiles.']
+    ]
+  },
+  {
+    slug: 'home-check-ins', id: 'home', name: 'Home check-ins', short: 'Home check-ins',
+    title: 'House Sitting and Home Check-Ins in Belmont, NC',
+    metaTitle: 'House Sitting & Home Check-Ins in Belmont, NC | Porchlight',
+    metaDesc: 'Home check-ins while you travel in Belmont, Mt. Holly, Cramerton and Lake Wylie. Mail and packages in, plants watered, lights rotated, a walk-through for leaks and problems. No pets needed. $30 a visit.',
+    h1: 'Your house, looked after while you’re away.',
+    lede: 'No pets required. We bring in the mail, water the plants, rotate the lights and walk through the house, so it looks lived in and nothing goes wrong unnoticed.',
+    price: 30, unit: 'per visit',
+    hero: img('photo-1605449669747-35d71b9436f8', 1200), heroAlt: 'Houseplants being watered',
+    gallery: [
+      [img('photo-1789352050543-b1bbc066fefc', 1200, 800), 'View from a covered front porch onto a quiet street'],
+      [img('photo-1759693726718-10912942c0fb', 700, 700), 'A mailbox on a front door'],
+      [img('photo-1607539678863-ba64f95124bc', 700, 700), 'A cat waiting at home']
+    ],
+    cta: 'Book a check-in',
+    included: [
+      ['mail', 'Mail and packages in', 'Nothing piling up on the porch telling people you’re gone.'],
+      ['plant', 'Plants watered', 'Indoor and porch plants, on the schedule you set.'],
+      ['bulb', 'Lights and blinds rotated', 'Different rooms on different days, so the house looks occupied.'],
+      ['trash', 'Trash and recycling', 'Bins out on collection day and back in after.'],
+      ['thermo', 'A walk-through', 'Every room checked for leaks, temperature problems, power outages and anything out of place.'],
+      ['camera', 'A report every visit', 'Photos and a note, and a call right away if something needs attention.']
+    ],
+    timelineTitle: 'How a check-in goes',
+    timeline: [
+      ['Arrive', 'Outside first', 'A look at doors, windows and the yard. Packages and mail collected.'],
+      ['10 min', 'Inside walk-through', 'Every room, the water heater, under sinks, the thermostat.'],
+      ['10 min', 'Plants and lights', 'Water what’s due, change which lights and blinds are on.'],
+      ['5 min', 'Trash and tidy', 'Bins on collection day, mail stacked where you want it.'],
+      ['Before leaving', 'Report sent', 'Photos and a note, and the house locked up.']
+    ],
+    needs: {
+      title: 'Before your trip',
+      sub: 'A quick list so we can do the job right.',
+      items: [
+        ['Which plants, and how much water', 'A note or a photo of each one helps.'],
+        ['Trash and recycling days', 'And where the bins live.'],
+        ['Alarm code and company', 'So a check-in doesn’t become a police visit.'],
+        ['Who to call for problems', 'Your plumber, HVAC company, or a neighbor with a key.']
+      ]
+    },
+    brings: {
+      title: 'Add it to pet care',
+      sub: 'Already booking pet care?',
+      items: [
+        ['Overnight stays include this', 'Mail, trash, lights and plants are part of every overnight.'],
+        ['Drop-ins and walks', 'Ask us to grab the mail or water a plant on the way out. Small extras are free.'],
+        ['Longer trips', 'Two or three check-ins a week keep things running for a month away.']
+      ]
+    },
+    pricing: [
+      ['Home check-in', 'About 30 minutes', '$30'],
+      ['Holidays', 'Per visit', '+$10']
+    ],
+    faq: [
+      ['How often should someone check on my house?', 'Every two to three days for most trips. Daily if you get lots of packages or have plants that need it.'],
+      ['What happens if you find a problem?', 'We call you right away, and with your permission call the contractor you listed. We send photos either way.'],
+      ['Do I need pets to book this?', 'No. Plenty of clients book check-ins for an empty house.'],
+      ['Can you start my car or run the faucets?', 'Yes. Small upkeep jobs like those are included; just tell us what you’d like done.']
+    ]
+  }
+];
+
+/* ---------- Shared chrome ---------- */
+const head = (title, desc, canonical, extra) => `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title}</title>
+<meta name="description" content="${desc}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${desc}">
+<meta property="og:url" content="${canonical}">
+${extra || ''}<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M6 16 19 7l13 9z' fill='%2314233B'/%3E%3Crect x='9' y='16' width='20' height='21' rx='3' fill='%23F2B33D' stroke='%2314233B' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/services.css">
+</head>
+<body>
+<header class="site-header"><div class="wrap">
+<a class="brand" href="/" aria-label="Porchlight Pet and Home Care, home">
+<svg aria-hidden="true" width="38" height="44" viewBox="0 0 38 44" fill="none"><path d="M19 2v5" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/><path d="M6 16 19 7l13 9z" fill="#14233B"/><rect x="9" y="16" width="20" height="21" rx="3" fill="#F2B33D" stroke="#14233B" stroke-width="2.5"/><path d="M19 22c2.6 2.6 3.6 4.6 3.6 6.4a3.6 3.6 0 0 1-7.2 0c0-1.8 1-3.8 3.6-6.4z" fill="#FFFFFF"/><path d="M13 41h12" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/></svg>
+<span class="brand-name"><b>Porchlight</b><span>Pet &amp; Home Care</span></span></a>
+<nav class="nav" aria-label="Main">
+<a href="/services" aria-current="page">Services</a>
+<a href="/#pricing">Pricing</a>
+<a href="/#area">Service area</a>
+<a href="/#faq">FAQ</a>
+<a href="/portal">Client login</a>
+<a class="btn btn-navy" href="/#booking">Request a visit</a>
+</nav></div></header>
+`;
+
+const footer = () => `
+<section class="closing"><div class="wrap">
+<div style="max-width:640px;display:flex;flex-direction:column;gap:8px">
+<h2 class="display">Heading out of town? We’ll leave the light on.</h2>
+<p style="font-size:19px">New here? Start with the <a href="/intake">new client form</a> and a free meet-and-greet.</p>
+</div>
+<div class="cta-row"><a class="btn btn-navy" href="/#booking">Request a visit</a><a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a></div>
+</div></section>
+<footer class="site-footer"><div class="wrap">
+<div class="foot-cols">
+<div style="max-width:340px"><p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p><p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p></div>
+<div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
+<div><h4>Clients</h4><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Contact</h4><a href="tel:[PHONE]">[PHONE]</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
+</div>
+<div class="foot-base"><p>© 2026 Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
+</div></footer>
+<script>
+/* Keep prices in sync with the booking system. */
+fetch('https://ngiwnyoxdcycwotxargm.supabase.co/rest/v1/porchlight_services?select=id,price_cents', { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naXdueW94ZGN5Y3dvdHhhcmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjQzOTEsImV4cCI6MjA5NzMwMDM5MX0.qcK6CUQkMzxoCZ2Dk8682It2honSch-blEyDXZEt9dc' } })
+  .then(function (r) { return r.ok ? r.json() : []; })
+  .then(function (rows) { rows.forEach(function (s) { document.querySelectorAll('[data-price="' + s.id + '"]').forEach(function (n) { n.textContent = '$' + Math.round(s.price_cents / 100); }); }); })
+  .catch(function () {});
+</script>
+</body>
+</html>
+`;
+
+const business = {
+  '@type': 'LocalBusiness', '@id': SITE + '/#business', name: 'Porchlight Pet & Home Care', url: SITE,
+  address: { '@type': 'PostalAddress', addressLocality: 'Belmont', addressRegion: 'NC', postalCode: '28012', addressCountry: 'US' },
+  areaServed: TOWNS.map(t => ({ '@type': 'City', name: t + ', NC' })), priceRange: '$$'
+};
+const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>\n`;
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+function servicePage(s) {
+  const url = `${SITE}/services/${s.slug}`;
+  const book = `/?service=${s.id}#booking`;
+  const schema = ld({
+    '@context': 'https://schema.org', '@graph': [
+      business,
+      { '@type': 'Service', name: s.title, serviceType: s.name, provider: { '@id': SITE + '/#business' }, areaServed: business.areaServed,
+        url, description: s.metaDesc, offers: { '@type': 'Offer', price: String(s.price), priceCurrency: 'USD', description: s.unit } },
+      { '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+        { '@type': 'ListItem', position: 2, name: 'Services', item: SITE + '/services' },
+        { '@type': 'ListItem', position: 3, name: s.name, item: url }] },
+      { '@type': 'FAQPage', mainEntity: s.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }
+    ]
+  });
+  const others = SERVICES.filter(o => o !== s);
+  return head(esc(s.metaTitle), esc(s.metaDesc), url, `<meta property="og:image" content="${s.hero}">\n` + schema) + `
+<main>
+<section class="svc-hero"><div class="wrap">
+<div class="svc-hero-copy">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/services">Services</a></li><li aria-current="page">${s.name}</li></ol></nav>
+<p class="eyebrow">${esc(s.title)}</p>
+<h1 class="display">${esc(s.h1)}</h1>
+<p class="lede">${esc(s.lede)}</p>
+<p class="price-tag"><b data-price="${s.id}">$${s.price}</b><span>${esc(s.unit)}</span></p>
+<div class="cta-row"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a><a class="btn btn-ghost" href="#included">What’s included</a></div>
+</div>
+<div class="svc-hero-media"><img src="${s.hero}" alt="${esc(s.heroAlt)}" width="600" height="520" fetchpriority="high"></div>
+</div></section>
+
+<section class="section" id="included"><div class="wrap">
+<div class="section-head"><p class="eyebrow">What’s included</p><h2 class="display">Every ${s.id === 'overnight' ? 'overnight' : s.id === 'walk' ? 'walk' : 'visit'} includes</h2></div>
+<div class="included">
+${s.included.map(([ic, t, d]) => `<article class="inc"><span class="ic">${icon(ic)}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></article>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section tint"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Hour by hour</p><h2 class="display">${esc(s.timelineTitle)}</h2></div>
+<ol class="timeline">
+${s.timeline.map(([t, h, p]) => `<li><span class="t">${esc(t)}</span><div><h3>${esc(h)}</h3><p>${esc(p)}</p></div></li>`).join('\n')}
+</ol>
+<p class="lede" style="margin-top:12px;font-size:16px;color:var(--muted)">Times are a guide. We follow your pet’s routine, not ours.</p>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="gallery">
+${s.gallery.map(([src, alt]) => `<img src="${src}" alt="${esc(alt)}" loading="lazy">`).join('\n')}
+</div>
+</div></section>
+
+<section class="section tint"><div class="wrap">
+<div class="two-lists">
+<div class="checklist featured"><h3>${esc(s.needs.title)}</h3><p class="sub">${esc(s.needs.sub)}</p><ul>
+${s.needs.items.map(([b, t]) => `<li>${tick('#F2B33D')}<div><b>${esc(b)}</b><span>${esc(t)}</span></div></li>`).join('\n')}
+</ul></div>
+<div class="checklist"><h3>${esc(s.brings.title)}</h3><p class="sub">${esc(s.brings.sub)}</p><ul>
+${s.brings.items.map(([b, t]) => `<li>${tick('#14233B')}<div><b>${esc(b)}</b><span>${esc(t)}</span></div></li>`).join('\n')}
+</ul></div>
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Pricing</p><h2 class="display">Simple, listed prices</h2></div>
+<dl class="pricebox">
+${s.pricing.map(([n, d, p], i) => `<div><dt><b>${esc(n)}</b><span>${esc(d)}</span></dt><dd${i === 0 ? ` data-price="${s.id}"` : ''}>${esc(p)}</dd></div>`).join('\n')}
+</dl>
+<div class="cta-row" style="margin-top:28px"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a></div>
+</div></section>
+
+<section class="section tint"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Questions</p><h2 class="display">About ${s.name.toLowerCase()}</h2></div>
+<div class="faq-list">
+${s.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">More from Porchlight</p><h2 class="display">Other services</h2></div>
+<div class="others">
+${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>From $${o.price} ${esc(o.unit)}</p></div></a>`).join('\n')}
+</div>
+</div></section>
+</main>
+` + footer();
+}
+
+function hubPage() {
+  const url = `${SITE}/services`;
+  const desc = 'Overnight pet sitting, dog walking, drop-in visits and home check-ins in Belmont, Mt. Holly, Cramerton, McAdenville, Lake Wylie and Steele Creek, NC.';
+  const schema = ld({ '@context': 'https://schema.org', '@graph': [business, { '@type': 'ItemList', itemListElement: SERVICES.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/${s.slug}`, name: s.title })) }] });
+  return head('Pet Sitting &amp; Home Care Services in Belmont, NC | Porchlight', desc, url, schema) + `
+<main>
+<section class="svc-hero"><div class="wrap" style="padding-bottom:56px">
+<div class="svc-hero-copy" style="flex-basis:100%">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Services</li></ol></nav>
+<h1 class="display">Pet sitting and home care in Belmont, NC.</h1>
+<p class="lede" style="max-width:720px">Everything happens in your home, by one person you’ve met first. Pick a service to see exactly what’s included.</p>
+</div></div></section>
+<section class="section"><div class="wrap"><div class="hub">
+${SERVICES.map(s => `<a href="/services/${s.slug}"><img src="${s.hero.replace('w=1200', 'w=800&h=480')}" alt="${esc(s.heroAlt)}" loading="lazy"><div class="b"><p class="eyebrow">From <span data-price="${s.id}">$${s.price}</span> ${esc(s.unit)}</p><h2>${s.name}</h2><p>${esc(s.lede)}</p><span class="more">See what’s included →</span></div></a>`).join('\n')}
+</div></div></section>
+</main>
+` + footer();
+}
+
+fs.mkdirSync(path.join(ROOT, 'services'), { recursive: true });
+SERVICES.forEach(s => fs.writeFileSync(path.join(ROOT, 'services', s.slug + '.html'), servicePage(s)));
+fs.writeFileSync(path.join(ROOT, 'services.html'), hubPage());
+
+const pages = ['', '/services'].concat(SERVICES.map(s => '/services/' + s.slug), ['/intake']);
+fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
+  '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+  pages.map(p => `  <url><loc>${SITE}${p || '/'}</loc></url>`).join('\n') + '\n</urlset>\n');
+fs.writeFileSync(path.join(ROOT, 'robots.txt'), `User-agent: *\nDisallow: /portal\nSitemap: ${SITE}/sitemap.xml\n`);
+console.log('Built', SERVICES.length, 'service pages, the hub, sitemap.xml and robots.txt');

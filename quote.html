@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request a Trip Quote | Porchlight Pet &amp; Home Care</title>
+<meta name="description" content="Request a written quote for a pet flight companion or a long-distance pet transport trip.">
+<link rel="canonical" href="https://porchlightpetcare.com/quote">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M6 16 19 7l13 9z' fill='%2314233B'/%3E%3Crect x='9' y='16' width='20' height='21' rx='3' fill='%23F2B33D' stroke='%2314233B' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/porchlight.css">
+</head>
+<body>
+<header class="topbar"><div class="in">
+<a class="brand" href="/" aria-label="Porchlight home">
+<svg aria-hidden="true" width="32" height="38" viewBox="0 0 38 44" fill="none"><path d="M19 2v5" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/><path d="M6 16 19 7l13 9z" fill="#14233B"/><rect x="9" y="16" width="20" height="21" rx="3" fill="#F2B33D" stroke="#14233B" stroke-width="2.5"/><path d="M13 41h12" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/></svg>
+<span><b>Porchlight</b><small>Pet &amp; Home Care</small></span></a>
+<a class="btn ghost sm" href="/services">All services</a>
+</div></header>
+
+<main class="page narrow">
+<form id="quote" class="stack" novalidate>
+<div class="stack" style="gap:10px;margin-bottom:8px">
+<p class="eyebrow">Trip quote</p>
+<h1 class="display" style="font-size:clamp(32px,5vw,44px);line-height:1.05">Tell us about the trip.</h1>
+<p class="lede">Flights and long drives are priced one trip at a time. Send the details and we’ll reply with a written quote, usually within a day. Asking is free and doesn’t commit you to anything.</p>
+</div>
+
+<section class="panel stack">
+<fieldset style="border:0;margin:0;padding:0" class="stack">
+<legend class="eyebrow" style="margin-bottom:8px">What kind of trip?</legend>
+<label class="check"><input type="radio" name="kind" value="flight"> <span><strong>Flight companion.</strong> Small dog or cat flying in the cabin with a companion.</span></label>
+<label class="check"><input type="radio" name="kind" value="transport"> <span><strong>Pet transport by car.</strong> Moves, adoptions and long drives, door to door.</span></label>
+</fieldset>
+</section>
+
+<section class="panel stack">
+<h2>Your pet</h2>
+<label class="f">Pet(s)<input id="pet_desc" maxlength="600" placeholder="e.g. Biscuit, 12 lb mini dachshund, 4 years old" autocomplete="off"></label>
+<div class="row" style="align-items:flex-start;gap:16px">
+<label class="f" style="flex:1 1 160px">How many pets<input id="pet_count" type="number" min="1" max="10" value="1" inputmode="numeric"></label>
+<label class="f" style="flex:1 1 200px">Weight of the heaviest pet (lb)<input id="pet_weight" type="number" min="1" max="300" inputmode="numeric" placeholder="Optional"></label>
+</div>
+<p class="notice info" id="weight-note" hidden>Most airlines only allow pets in the cabin if the pet and carrier together weigh 20 lb or less. For a larger pet, ground transport is usually the better choice.</p>
+</section>
+
+<section class="panel stack">
+<h2>The trip</h2>
+<label class="f">Starting from<input id="from_place" maxlength="200" placeholder="City and state, or a full address" autocomplete="off"></label>
+<label class="f">Going to<input id="to_place" maxlength="200" placeholder="City and state, or a full address" autocomplete="off"></label>
+<div class="row" style="align-items:flex-end;gap:16px">
+<label class="f" style="flex:1 1 200px">Travel date<input id="travel_date" type="date"></label>
+<label class="check" style="flex:1 1 200px"><input type="checkbox" id="flexible"> <span>My dates are flexible</span></label>
+</div>
+<label class="f">Anything else we should know<textarea id="notes" maxlength="2000" rows="4" placeholder="Airline, motion sickness, medications, who’s meeting your pet, anything that helps us quote accurately"></textarea></label>
+</section>
+
+<section class="panel stack">
+<h2>How to reach you</h2>
+<label class="f">Your name<input id="name" maxlength="120" autocomplete="name"></label>
+<div class="row" style="align-items:flex-start;gap:16px">
+<label class="f" style="flex:1 1 220px">Mobile phone<input id="phone" type="tel" maxlength="40" autocomplete="tel"></label>
+<label class="f" style="flex:1 1 220px">Email<input id="email" type="email" maxlength="200" autocomplete="email"></label>
+</div>
+</section>
+
+<p class="notice err" id="err" role="alert" hidden></p>
+<div class="spread"><p class="small muted">Everything above is needed to give you an accurate quote.</p>
+<button class="btn amber" type="submit" id="submit">Send quote request</button></div>
+</form>
+
+<section id="done" class="panel stack" hidden tabindex="-1">
+<p class="chip completed" style="align-self:flex-start">Request received</p>
+<h1 class="display" style="font-size:36px">Thanks. We’ll send your quote soon.</h1>
+<p class="lede" id="done-text">We’ll reply by email or text with a written quote, usually within a day.</p>
+<div class="row"><a class="btn" href="/services">Back to services</a><a class="btn ghost" href="/intake">New client form</a></div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/assets/app.js"></script>
+<script>
+(function () {
+  var P = window.Porchlight;
+  var $ = function (id) { return document.getElementById(id); };
+  var params = new URLSearchParams(location.search);
+  var kind = params.get('type');
+  document.querySelectorAll('input[name=kind]').forEach(function (r) { if (r.value === kind) r.checked = true; });
+  function chosen() { var r = document.querySelector('input[name=kind]:checked'); return r ? r.value : null; }
+
+  var today = new Date(); today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  $('travel_date').min = today.toISOString().slice(0, 10);
+
+  function weightNote() {
+    var w = parseInt($('pet_weight').value, 10);
+    $('weight-note').hidden = !(chosen() === 'flight' && w > 20);
+  }
+  $('pet_weight').addEventListener('input', weightNote);
+  document.querySelectorAll('input[name=kind]').forEach(function (r) { r.addEventListener('change', weightNote); });
+  weightNote();
+
+  var err = $('err');
+  function fail(msg, el) { err.textContent = msg; err.hidden = false; if (el) { el.focus(); el.scrollIntoView({ block: 'center' }); } else err.scrollIntoView({ block: 'center' }); }
+
+  $('quote').addEventListener('submit', function (ev) {
+    ev.preventDefault(); err.hidden = true;
+    if (!chosen()) return fail('Please choose the kind of trip.', document.querySelector('input[name=kind]'));
+    var need = [['pet_desc', 'a description of your pet'], ['from_place', 'where the trip starts'], ['to_place', 'where it ends'],
+                ['name', 'your name'], ['phone', 'your phone number'], ['email', 'your email']];
+    for (var i = 0; i < need.length; i++) {
+      var f = $(need[i][0]);
+      if (!f.value.trim() || !f.checkValidity()) return fail('Please fill in ' + need[i][1] + '.', f);
+    }
+    var btn = $('submit'); btn.disabled = true; btn.textContent = 'Sending…';
+    var w = parseInt($('pet_weight').value, 10);
+    P.sb.rpc('porchlight_request_quote', {
+      p_kind: chosen(), p_name: $('name').value, p_email: $('email').value, p_phone: $('phone').value,
+      p_pet_desc: $('pet_desc').value, p_pet_count: parseInt($('pet_count').value, 10) || 1, p_pet_weight: isNaN(w) ? null : w,
+      p_from: $('from_place').value, p_to: $('to_place').value, p_date: $('travel_date').value || null,
+      p_flexible: $('flexible').checked, p_notes: $('notes').value || null
+    }).then(function (r) {
+      if (r.error) throw r.error;
+      $('quote').hidden = true;
+      $('done-text').textContent = 'We’ll reply to ' + $('email').value.trim() + ' with a written quote, usually within a day.';
+      var d = $('done'); d.hidden = false; d.focus(); window.scrollTo(0, 0);
+    }).catch(function (e) {
+      fail(P.errMsg(e)); btn.disabled = false; btn.textContent = 'Send quote request';
+    });
+  });
+})();
+</script>
+</body>
+</html>

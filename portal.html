@@ -27,8 +27,14 @@
   var me = null; // { email, is_staff, client_id }
   var arrivedForReset = /type=recovery/.test(location.hash);
 
-  var SERVICE_LABEL = { walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in' };
-  var BOOKING_SELECT = 'id,created_at,start_at,end_at,status,service_id,town_id,group_id,series_label,client_id,client_name,client_email,client_phone,street_address,pets,notes,is_new_client,staff_notes,' +
+  var SERVICE_LABEL = { walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in',
+    taxi: 'Pet taxi, one way', taxi_rt: 'Pet taxi, round trip' };
+  var QUOTE_LABEL = { flight: 'Flight companion', transport: 'Pet transport' };
+  var PAY_METHODS = [['cash', 'Cash'], ['check', 'Check'], ['venmo', 'Venmo'], ['zelle', 'Zelle'], ['other', 'Other']];
+  var PAY_LABEL = { cash: 'Cash', check: 'Check', venmo: 'Venmo', zelle: 'Zelle', card: 'Card', other: 'Other' };
+  function isTaxi(id) { return id === 'taxi' || id === 'taxi_rt'; }
+  function usd(cents) { return '$' + (cents / 100).toFixed(cents % 100 ? 2 : 0); }
+  var BOOKING_SELECT = 'id,created_at,start_at,end_at,status,service_id,town_id,group_id,series_label,client_id,client_name,client_email,client_phone,street_address,dropoff_address,pets,notes,is_new_client,staff_notes,' +
     'porchlight_clients(id,name,address,phone,town_id,porchlight_pets(name,species))';
 
   function q(sel) { return app.querySelector(sel); }
@@ -147,7 +153,7 @@
   }
 
   /* ================= Kraig (staff) ================= */
-  var pendingCount = 0;
+  var pendingCount = 0, quoteCount = 0;
   var staleCount = 0, ESCALATE_MIN = 120;
   function refreshPending() {
     return sb.from('porchlight_bookings').select('group_id,id,created_at')
@@ -160,10 +166,11 @@
           if (new Date(b.created_at).getTime() < cutoff) stale[k] = true;
         });
         pendingCount = Object.keys(seen).length; staleCount = Object.keys(stale).length;
-      });
+        return sb.from('porchlight_quotes').select('id', { count: 'exact', head: true }).eq('status', 'new');
+      }).then(function (r) { quoteCount = (r && r.count) || 0; });
   }
   function staffTabs(current) {
-    var t = tabs([['#/schedule', 'schedule', 'Schedule'], ['#/requests', 'requests', 'Requests', pendingCount], ['#/clients', 'clients', 'Clients']], current);
+    var t = tabs([['#/schedule', 'schedule', 'Schedule'], ['#/requests', 'requests', 'Requests', pendingCount], ['#/quotes', 'quotes', 'Quotes', quoteCount], ['#/payments', 'payments', 'Payments'], ['#/clients', 'clients', 'Clients']], current);
     if (!staleCount || current === 'requests') return t;
     return h('div', null,
       h('a', { class: 'escalate', href: '#/requests' },
@@ -176,6 +183,8 @@
     page().appendChild(h('p', { class: 'muted', text: 'Loading…' }));
     refreshPending().then(function () {
       if (p[0] === 'requests') return staffRequests();
+      if (p[0] === 'quotes') return staffQuotes();
+      if (p[0] === 'payments') return staffPayments();
       if (p[0] === 'clients') return staffClients();
       if (p[0] === 'client' && p[1]) return staffClient(p[1]);
       if (p[0] === 'visit' && p[1]) return staffVisit(p[1]);
@@ -226,6 +235,8 @@
           !b.client_id ? h('span', { class: 'chip new', text: 'no intake yet' }) : null),
         h('div', null, w.name, P.townName(b.town_id) ? ' · ' + P.townName(b.town_id) : ''),
         w.pets ? h('div', { class: 'small muted', text: w.pets }) : null,
+        isTaxi(b.service_id) && b.dropoff_address ? h('div', { class: 'small' }, '→ Drop-off: ',
+          h('a', { href: P.mapsLink(b.dropoff_address), target: '_blank', rel: 'noopener', text: b.dropoff_address })) : null,
         b.series_label && !opts.inGroup ? h('div', { class: 'small', text: '↻ ' + b.series_label }) : null,
         opts.contact ? h('div', { class: 'small' }, h('a', { href: 'tel:' + b.client_phone, text: b.client_phone }), ' · ', h('a', { href: 'mailto:' + b.client_email, text: b.client_email })) : null,
         opts.contact && b.notes ? h('div', { class: 'small muted', text: 'Note: ' + b.notes }) : null,
@@ -325,6 +336,119 @@
           setAll('declined', ev);
         } })),
       more);
+  }
+
+  /* ================= Quotes (flights and long-distance transport) ================= */
+  function staffQuotes() {
+    var root = page();
+    root.appendChild(staffTabs('quotes'));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Trip quotes' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Flight companion and long-distance transport requests. Reply with a written quote, then record it here.' }));
+    var listBox = h('div', { class: 'list' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(listBox);
+    sb.from('porchlight_quotes').select('*').order('created_at', { ascending: false }).limit(100).then(guard).then(function (rows) {
+      P.clear(listBox);
+      if (!rows.length) { listBox.appendChild(h('div', { class: 'empty', text: 'No quote requests yet.' })); return; }
+      rows.forEach(function (qt) { listBox.appendChild(quoteItem(qt)); });
+    }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function quoteItem(qt) {
+    var amount = h('input', { type: 'number', min: '0', step: '1', 'aria-label': 'Quoted amount in dollars', placeholder: 'Quote $', value: qt.quoted_cents != null ? String(qt.quoted_cents / 100) : '', style: 'max-width:130px' });
+    var status = h('select', { 'aria-label': 'Status', style: 'max-width:150px' });
+    ['new', 'quoted', 'booked', 'declined', 'closed'].forEach(function (v) { var o = h('option', { value: v, text: v }); if (v === qt.status) o.selected = true; status.appendChild(o); });
+    var notes = h('textarea', { 'aria-label': 'Your notes', placeholder: 'Your notes (airline, route, what you quoted)', rows: 2 });
+    notes.value = qt.staff_notes || '';
+    var save = h('button', { class: 'btn sm', type: 'button', text: 'Save', onclick: function () {
+      var dollars = amount.value.trim() === '' ? null : Math.round(parseFloat(amount.value) * 100);
+      if (dollars != null && (isNaN(dollars) || dollars < 0)) { P.toast('Enter the quote as a dollar amount'); return; }
+      var st = status.value === 'new' && dollars != null ? 'quoted' : status.value;
+      save.disabled = true;
+      sb.from('porchlight_quotes').update({ quoted_cents: dollars, status: st, staff_notes: notes.value.trim() || null }).eq('id', qt.id).then(guard)
+        .then(function () { P.toast('Saved'); render(); }).catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
+    } });
+    var when = qt.travel_date ? new Date(qt.travel_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) + (qt.flexible ? ' (flexible)' : '') : (qt.flexible ? 'Dates flexible' : 'No date given');
+    var subject = encodeURIComponent('Your ' + (QUOTE_LABEL[qt.kind] || 'trip').toLowerCase() + ' quote from Porchlight');
+    return h('div', { class: 'item' },
+      h('div', { class: 'main' },
+        h('div', { class: 'row' }, h('strong', { text: QUOTE_LABEL[qt.kind] || qt.kind }), chip(qt.status), h('span', { class: 'small muted', text: 'Received ' + P.fmtDay(qt.created_at) })),
+        h('div', null, qt.name),
+        h('div', { class: 'small' }, h('a', { href: 'tel:' + qt.phone, text: qt.phone }), ' · ', h('a', { href: 'mailto:' + qt.email + '?subject=' + subject, text: qt.email })),
+        h('div', { class: 'small', text: qt.from_place + ' → ' + qt.to_place + ' · ' + when }),
+        h('div', { class: 'small', text: qt.pet_count + ' pet' + (qt.pet_count > 1 ? 's' : '') + ': ' + qt.pet_desc + (qt.pet_weight_lb ? ' · up to ' + qt.pet_weight_lb + ' lb' : '') }),
+        qt.kind === 'flight' && qt.pet_weight_lb > 20 ? h('div', { class: 'small late', text: 'Over 20 lb: most airlines won’t allow this pet in the cabin.' }) : null,
+        qt.notes ? h('div', { class: 'small muted', text: 'Note: ' + qt.notes }) : null,
+        h('div', { class: 'row', style: 'margin-top:8px' }, amount, status, save),
+        h('div', { style: 'margin-top:8px' }, notes)));
+  }
+
+  /* ================= Payments (cash, check, Venmo, Zelle) ================= */
+  function staffPayments() {
+    var root = page();
+    root.appendChild(staffTabs('payments'));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Payments' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Completed visits that haven’t been paid yet, grouped by client. When someone pays by cash, check or Venmo, record it here.' }));
+    var box = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(box);
+    Promise.all([
+      sb.from('porchlight_services').select('id,price_cents').then(guard),
+      sb.from('porchlight_bookings').select('id,start_at,service_id,client_id,client_name,client_email,porchlight_clients(name),porchlight_payments(id,amount_cents,tip_cents,method,reference,paid_at)')
+        .eq('status', 'completed').order('start_at', { ascending: false }).limit(400).then(guard)
+    ]).then(function (res) {
+      var price = {}; res[0].forEach(function (s) { price[s.id] = s.price_cents; });
+      var unpaid = {}, order = [], paid = [];
+      res[1].forEach(function (b) {
+        var pay = paidOf(b);
+        if (pay) { paid.push({ b: b, pay: pay }); return; }
+        var key = b.client_id || b.client_email;
+        if (!unpaid[key]) { unpaid[key] = { name: (b.porchlight_clients && b.porchlight_clients.name) || b.client_name, email: b.client_email, items: [] }; order.push(key); }
+        unpaid[key].items.push({ b: b, cents: price[b.service_id] || 0 });
+      });
+      P.clear(box);
+      var owed = order.reduce(function (t, k) { return t + unpaid[k].items.reduce(function (a, i) { return a + i.cents; }, 0); }, 0);
+      box.appendChild(h('div', { class: 'panel' }, h('div', { class: 'spread' },
+        h('div', null, h('p', { class: 'eyebrow', text: 'Unpaid' }), h('p', { class: 'display', style: 'font-size:32px', text: usd(owed) })),
+        h('p', { class: 'muted', text: order.length ? 'across ' + order.length + ' client' + (order.length > 1 ? 's' : '') : 'Everyone is paid up.' }))));
+      order.forEach(function (k) { box.appendChild(unpaidClient(unpaid[k])); });
+      if (paid.length) {
+        var l = h('div', { class: 'list' });
+        paid.slice(0, 25).forEach(function (x) {
+          l.appendChild(h('div', { class: 'item' },
+            h('div', { class: 'time', text: P.fmtDay(x.b.start_at) }),
+            h('div', { class: 'main' }, h('strong', { text: (x.b.porchlight_clients && x.b.porchlight_clients.name) || x.b.client_name }),
+              h('div', { class: 'small muted', text: (SERVICE_LABEL[x.b.service_id] || x.b.service_id) })),
+            h('div', { class: 'small', text: usd(x.pay.amount_cents + (x.pay.tip_cents || 0)) + ' · ' + (PAY_LABEL[x.pay.method] || x.pay.method) + (x.pay.reference ? ' · ' + x.pay.reference : '') })));
+        });
+        box.appendChild(h('section', { class: 'stack' }, h('h2', { class: 'display', style: 'font-size:22px', text: 'Recently paid' }), l));
+      }
+    }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function unpaidClient(g) {
+    var sum = g.items.reduce(function (a, i) { return a + i.cents; }, 0);
+    var amount = h('input', { type: 'number', min: '0', step: '0.01', value: (sum / 100).toFixed(2), 'aria-label': 'Amount received in dollars', style: 'max-width:130px' });
+    var tip = h('input', { type: 'number', min: '0', step: '0.01', placeholder: 'Tip $', 'aria-label': 'Tip in dollars', style: 'max-width:100px' });
+    var method = h('select', { 'aria-label': 'Payment method', style: 'max-width:140px' });
+    PAY_METHODS.forEach(function (m) { method.appendChild(h('option', { value: m[0], text: m[1] })); });
+    var ref = h('input', { maxlength: '80', placeholder: 'Check # or note', 'aria-label': 'Check number or note', style: 'max-width:180px' });
+    var btn = h('button', { class: 'btn sm', type: 'button', text: 'Mark paid', onclick: function () {
+      var total = Math.round(parseFloat(amount.value) * 100), tipC = tip.value.trim() ? Math.round(parseFloat(tip.value) * 100) : 0;
+      if (isNaN(total) || total < 0 || isNaN(tipC) || tipC < 0) { P.toast('Enter the amounts in dollars'); return; }
+      // One row per visit. Anything above or below the listed prices (extra pets, holiday fees) goes on the first visit.
+      var amounts = g.items.map(function (i) { return i.cents; });
+      amounts[0] += total - sum;
+      if (amounts[0] < 0) { P.toast('That amount is lower than the visits listed. Add up what was paid again.'); return; }
+      var rows = g.items.map(function (i, n) { return { booking_id: i.b.id, amount_cents: amounts[n], tip_cents: n === 0 ? tipC : 0, method: method.value, reference: ref.value.trim() || null }; });
+      btn.disabled = true;
+      sb.from('porchlight_payments').insert(rows).then(guard).then(function () { P.toast('Recorded ' + usd(total + tipC) + ' from ' + g.name); render(); })
+        .catch(function (e) { P.toast(P.errMsg(e)); btn.disabled = false; });
+    } });
+    var list = h('ul', { class: 'small', style: 'margin:6px 0 0;padding-left:18px' });
+    g.items.forEach(function (i) { list.appendChild(h('li', { text: P.fmtDay(i.b.start_at) + ' · ' + (SERVICE_LABEL[i.b.service_id] || i.b.service_id) + ' · ' + usd(i.cents) })); });
+    return h('section', { class: 'panel stack' },
+      h('div', { class: 'spread' }, h('h3', { text: g.name }), h('strong', { text: usd(sum) + ' for ' + g.items.length + ' visit' + (g.items.length > 1 ? 's' : '') })),
+      list,
+      h('div', { class: 'row' }, amount, tip, method, ref, btn));
   }
 
   function staffClients() {
@@ -563,7 +687,8 @@
       h('div', { class: 'stack', style: 'gap:4px' },
         h('p', { class: 'eyebrow', text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' + P.fmtDay(b.start_at) + ' ' + P.fmtTime(b.start_at) }),
         h('h1', { class: 'display', style: 'font-size:32px', text: c ? c.name : b.client_name }),
-        h('p', { class: 'muted', text: address })),
+        h('p', { class: 'muted', text: address }),
+        isTaxi(b.service_id) && b.dropoff_address ? h('p', null, h('strong', { text: 'Drop-off: ' }), h('a', { href: P.mapsLink(b.dropoff_address), target: '_blank', rel: 'noopener', text: b.dropoff_address })) : null),
       h('div', { class: 'row' }, chip(b.status),
         h('a', { class: 'btn ghost sm', href: P.mapsLink(address), target: '_blank', rel: 'noopener', text: 'Directions' }),
         h('a', { class: 'btn ghost sm', href: 'tel:' + ((c && c.phone) || b.client_phone), text: 'Call' }))));
@@ -676,6 +801,7 @@
     var dogsOrWalk = b.service_id === 'walk' || pets.some(function (x) { return /dog/i.test(x.species || ''); });
     var items = ['Fed', 'Fresh water'].concat(dogsOrWalk ? ['Walked', 'Potty break'] : [], hasMeds ? ['Medication given'] : [], hasCat ? ['Litter scooped'] : [],
       b.service_id === 'walk' ? [] : ['Mail brought in', 'Plants watered', 'Trash out', 'Lights adjusted', 'Doors locked']);
+    if (isTaxi(b.service_id)) items = ['Carrier or harness secured', 'Picked up', 'Dropped off safely', 'Handed to staff', 'Back home safe'];
     function chips(list, key, label) {
       var row = h('div', { class: 'chips', role: 'group', 'aria-label': label });
       list.forEach(function (it) {
@@ -731,7 +857,7 @@
       h('a', { class: 'btn amber', href: '/#booking', text: 'Request a visit' })));
     var listBox = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(listBox);
-    sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id,group_id,series_label').order('start_at', { ascending: false }).limit(100)
+    sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id,group_id,series_label,dropoff_address,porchlight_payments(method,paid_at)').order('start_at', { ascending: false }).limit(100)
       .then(guard).then(function (rows) {
         P.clear(listBox);
         var now = Date.now();
@@ -779,7 +905,9 @@
             l.appendChild(h('div', { class: 'item' },
               h('div', { class: 'time', text: P.fmtDay(b.start_at) }),
               h('div', { class: 'main' }, h('div', { class: 'row' }, h('strong', { text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' +
-                (b.service_id === 'overnight' ? P.fmtTime(b.start_at) + ' to morning' : 'arrive ' + P.fmtWindow(b.start_at)) }), chip(b.status)),
+                (b.service_id === 'overnight' ? P.fmtTime(b.start_at) + ' to morning' : 'arrive ' + P.fmtWindow(b.start_at)) }), chip(b.status),
+                paidOf(b) ? h('span', { class: 'chip completed', text: 'Paid · ' + (PAY_LABEL[paidOf(b).method] || paidOf(b).method) }) : null),
+                isTaxi(b.service_id) && b.dropoff_address ? h('div', { class: 'small muted', text: 'To: ' + b.dropoff_address }) : null,
                 b.series_label ? h('div', { class: 'small muted', text: '↻ ' + b.series_label }) : null),
               acts));
           });
@@ -790,6 +918,8 @@
         listBox.appendChild(h('p', { class: 'small muted', text: 'Requested visits are confirmed personally, usually within a few hours.' }));
       }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
   }
+
+  function paidOf(b) { var p = b.porchlight_payments; return Array.isArray(p) ? p[0] : p; }
 
   function clientReports() {
     var root = page();

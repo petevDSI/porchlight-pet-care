@@ -281,6 +281,33 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 </article>
 </div>
+<div class="section-head" style="margin:40px 0 20px"><p class="eyebrow">Rides and trips</p><h3 class="display" style="font-size:28px">Getting your pet where they need to go.</h3></div>
+<div class="cards">
+<article class="card">
+<img src="https://images.unsplash.com/photo-1711654783635-c65873cdae66?auto=format&fit=crop&w=800&h=560&q=75" alt="A cocker spaniel looking out of a car window" loading="lazy">
+<div class="card-body">
+<h3><a class="card-link" href="/services/pet-taxi">Pet taxi</a></h3>
+<p>A secured ride to the vet, groomer or boarding, door to door, with a text at pickup and drop-off.</p>
+<div class="card-foot"><p class="price"><span data-price="taxi">$35</span> <small>one way</small></p><a href="/services/pet-taxi">What’s included</a></div>
+</div>
+</article>
+<article class="card">
+<img src="https://images.unsplash.com/photo-1774790479490-dbf0f3a7fb60?auto=format&fit=crop&w=800&h=560&q=75" alt="A small dog peeking out of a carrier bag" loading="lazy">
+<div class="card-body">
+<h3><a class="card-link" href="/services/flight-companion">Flight companion</a></h3>
+<p>We fly with your small dog or cat in the cabin, from your door to the person waiting at the other end.</p>
+<div class="card-foot"><p class="price"><small>Quoted per trip</small></p><a href="/services/flight-companion">How it works</a></div>
+</div>
+</article>
+<article class="card">
+<img src="https://images.unsplash.com/photo-1759559790290-a3c6fce1d55f?auto=format&fit=crop&w=800&h=560&q=75" alt="A beagle with its ears blowing out of a car window" loading="lazy">
+<div class="card-body">
+<h3><a class="card-link" href="/services/pet-transport">Pet transport</a></h3>
+<p>Moves, adoptions and long drives by car, door to door, with regular breaks and photo updates.</p>
+<div class="card-foot"><p class="price"><small>Quoted by the trip</small></p><a href="/services/pet-transport">How it works</a></div>
+</div>
+</article>
+</div>
 </div>
 </section>
 
@@ -312,6 +339,16 @@ details p{margin-top:12px;color:var(--ink)}
 <button type="button" class="choice" data-service="visit" aria-pressed="false">Drop-in visit</button>
 <button type="button" class="choice" data-service="overnight" aria-pressed="false">Overnight</button>
 <button type="button" class="choice" data-service="home" aria-pressed="false">Home check-in</button>
+<button type="button" class="choice" data-service="taxi" aria-pressed="false">Pet taxi</button>
+</div>
+<div id="taxi-box" hidden style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
+<div class="choice-row" id="taxi-trip" role="group" aria-label="Trip type">
+<button type="button" class="choice" data-trip="taxi" aria-pressed="true">One way <span data-price="taxi">$35</span></button>
+<button type="button" class="choice" data-trip="taxi_rt" aria-pressed="false">Round trip <span data-price="taxi_rt">$65</span></button>
+</div>
+<div><label class="field-label" for="dropoff">Where is your pet going?</label>
+<input id="dropoff" maxlength="300" placeholder="Vet, groomer or boarding address">
+<p class="hint">Up to about 15 miles from your home. Farther, or a long wait? Call us and we’ll quote it. Flying with your pet, or moving across the country? <a href="/services/flight-companion">Flight companion</a> and <a href="/services/pet-transport">pet transport</a> are quoted by the trip.</p></div>
 </div>
 </fieldset>
 
@@ -422,16 +459,21 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="section-head">
 <p class="eyebrow">Pricing</p>
 <h2 class="display">Flat prices, listed in full.</h2>
-<p class="lede">No call-for-a-quote. Pay by card after each visit or once a week.</p>
+<p class="lede">Everyday care has flat prices, listed in full. Flights and long drives are quoted by the trip.</p>
 </div>
 <dl class="price-list">
 <div><dt><b>Dog walk</b><span>30 minutes</span></dt><dd data-price="walk">$26</dd></div>
 <div><dt><b>Drop-in visit</b><span>30 minutes, any pet</span></dt><dd data-price="visit">$25</dd></div>
 <div><dt><b>Overnight stay</b><span>Evening to morning, in your home</span></dt><dd data-price="overnight">$95</dd></div>
 <div><dt><b>Home check-in</b><span>Mail, plants, lights. No pets needed</span></dt><dd data-price="home">$30</dd></div>
+<div><dt><b>Pet taxi, one way</b><span>Door to the vet or groomer, up to about 15 miles</span></dt><dd data-price="taxi">$35</dd></div>
+<div><dt><b>Pet taxi, round trip</b><span>There and back, with a short wait or a return pickup</span></dt><dd data-price="taxi_rt">$65</dd></div>
+<div><dt><b>Flight companion</b><span>Flies with your small pet in the cabin</span></dt><dd><a href="/quote?type=flight">Get a quote</a></dd></div>
+<div><dt><b>Pet transport by car</b><span>Moves, adoptions and long drives</span></dt><dd><a href="/quote?type=transport">Get a quote</a></dd></div>
 <div><dt><b>Each additional pet</b><span>Per visit or night</span></dt><dd>+$5</dd></div>
 <div><dt><b>Holidays</b><span>Added per visit / per night</span></dt><dd>+$10 / +$20</dd></div>
 </dl>
+<p class="lede" style="margin-top:20px"><strong>How to pay:</strong> cash, check or Venmo, after each visit or at the end of your trip.</p>
 </div>
 </section>
 
@@ -460,6 +502,7 @@ details p{margin-top:12px;color:var(--ink)}
 <details><summary>How do you get into the house?</summary><p>A lockbox or a door code is easiest. If you'd rather hand over a key, it's tagged with a code, never your name or address.</p></details>
 <details><summary>Are you insured and bonded?</summary><p>Yes. We carry pet-care liability insurance and a bond, and we're glad to show proof at the meet-and-greet.</p></details>
 <details><summary>Will I hear from you during a visit?</summary><p>After every visit you get a short note and a photo. On overnights, one in the evening and one in the morning.</p></details>
+<details><summary>How do I pay?</summary><p>Cash, check or Venmo, after each visit or at the end of your trip. We record every payment in your client portal so you can see what’s been paid.</p></details>
 <details><summary>What if I need to cancel?</summary><p>Cancel at least 24 hours ahead and there's no charge. Later than that, the visit is billed.</p></details>
 <details><summary>What happens if my pet gets sick while I'm away?</summary><p>We call you first, then your vet. If we can't reach either, we go to the emergency clinic you named at the meet-and-greet.</p></details>
 <details><summary>What if it's storming?</summary><p>We still come. In heavy rain or extreme heat the walk gets shorter and the indoor play gets longer, and we'll tell you so in the visit note.</p></details>
@@ -490,7 +533,7 @@ details p{margin-top:12px;color:var(--ink)}
 <p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p>
 </div>
 <div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
-<div><h4>Services</h4><a href="/services/overnight-pet-sitting">Overnight stays</a><a href="/services/dog-walking">Dog walking</a><a href="/services/drop-in-visits">Drop-in visits</a><a href="/services/home-check-ins">Home check-ins</a></div>
+<div><h4>Services</h4><a href="/services/overnight-pet-sitting">Overnight stays</a><a href="/services/dog-walking">Dog walking</a><a href="/services/drop-in-visits">Drop-in visits</a><a href="/services/home-check-ins">Home check-ins</a><a href="/services/pet-taxi">Pet taxi</a><a href="/services/flight-companion">Flight companion</a><a href="/services/pet-transport">Pet transport</a></div>
 <div><h4>Contact</h4><a href="tel:[PHONE]">[PHONE]</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© <span id="year">2026</span> Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
@@ -519,7 +562,8 @@ details p{margin-top:12px;color:var(--ink)}
 
   var TZ = 'America/New_York';
   var state = { service: 'walk', picked: [], cart: [], often: 'once', dows: {}, prices: {}, labels: {
-    walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in' } };
+    walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in',
+    taxi: 'Pet taxi, one way', taxi_rt: 'Pet taxi, round trip' } };
 
   var el = function(id){ return document.getElementById(id); };
   var serviceButtons = document.querySelectorAll('#service-row .choice');
@@ -575,9 +619,14 @@ details p{margin-top:12px;color:var(--ink)}
 
   function setService(id){
     state.service = id;
-    serviceButtons.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.service === id ? 'true' : 'false'); });
+    var isTaxi = id === 'taxi' || id === 'taxi_rt';
+    serviceButtons.forEach(function(b){ b.setAttribute('aria-pressed', (b.dataset.service === id || (isTaxi && b.dataset.service === 'taxi')) ? 'true' : 'false'); });
+    el('taxi-box').hidden = !isTaxi;
+    document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.trip === id ? 'true' : 'false'); });
     loadSlots();
   }
+  document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.trip); }); });
+  if (window.PorchlightAddress) PorchlightAddress.attach(el('dropoff'), function(){});
   serviceButtons.forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.service); }); });
   document.querySelectorAll('[data-pick]').forEach(function(a){
     a.addEventListener('click', function(){ setService(a.dataset.pick); });
@@ -791,6 +840,11 @@ details p{margin-top:12px;color:var(--ink)}
         errBox.hidden = false; f.focus(); return;
       }
     }
+    var needsDrop = state.cart.some(function(c){ return c.service === 'taxi' || c.service === 'taxi_rt'; });
+    if (needsDrop && !el('dropoff').value.trim()) {
+      errBox.textContent = 'Please tell us where your pet is going (the vet, groomer or boarding address).';
+      errBox.hidden = false; el('taxi-box').hidden = false; el('dropoff').focus(); return;
+    }
     var what = summary.textContent;
     submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
     api('rpc/porchlight_request_bookings', { body: withGeo({
@@ -798,7 +852,8 @@ details p{margin-top:12px;color:var(--ink)}
       p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series }; }),
       p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
       p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
-      p_new_client: el('new-client').checked
+      p_new_client: el('new-client').checked,
+      p_dropoff: needsDrop ? el('dropoff').value.trim() : null
     })}).then(function(){
       var isNew = el('new-client').checked;
       el('success-text').textContent = 'Your request for ' + what + ' is in. ' +

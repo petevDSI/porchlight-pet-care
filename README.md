@@ -40,3 +40,10 @@ Prices come from the `porchlight_services` table (`price_cents`). Change them th
 - The visit screen has a "before you go in" box, a checklist, mood chips and a one-time GPS check-in/out.
 - Clients can skip a stretch of dates in a repeating request (`porchlight_skip_dates`).
 - Requests waiting more than 2 hours get a banner in the portal. Email alerts come once the domain is set up in Resend.
+
+## Rides, trips and payments
+
+- **Pet taxi** (`taxi` one way, `taxi_rt` round trip) books on the normal calendar. The client gives a pickup address and a drop-off address; the drop-off is stored on the booking (`dropoff_address`) and shown to Kraig on the schedule and the visit screen. Prices live in `porchlight_services` and are editable there.
+- **Flight companion** and **pet transport** are quoted per trip. `/quote` sends a request to `porchlight_quotes` through the `porchlight_request_quote` function; Kraig sees them in the portal's **Quotes** tab, records the price he quoted, and moves each through new, quoted, booked, declined or closed.
+- **Payments** are recorded by hand in the portal's **Payments** tab (cash, check, Venmo, Zelle, other). Unpaid completed visits are grouped by client. One tap records a payment for all of a client's unpaid visits; an amount above or below the listed prices (extra pets, holiday fees) goes on the first visit, and a tip can be added. Clients see "Paid · Venmo" on their visits. Card payments can be added later with Stripe.
+- Page content for all seven services is in `tools/build-services.js`. Edit there and run `node tools/build-services.js`.

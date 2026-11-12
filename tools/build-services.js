@@ -297,8 +297,207 @@ const SERVICES = [
       ['Do I need pets to book this?', 'No. Plenty of clients book check-ins for an empty house.'],
       ['Can you start my car or run the faucets?', 'Yes. Small upkeep jobs like those are included; just tell us what you’d like done.']
     ]
+  },
+  {
+    slug: 'pet-taxi', id: 'taxi', name: 'Pet taxi', short: 'Pet taxi',
+    title: 'Pet Taxi in Belmont, NC',
+    metaTitle: 'Pet Taxi in Belmont, NC | Rides to the Vet and Groomer | Porchlight',
+    metaDesc: 'Pet taxi in Belmont, Mt. Holly, Cramerton and Lake Wylie. A safe, secured ride to the vet, groomer or boarding, door to door, with a text at pickup and drop-off. $35 one way, $65 round trip.',
+    h1: 'A safe ride to the vet, the groomer or the kennel.',
+    lede: 'Can’t get off work for the appointment? We pick your pet up at your door, ride them there secured and calm, hand them to the clinic, and bring them home, with a text at every step.',
+    price: 35, unit: 'one way, up to about 15 miles',
+    hero: img('photo-1711654783635-c65873cdae66', 1200), heroAlt: 'A cocker spaniel looking out of a car window',
+    gallery: [
+      [img('photo-1703733565148-0a33aa10184e', 1200, 800), 'Two dogs sitting in a car, looking out the window'],
+      [img('photo-1764343983275-f350e4d86361', 1200, 800), 'A dog peeking out of a car window'],
+      [img('photo-1759340875613-75cb64d2c16d', 1200, 800), 'A dog with its head out of a car window on a sunny day']
+    ],
+    cta: 'Book a pet taxi',
+    includesTitle: 'Every ride includes',
+    included: [
+      ['car', 'Door-to-door pickup', 'We collect your pet from your home and bring them back, so you don’t have to leave work or find a ride.'],
+      ['shield', 'Always secured', 'Every pet rides in a crate or a harness clipped to the seat belt, never loose in the car.'],
+      ['paw', 'A calm, careful hand-off', 'We walk your pet in, check them in at the clinic or groomer, and tell the staff who to call.'],
+      ['heart', 'A calm ride', 'Windows up, air on, no rushing. Anxious passengers get extra time and a soft voice.'],
+      ['clock', 'Round trips with waiting', 'Need them brought home after? Choose a round trip and we handle the way back too.'],
+      ['camera', 'A text at every step', 'Picked up, dropped off, and back home safe, so you always know where your pet is.']
+    ],
+    timelineTitle: 'How a pet taxi ride goes',
+    timeline: [
+      ['Pickup', 'Hello and secure', 'A calm greeting, leash and harness or carrier checked, and your appointment details confirmed.'],
+      ['Ride', 'Straight there', 'The direct route, with the heat or air on and your pet buckled in or crated.'],
+      ['Arrive', 'Hand-off', 'We check your pet in with the clinic or groomer and leave your phone number.'],
+      ['Return', 'Pick up again', 'On a round trip, we collect your pet when they’re ready and bring them home.'],
+      ['Home', 'Safe and settled', 'Water, a quick potty break, and a text letting you know they’re back.']
+    ],
+    needs: {
+      title: 'What we need from you',
+      sub: 'Put these in the booking notes and the ride goes smoothly.',
+      items: [
+        ['The destination address', 'The vet, groomer or boarding facility, and the appointment time.'],
+        ['A carrier, or a harness that fits', 'Cats and small pets travel in a carrier. Dogs in a crate or a harness we can clip in.'],
+        ['A heads-up to the clinic', 'Tell them Porchlight is dropping off. Only you, or a contact you list, can approve treatment.'],
+        ['Your pet’s paperwork', 'Vaccine records or forms the clinic needs, in a folder or an envelope.'],
+        ['A phone that’s on', 'The vet may need to reach you, and so may we.']
+      ]
+    },
+    brings: {
+      title: 'What we bring',
+      sub: 'You don’t need to supply any of this.',
+      items: [
+        ['Seat covers and towels', 'For mud, drool and nervous accidents.'],
+        ['Water and a bowl', 'For the ride, and for the wait.'],
+        ['Cleaning supplies and a first-aid kit', 'Always in the car, always restocked.']
+      ]
+    },
+    pricing: [
+      ['Pet taxi, one way', 'Door to the destination, up to about 15 miles', '$35', 'taxi'],
+      ['Pet taxi, round trip', 'There and back, with a short wait or a scheduled return pickup', '$65', 'taxi_rt'],
+      ['Farther than 15 miles, or a long wait', 'We’ll tell you the price before you book', 'Quoted']
+    ],
+    faq: [
+      ['Which pets can ride?', 'Dogs, cats and small pets in a carrier. Tell us the breed and weight when you book so we can confirm they ride safely in our vehicle.'],
+      ['Do you stay with my pet at the vet?', 'We check your pet in and hand them to the staff. On a round trip we come back for them when they’re ready. We don’t make medical decisions: you, or a contact you list, approve treatment.'],
+      ['Who pays the vet or groomer?', 'You do, directly. We bring your pet and bring them home; we don’t pay for or collect for the clinic.'],
+      ['What if the appointment runs long?', 'Text us. A short delay is part of a round trip. For long waits we’ll agree on the extra cost with you first.'],
+      ['Can I book the same ride every week?', 'Yes. Weekly rides to a groomer, daycare or physical therapy can be booked as a repeating request.']
+    ]
+  },
+  {
+    slug: 'flight-companion', id: 'flight', quote: 'flight', name: 'Flight companion', short: 'Flight companion',
+    title: 'Pet Flight Companion (Flight Nanny) Near Charlotte, NC',
+    metaTitle: 'Pet Flight Companion (Flight Nanny) near Charlotte, NC | Porchlight',
+    metaDesc: 'A flight companion travels with your small dog or cat in the airplane cabin, door to door. Quoted per trip. Serving Belmont, Mt. Holly and the Charlotte area.',
+    h1: 'Your pet flies in the cabin, with someone who cares.',
+    lede: 'A flight companion, sometimes called a flight nanny, flies with your small dog or cat in the passenger cabin, from your door to the person waiting at the other end. No cargo hold, and no flying alone.',
+    price: null, unit: 'quoted for each trip',
+    hero: img('photo-1774790479490-dbf0f3a7fb60', 1200), heroAlt: 'A small dog peeking out of a carrier bag',
+    gallery: [
+      [img('photo-1779638416594-c56bcb5c8682', 1200, 800), 'A small shaggy dog peeking out of a black carrier'],
+      [img('photo-1593182440709-4b7b56482c55', 1200, 800), 'An airplane wing above the clouds'],
+      [img('photo-1530469641172-8ac15d0a7d6a', 1200, 800), 'A view of an airplane wing from a window seat']
+    ],
+    cta: 'Request a flight quote',
+    includesTitle: 'Every flight includes',
+    included: [
+      ['paw', 'One-on-one, start to finish', 'Your pet stays with their companion from pickup to hand-off. They’re never left in a terminal or a hold.'],
+      ['shield', 'In the cabin, under the seat', 'Your pet rides in an airline-approved carrier at the companion’s feet, not as cargo.'],
+      ['bowl', 'Water, comfort and potty breaks', 'Feeding, water and a pet relief break at layovers, plus a favorite blanket or toy for the ride.'],
+      ['camera', 'Updates along the way', 'Photos, videos and check-in texts, so you can watch your pet get there.'],
+      ['car', 'Door-to-airport rides', 'Pickup at your home and a hand-off at the destination are planned into your quote.'],
+      ['book', 'Help with the paperwork', 'We walk you through the airline’s pet rules and the health documents you’ll need.']
+    ],
+    timelineTitle: 'How a flight goes',
+    timeline: [
+      ['Weeks before', 'Quote and plan', 'You send the details, we send a written quote and a checklist of the paperwork and carrier you’ll need.'],
+      ['Day before', 'Final check', 'Confirm the flight, the carrier, the health certificate and who is meeting your pet.'],
+      ['Departure', 'Pickup and check-in', 'We collect your pet, handle airline check-in, and go through security together.'],
+      ['In flight', 'Cabin and layovers', 'Your pet stays under the seat, with a relief break and water at any layover.'],
+      ['Arrival', 'Hand-off', 'Your pet goes to the person you named at the other end, and you get a photo and a text.']
+    ],
+    needs: {
+      title: 'What you’ll need to have ready',
+      sub: 'We’ll send a checklist with your quote. The common items:',
+      items: [
+        ['A pet that fits the cabin rules', 'Most airlines require the pet and carrier to weigh 20 lb or less and fit under the seat. Check your airline.'],
+        ['An airline-approved carrier', 'With enough room and ventilation for your pet to turn around and lie down.'],
+        ['A health certificate', 'For interstate travel, a Certificate of Veterinary Inspection from a licensed vet, usually within 10 days of travel.'],
+        ['Current vaccinations', 'Records showing rabies and other required vaccines. A microchip is recommended.'],
+        ['Medications and a familiar blanket', 'Plus any food and a small bag of treats.'],
+        ['A named person at the destination', 'With a phone number, ready to meet your pet at the gate or curb.']
+      ]
+    },
+    brings: {
+      title: 'How the price works',
+      sub: 'Every trip is different, so each one is quoted.',
+      items: [
+        ['A written quote up front', 'Covering pickup, the flight, layovers and drop-off, so there are no surprises.'],
+        ['The airline’s pet fee is separate', 'You pay the airline directly. Your companion’s own ticket is also separate and shown in the quote.'],
+        ['What changes the price', 'Distance, layovers, the number of pets, and any medical needs on the way.']
+      ]
+    },
+    pricing: [
+      ['Companion fee', 'Pickup, flight, layovers and hand-off. Priced for each trip.', 'Quoted'],
+      ['Airline pet fee', 'Paid by you to the airline', 'At cost'],
+      ['Companion’s ticket', 'Shown as its own line in your quote', 'At cost']
+    ],
+    faq: [
+      ['Which pets can fly with a companion?', 'Small dogs and cats that fit in an airline-approved carrier under the seat. Larger pets can’t fly in the cabin, so ground transport is usually the better choice.'],
+      ['Why is there no set price?', 'Distance, dates, layovers and airline fees change every trip. We give you a written quote with each part listed, so you can compare it with any other.'],
+      ['What if my flight is delayed or canceled?', 'We’ll agree in writing, before you book, what happens and what it costs if plans change. Your pet is never left alone while we sort it out.'],
+      ['Do you need the health certificate?', 'For interstate travel, airlines and states generally require a Certificate of Veterinary Inspection from a licensed vet. We’ll tell you what applies to your route.'],
+      ['Can you fly my pet internationally?', 'Not at this time. International travel has more rules and paperwork than we can promise to handle well.']
+    ]
+  },
+  {
+    slug: 'pet-transport', id: 'transport', quote: 'transport', name: 'Pet transport', short: 'Pet transport',
+    title: 'Long-Distance Pet Transport by Car from Belmont, NC',
+    metaTitle: 'Long-Distance Pet Transport by Car from Belmont, NC | Porchlight',
+    metaDesc: 'Door-to-door pet and puppy transport by car for moves, adoptions and long trips, with regular breaks and photo updates. Quoted by the trip. Based in Belmont, NC.',
+    h1: 'Door to door by car, for moves and long trips.',
+    lede: 'Moving, adopting a puppy from a rescue or breeder, or driving to a specialist hours away? We drive your pet there directly, with regular breaks and updates all the way.',
+    price: null, unit: 'quoted by the trip',
+    hero: img('photo-1759559790290-a3c6fce1d55f', 1200), heroAlt: 'A beagle with its ears blowing out of a car window',
+    gallery: [
+      [img('photo-1764387519679-4364d7c4e1f2', 1200, 800), 'A poodle mix looking out of a car window'],
+      [img('photo-1781999514099-26926cd1bf72', 1200, 800), 'A dalmatian looking out of a black car window'],
+      [img('photo-1703733565148-0a33aa10184e', 1200, 800), 'Two dogs sitting in a car, looking out the window']
+    ],
+    cta: 'Request a transport quote',
+    includesTitle: 'Every trip includes',
+    included: [
+      ['car', 'A direct drive', 'From your door, or the rescue or breeder’s, straight to the destination. No hubs and no hand-offs between drivers.'],
+      ['shield', 'Secured for the whole ride', 'In a crate or a harness clipped in, with a cover for the seat and the air on.'],
+      ['water', 'Breaks every few hours', 'Water, a leash walk and a potty break at regular stops, more often for puppies and seniors.'],
+      ['camera', 'Updates all the way', 'Photos and texts at each stop, and when we arrive.'],
+      ['book', 'Paperwork in order', 'We’ll tell you which health records your route needs, and keep them with your pet.'],
+      ['heart', 'A calm, careful handler', 'One person with your pet the whole way, who treats them the way you would.']
+    ],
+    timelineTitle: 'How a long-distance trip goes',
+    timeline: [
+      ['Request', 'Tell us the route', 'Where from, where to, when, and who is traveling. We reply with a written quote.'],
+      ['Before', 'Records and a plan', 'We confirm the health papers your route needs and agree on pickup and drop-off times.'],
+      ['Pickup', 'Meet and secure', 'We meet your pet, check the crate or harness, and confirm who will receive them.'],
+      ['On the road', 'Steady driving, regular stops', 'Water, walks and updates at each break, with no long stretches alone in the car.'],
+      ['Arrival', 'Hand-off', 'Your pet goes only to the person you named, and you get a photo and a text.']
+    ],
+    needs: {
+      title: 'What you’ll need to have ready',
+      sub: 'We’ll send a checklist with your quote. The common items:',
+      items: [
+        ['The route and dates', 'Start and end addresses, a pickup window, and how flexible you are.'],
+        ['Your pet’s details', 'Species, breed, age and weight, and anything that affects a long ride, like motion sickness or anxiety.'],
+        ['Health records', 'Current vaccinations including rabies. Many interstate trips also need a Certificate of Veterinary Inspection.'],
+        ['A crate or harness that fits', 'We can use yours, so the crate smells like home.'],
+        ['Food, medication and a comfort item', 'Enough for the trip, plus a day extra in case of delays.'],
+        ['Someone to meet your pet', 'A named person with a phone number at the destination.']
+      ]
+    },
+    brings: {
+      title: 'How the price works',
+      sub: 'Every trip is different, so each one is quoted.',
+      items: [
+        ['A written quote up front', 'Based on distance, the time on the road and tolls, so you know the cost before you commit.'],
+        ['Longer trips may include an overnight', 'If a trip can’t be driven in a day, the quote will include the extra night.'],
+        ['More than one pet?', 'Pets from the same household can travel together, which usually costs less than separate trips.']
+      ]
+    },
+    pricing: [
+      ['Transport fee', 'Mileage, time on the road and tolls. Priced for each trip.', 'Quoted'],
+      ['Overnight stop on a long trip', 'Only if the drive needs one. Shown in your quote.', 'In the quote'],
+      ['Additional pets', 'From the same household, on the same trip', 'In the quote']
+    ],
+    faq: [
+      ['How far will you drive?', 'We’ll quote any trip we can drive safely and reliably. Longer routes are quoted with an overnight stop.'],
+      ['Can you bring home a puppy from a breeder or rescue?', 'Yes. Puppies need to be old enough and vaccinated for travel under the rules of the states involved, and we’ll ask for their records before the trip.'],
+      ['Will my pet ride with other clients’ animals?', 'Not unless you agree to it. Pets from the same household travel together.'],
+      ['What health papers do I need?', 'It depends on the route. For many interstate trips, a Certificate of Veterinary Inspection from a licensed vet is required, plus current rabies vaccination. We’ll tell you what applies when we quote.'],
+      ['How do I get a price?', 'Send a quote request with the route and dates. We’ll reply with a written price, usually within a day.']
+    ]
   }
 ];
+
+const PAY_LINE = 'Pay by cash, check or Venmo after each visit or trip. Cancel at least 24 hours ahead at no charge.';
 
 /* ---------- Shared chrome ---------- */
 const head = (title, desc, canonical, extra, current) => `<!doctype html>
@@ -373,12 +572,12 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, 
 
 function servicePage(s) {
   const url = `${SITE}/services/${s.slug}`;
-  const book = `/?service=${s.id}#booking`;
+  const book = s.quote ? `/quote?type=${s.quote}` : `/?service=${s.id}#booking`;
   const schema = ld({
     '@context': 'https://schema.org', '@graph': [
       business,
       { '@type': 'Service', name: s.title, serviceType: s.name, provider: { '@id': SITE + '/#business' }, areaServed: business.areaServed,
-        url, description: s.metaDesc, offers: { '@type': 'Offer', price: String(s.price), priceCurrency: 'USD', description: s.unit } },
+        url, description: s.metaDesc, ...(s.quote ? {} : { offers: { '@type': 'Offer', price: String(s.price), priceCurrency: 'USD', description: s.unit } }) },
       { '@type': 'BreadcrumbList', itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
         { '@type': 'ListItem', position: 2, name: 'Services', item: SITE + '/services' },
@@ -395,14 +594,14 @@ function servicePage(s) {
 <p class="eyebrow">${esc(s.title)}</p>
 <h1 class="display">${esc(s.h1)}</h1>
 <p class="lede">${esc(s.lede)}</p>
-<p class="price-tag"><b data-price="${s.id}">$${s.price}</b><span>${esc(s.unit)}</span></p>
+<p class="price-tag">${s.quote ? '<b>Custom quote</b>' : `<b data-price="${s.id}">$${s.price}</b>`}<span>${esc(s.unit)}</span></p>
 <div class="cta-row"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a><a class="btn btn-ghost" href="#included">What’s included</a></div>
 </div>
 <div class="svc-hero-media"><img src="${s.hero}" alt="${esc(s.heroAlt)}" width="600" height="520" fetchpriority="high"></div>
 </div></section>
 
 <section class="section" id="included"><div class="wrap">
-<div class="section-head"><p class="eyebrow">What’s included</p><h2 class="display">Every ${s.id === 'overnight' ? 'overnight' : s.id === 'walk' ? 'walk' : 'visit'} includes</h2></div>
+<div class="section-head"><p class="eyebrow">What’s included</p><h2 class="display">${s.includesTitle || `Every ${s.id === 'overnight' ? 'overnight' : s.id === 'walk' ? 'walk' : 'visit'} includes`}</h2></div>
 <div class="included">
 ${s.included.map(([ic, t, d]) => `<article class="inc"><span class="ic">${icon(ic)}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></article>`).join('\n')}
 </div>
@@ -434,11 +633,12 @@ ${s.brings.items.map(([b, t]) => `<li>${tick('#14233B')}<div><b>${esc(b)}</b><sp
 </div></section>
 
 <section class="section"><div class="wrap">
-<div class="section-head"><p class="eyebrow">Pricing</p><h2 class="display">Simple, listed prices</h2></div>
+<div class="section-head"><p class="eyebrow">Pricing</p><h2 class="display">${s.quote ? 'How pricing works' : 'Simple, listed prices'}</h2></div>
 <dl class="pricebox">
-${s.pricing.map(([n, d, p], i) => `<div><dt><b>${esc(n)}</b><span>${esc(d)}</span></dt><dd${i === 0 ? ` data-price="${s.id}"` : ''}>${esc(p)}</dd></div>`).join('\n')}
+${s.pricing.map(([n, d, p, pid], i) => `<div><dt><b>${esc(n)}</b><span>${esc(d)}</span></dt><dd${pid ? ` data-price="${pid}"` : (i === 0 && !s.quote ? ` data-price="${s.id}"` : '')}>${esc(p)}</dd></div>`).join('\n')}
 </dl>
-<div class="cta-row" style="margin-top:28px"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a></div>
+<p class="lede" style="margin-top:18px;font-size:16px;color:var(--muted)">${PAY_LINE}</p>
+<div class="cta-row" style="margin-top:20px"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a></div>
 </div></section>
 
 <section class="section tint"><div class="wrap">
@@ -451,7 +651,7 @@ ${s.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}
 <section class="section"><div class="wrap">
 <div class="section-head"><p class="eyebrow">More from Porchlight</p><h2 class="display">Other services</h2></div>
 <div class="others">
-${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>From $${o.price} ${esc(o.unit)}</p></div></a>`).join('\n')}
+${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>${o.quote ? 'Quoted ' + esc(o.unit.replace(/^quoted /, '')) : 'From $' + o.price + ' ' + esc(o.unit)}</p></div></a>`).join('\n')}
 </div>
 </div></section>
 </main>
@@ -460,7 +660,7 @@ ${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gal
 
 function hubPage() {
   const url = `${SITE}/services`;
-  const desc = 'Overnight pet sitting, dog walking, drop-in visits and home check-ins in Belmont, Mt. Holly, Cramerton, McAdenville, Lake Wylie and Steele Creek, NC.';
+  const desc = 'Overnight pet sitting, dog walking, drop-in visits, home check-ins, pet taxi, flight companions and pet transport in Belmont, Mt. Holly, Cramerton, McAdenville, Lake Wylie and Steele Creek, NC.';
   const schema = ld({ '@context': 'https://schema.org', '@graph': [business, { '@type': 'ItemList', itemListElement: SERVICES.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/${s.slug}`, name: s.title })) }] });
   return head('Pet Sitting &amp; Home Care Services in Belmont, NC | Porchlight', desc, url, schema, 'services') + `
 <main>
@@ -471,7 +671,7 @@ function hubPage() {
 <p class="lede" style="max-width:720px">Everything happens in your home, by one person you’ve met first. Pick a service to see exactly what’s included.</p>
 </div></div></section>
 <section class="section"><div class="wrap"><div class="hub">
-${SERVICES.map(s => `<a href="/services/${s.slug}"><img src="${s.hero.replace('w=1200', 'w=800&h=480')}" alt="${esc(s.heroAlt)}" loading="lazy"><div class="b"><p class="eyebrow">From <span data-price="${s.id}">$${s.price}</span> ${esc(s.unit)}</p><h2>${s.name}</h2><p>${esc(s.lede)}</p><span class="more">See what’s included →</span></div></a>`).join('\n')}
+${SERVICES.map(s => `<a href="/services/${s.slug}"><img src="${s.hero.replace('w=1200', 'w=800&h=480')}" alt="${esc(s.heroAlt)}" loading="lazy"><div class="b"><p class="eyebrow">${s.quote ? 'Quoted ' + esc(s.unit.replace(/^quoted /, '')) : `From <span data-price="${s.id}">$${s.price}</span> ${esc(s.unit)}`}</p><h2>${s.name}</h2><p>${esc(s.lede)}</p><span class="more">See what’s included →</span></div></a>`).join('\n')}
 </div></div></section>
 </main>
 ` + footer();
@@ -584,7 +784,7 @@ fs.writeFileSync(path.join(ROOT, 'about.html'), aboutPage());
 SERVICES.forEach(s => fs.writeFileSync(path.join(ROOT, 'services', s.slug + '.html'), servicePage(s)));
 fs.writeFileSync(path.join(ROOT, 'services.html'), hubPage());
 
-const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), ['/intake']);
+const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), ['/quote', '/intake']);
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
   '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
   pages.map(p => `  <url><loc>${SITE}${p || '/'}</loc></url>`).join('\n') + '\n</urlset>\n');

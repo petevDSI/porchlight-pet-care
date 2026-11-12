@@ -788,7 +788,7 @@ ${s.brings.items.map(([b, t]) => `<li>${tick('#14233B')}<div><b>${esc(b)}</b><sp
 <dl class="pricebox">
 ${s.pricing.map(([n, d, p, pid, starting], i) => `<div><dt><b>${esc(n)}</b><span>${esc(d)}</span></dt>` + (starting ? `<dd><small style="font-size:14px;font-weight:600">Starting at </small><span data-price="${pid}">${esc(p)}</span></dd></div>` : `<dd${pid ? ` data-price="${pid}"` : (i === 0 && !s.quote ? ` data-price="${s.id}"` : '')}>${esc(p)}</dd></div>`)).join('\n')}
 </dl>
-<p class="lede" style="margin-top:18px;font-size:16px;color:var(--muted)">${PAY_LINE}</p>
+<div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price. Payment is due when you book. Cancel at least 24 hours ahead for a full refund.</small></div></div>
 <div class="cta-row" style="margin-top:20px"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a></div>
 </div></section>
 
@@ -869,7 +869,7 @@ ${t.photos.map(k => `<figure><img src="${PH.src(k, 1000, 640)}" alt="${esc(PH.LI
 <div class="others">
 ${SERVICES.filter(o => !o.quote).map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>From $${o.price} ${esc(o.unit)}</p></div></a>`).join('\n')}
 </div>
-<p class="lede" style="margin-top:18px;font-size:16px;color:var(--muted)">${PAY_LINE}</p>
+<div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price. Payment is due when you book. Cancel at least 24 hours ahead for a full refund.</small></div></div>
 </div></section>
 
 <section class="section tint"><div class="wrap">

@@ -317,7 +317,7 @@ const SERVICES = [
     h1: 'A safe ride to the vet, the groomer or the kennel.',
     lede: 'Can’t get off work for the appointment? We pick your pet up at your door, ride them there secured and calm, hand them to the clinic, and bring them home, with a text at every step.',
     price: 30, unit: 'and up, metered by the mile',
-    hero: img('photo-1711654783635-c65873cdae66', 1200), heroAlt: 'A cocker spaniel looking out of a car window',
+    hero: '/assets/img/pack/maizy-car.jpg', heroAlt: 'Maizy riding in the car, watching the park go by through the window',
     gallery: [
       [img('photo-1703733565148-0a33aa10184e', 1200, 800), 'Two dogs sitting in a car, looking out the window'],
       [img('photo-1764343983275-f350e4d86361', 1200, 800), 'A dog peeking out of a car window'],
@@ -599,7 +599,7 @@ function servicePage(s) {
     ]
   });
   const others = SERVICES.filter(o => o !== s);
-  return head(esc(s.metaTitle), esc(s.metaDesc), url, `<meta property="og:image" content="${s.hero}">\n` + schema, 'services') + `
+  return head(esc(s.metaTitle), esc(s.metaDesc), url, `<meta property="og:image" content="${s.hero.startsWith('/') ? SITE + s.hero : s.hero}">\n` + schema, 'services') + `
 <main>
 <section class="svc-hero"><div class="wrap">
 <div class="svc-hero-copy">

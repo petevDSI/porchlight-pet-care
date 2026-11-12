@@ -158,6 +158,8 @@ textarea{min-height:88px;resize:vertical}
 /* Area */
 .towns{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:12px}
 .towns li{border:1px solid var(--line-2);font-weight:600;padding:12px 20px;border-radius:999px}
+.towns li a{color:inherit;text-decoration:none}
+.towns li:has(a):hover{border-color:var(--navy)}
 .towns li.home{background:var(--navy);color:var(--white);border-color:var(--navy);display:flex;align-items:center;gap:10px}
 .towns li.home span{background:var(--amber);color:var(--navy);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
 
@@ -507,8 +509,8 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="cta-row"><a class="btn btn-navy" href="/quote?type=local">Request a quote</a><a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a></div>
 </div>
 <ul class="towns">
-<li class="home">Belmont <span>Home base</span></li>
-<li>Mt. Holly</li><li>Cramerton</li><li>McAdenville</li><li>Lake Wylie</li><li>East Gastonia</li><li>Lowell</li><li>Ranlo</li><li>Clover</li><li>York</li><li>India Hook</li><li>Newport</li>
+<li class="home"><a href="/areas/belmont">Belmont</a> <span>Home base</span></li>
+<li><a href="/areas/mt-holly">Mt. Holly</a></li><li>Cramerton</li><li>McAdenville</li><li><a href="/areas/lake-wylie">Lake Wylie</a></li><li>East Gastonia</li><li>Lowell</li><li>Ranlo</li><li><a href="/areas/clover">Clover</a></li><li><a href="/areas/york">York</a></li><li>India Hook</li><li>Newport</li>
 </ul>
 <div id="area-map" role="img" aria-label="Map of the Porchlight service area, west of the Catawba River and Lake Wylie, from Mt. Holly south to the Celanese Rd area of Rock Hill" style="height:600px;max-height:75vh;margin-top:28px;border-radius:20px;overflow:hidden;background:#e9e5dc"></div>
 <p class="small" style="margin-top:8px;color:var(--muted)">The shaded area is where we work. Map data &copy; OpenStreetMap contributors.</p>
@@ -999,7 +1001,8 @@ details p{margin-top:12px;color:var(--ink)}
     loadSlots();
   });
 
-  var preset = new URLSearchParams(location.search).get('service');
+  var qs = new URLSearchParams(location.search), preset = qs.get('service'), presetTown = qs.get('town');
+  if (presetTown && townSel.querySelector('option[value="' + presetTown + '"]')) townSel.value = presetTown;
   syncRepeat(true);
   if (preset && state.labels[preset]) setService(preset); else loadSlots();
 })();

@@ -157,3 +157,9 @@ details p{margin-top:10px;color:var(--ink)}
 .story-photo{margin:10px 0 0}
 .story-photo img{width:100%;height:auto;border-radius:22px}
 .story-photo figcaption{margin-top:8px;font-size:15px;color:var(--muted)}
+
+.area-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:48px;align-items:start}
+.area-copy p{margin:0 0 16px;font-size:18px}
+.area-facts{background:var(--mist);border:1px solid var(--line);border-radius:18px;padding:24px}
+.area-facts h2{font-size:24px;margin:0 0 8px}
+@media (max-width:820px){.area-grid{grid-template-columns:1fr;gap:28px}}

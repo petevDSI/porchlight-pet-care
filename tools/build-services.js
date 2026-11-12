@@ -11,6 +11,7 @@ const path = require('path');
 const SITE = 'https://porchlightpetcare.com';
 const ROOT = path.join(__dirname, '..');
 const img = (id, w, h) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}${h ? '&h=' + h : ''}&q=75`;
+const TOWN_PAGES = require('./towns.js').map(t => ({ ...t, hero: typeof t.hero === 'function' ? t.hero(img) : t.hero }));
 const SC_TOWNS = ['Lake Wylie', 'Clover', 'York', 'India Hook', 'Newport'];
 const TOWNS = ['Belmont', 'Mt. Holly', 'Cramerton', 'McAdenville', 'Lake Wylie', 'East Gastonia', 'Lowell', 'Ranlo', 'Clover', 'York', 'India Hook', 'Newport'];
 
@@ -548,6 +549,7 @@ const footer = () => `
 <div class="foot-cols">
 <div style="max-width:340px"><p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p><p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p></div>
 <div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
+<div><h4>Areas</h4>${TOWN_PAGES.map(t => `<a href="/areas/${t.slug}">${t.name}, ${t.state}</a>`).join('')}</div>
 <div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
 <div><h4>Contact</h4><a href="tel:[PHONE]">[PHONE]</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
@@ -655,6 +657,78 @@ ${s.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}
 <div class="others">
 ${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>${o.quote ? 'Quoted ' + esc(o.unit.replace(/^quoted /, '')) : 'From $' + o.price + ' ' + esc(o.unit)}</p></div></a>`).join('\n')}
 </div>
+</div></section>
+</main>
+` + footer();
+}
+
+
+function areaPage(t) {
+  const url = `${SITE}/areas/${t.slug}`;
+  const loc = `${t.name}, ${t.state}`;
+  const schema = ld({
+    '@context': 'https://schema.org', '@graph': [
+      business,
+      { '@type': 'Service', name: `Pet sitting and dog walking in ${loc}`, serviceType: 'Pet sitting', provider: { '@id': SITE + '/#business' }, areaServed: { '@type': 'City', name: loc }, url },
+      { '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+        { '@type': 'ListItem', position: 2, name: 'Service area', item: SITE + '/#area' },
+        { '@type': 'ListItem', position: 3, name: loc, item: url }] },
+      { '@type': 'FAQPage', mainEntity: t.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }
+    ]
+  });
+  const near = t.nearby.map(sl => TOWN_PAGES.find(x => x.slug === sl)).filter(Boolean);
+  const heroSrc = t.hero.startsWith('http') ? t.hero : t.hero;
+  return head(esc(t.metaTitle), esc(t.metaDesc), url, `<meta property="og:image" content="${heroSrc.startsWith('/') ? SITE + heroSrc : heroSrc}">\n` + schema, 'area') + `
+<main>
+<section class="svc-hero"><div class="wrap">
+<div class="svc-hero-copy">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/#area">Service area</a></li><li aria-current="page">${esc(t.name)}</li></ol></nav>
+<p class="eyebrow">${esc(loc)}${t.home ? ' · Home base' : ''}</p>
+<h1 class="display">${esc(t.h1)}</h1>
+<p class="lede">${esc(t.lede)}</p>
+<div class="cta-row"><a class="btn btn-amber" href="/?town=${t.slug}#booking">Book a visit in ${esc(t.name)}</a><a class="btn btn-ghost" href="/?service=meet&amp;town=${t.slug}#booking">Free meet &amp; greet</a></div>
+</div>
+<div class="svc-hero-media"><img src="${heroSrc}" alt="${esc(t.heroAlt)}" width="600" height="520" fetchpriority="high"></div>
+</div></section>
+
+<section class="section"><div class="wrap area-grid">
+<div class="area-copy">
+<p class="eyebrow">Pet care in ${esc(t.name)}</p>
+${t.intro.map(p => `<p>${esc(p)}</p>`).join('\n')}
+</div>
+<aside class="area-facts"><h2 class="display">${esc(t.name)} at a glance</h2>
+<dl class="facts">
+${t.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('\n')}
+</dl></aside>
+</div></section>
+
+<section class="section tint"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Local walks</p><h2 class="display">${esc(t.placesTitle)}</h2></div>
+<div class="included">
+${t.places.map(([n, d]) => `<article class="inc"><span class="ic">${icon('leash')}</span><h3>${esc(n)}</h3><p>${esc(d)}</p></article>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">What we do in ${esc(t.name)}</p><h2 class="display">Care that comes to your door</h2></div>
+<div class="others">
+${SERVICES.filter(o => !o.quote).map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>From $${o.price} ${esc(o.unit)}</p></div></a>`).join('\n')}
+</div>
+<p class="lede" style="margin-top:18px;font-size:16px;color:var(--muted)">${PAY_LINE}</p>
+</div></section>
+
+<section class="section tint"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Questions</p><h2 class="display">About pet care in ${esc(t.name)}</h2></div>
+<div class="faq-list">
+${t.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Nearby</p><h2 class="display">Also serving</h2></div>
+<p class="lede" style="font-size:18px">${near.map(n => `<a href="/areas/${n.slug}">${esc(n.name)}, ${n.state}</a>`).join(' · ')} · <a href="/#area">See the full service area</a></p>
+<p class="lede" style="margin-top:22px;font-size:14px;color:var(--muted)">Sources for the local details on this page: ${t.sources.map(([n, u]) => `<a href="${u}" rel="noopener">${esc(n)}</a>`).join('; ')}. Park rules and hours change, so check before you go.</p>
 </div></section>
 </main>
 ` + footer();
@@ -784,9 +858,11 @@ ${ABOUT.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`)
 fs.mkdirSync(path.join(ROOT, 'services'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'about.html'), aboutPage());
 SERVICES.forEach(s => fs.writeFileSync(path.join(ROOT, 'services', s.slug + '.html'), servicePage(s)));
+fs.mkdirSync(path.join(ROOT, 'areas'), { recursive: true });
+TOWN_PAGES.forEach(t => fs.writeFileSync(path.join(ROOT, 'areas', t.slug + '.html'), areaPage(t)));
 fs.writeFileSync(path.join(ROOT, 'services.html'), hubPage());
 
-const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), ['/quote', '/intake']);
+const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), TOWN_PAGES.map(t => '/areas/' + t.slug), ['/quote', '/intake']);
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
   '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
   pages.map(p => `  <url><loc>${SITE}${p || '/'}</loc></url>`).join('\n') + '\n</urlset>\n');

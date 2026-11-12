@@ -31,6 +31,16 @@ Migration `20261113_sitters.sql` adds `porchlight_sitters`, `porchlight_payouts`
 - **Privacy:** a sitter sees client details only for assigned, confirmed visits, until 3 days after the visit.
 - **Pay:** the sitter keeps `keep_pct` (default 88) of cash actually collected, plus 100% of tips. The percentage is snapshotted when the visit is assigned. Staff record payouts in Portal > Sitters > Payouts after sending the money; each visit is paid once.
 
+### Availability and choosing a sitter
+
+Migration `20261114_sitter_availability.sql` (apply after `20261113_sitters.sql`).
+
+- Each sitter has weekly hours and days off (portal > Availability). New sitters start Mon-Fri 8-6. A sitter with no hours can't be booked.
+- `porchlight_sitter_conflict()` is the one rule: active, in their towns/services, inside hours, not on time off, and no clash or drive-time problem with their own visits. The booking calendar, "open requests" and "accept" all use it.
+- The booking page shows "Who would you like?" (Anyone, or a named sitter). If the named sitter is busy at a time, that time shows dashed with a free sitter's name. Picks are stored as `sitter_id` on each visit. "Anyone" leaves it open for any free sitter to accept.
+- Visits nobody has accepted yet use up capacity, so the site can't sell more simultaneous "anyone" visits than there are free sitters.
+- Until at least one sitter is active, the old single-provider logic runs, so booking keeps working during the switch.
+
 ## Changing prices
 
 Prices come from the `porchlight_services` table (`price_cents`). Change them there; the site reads them on load.

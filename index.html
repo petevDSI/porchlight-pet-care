@@ -113,6 +113,9 @@ textarea{min-height:88px;resize:vertical}
 .slot:disabled{border-style:dashed;border-color:var(--line);background:var(--mist);color:#6B768C;text-decoration:line-through;cursor:not-allowed}
 .hint{font-size:14px;color:var(--muted);margin-top:10px}
 .slot-status{font-size:15px;color:var(--muted)}
+.slot.alt{border-style:dashed;border-color:var(--navy)}
+.slot small{display:block;font-weight:500;font-size:12px;line-height:1.2;color:inherit;opacity:.8}
+.sitter-bio{margin-top:6px}
 .summary{background:var(--mist);border-radius:16px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
 .summary strong{font-size:18px}
 .addr-wrap{position:relative}
@@ -446,6 +449,12 @@ details p{margin-top:12px;color:var(--ink)}
 <div><label class="field-label" for="date">Day</label><input id="date" type="date" required></div>
 </div>
 
+<div id="sitter-box" hidden>
+<p class="field-label" id="sitter-label">Who would you like?</p>
+<div class="choice-row" role="group" aria-labelledby="sitter-label" id="sitter-row"></div>
+<p class="hint sitter-bio" id="sitter-bio"></p>
+</div>
+
 <div>
 <p class="field-label" id="slots-label">Open times <span style="text-transform:none;letter-spacing:0;font-weight:600">(pick one or more)</span></p>
 <div class="slot-grid" id="slots" role="group" aria-labelledby="slots-label"></div>
@@ -666,7 +675,7 @@ details p{margin-top:12px;color:var(--ink)}
   var details = el('details'), submitBtn = el('submit'), summary = el('summary'), errBox = el('form-error');
   var addBtn = el('add-btn'), addMsg = el('add-msg'), cartBox = el('cart'), cartList = el('cart-list');
   var whereMsg = el('where-msg'), WHERE_HINT = whereMsg.textContent;
-  state.place = null;
+  state.place = null; state.sitter = null; state.sitters = [];
   function withGeo(o){ if (state.place) { o.p_lat = state.place.lat; o.p_lng = state.place.lng; } return o; }
   if (window.PorchlightAddress) {
     PorchlightAddress.attach(el('where'), function(place){
@@ -688,7 +697,7 @@ details p{margin-top:12px;color:var(--ink)}
         whereMsg.textContent = WHERE_HINT;
       }
       if (state.cart.length) { state.cart = []; renderCart(); addMsg.textContent = 'Your list was cleared because the address changed.'; }
-      loadSlots();
+      loadSitters().then(loadSlots);
     });
   }
 
@@ -724,7 +733,7 @@ details p{margin-top:12px;color:var(--ink)}
     el('often-label').hidden = el('often-row').hidden = id === 'meet';
     if (id === 'meet' && state.often !== 'once') { state.often = 'once'; oftenButtons.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.often === 'once' ? 'true' : 'false'); }); syncRepeat(true); }
     document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.trip === id ? 'true' : 'false'); });
-    loadSlots();
+    loadSitters().then(loadSlots);
   }
   document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.trip); }); });
   // ---- Pet taxi fare, metered by distance ----
@@ -776,7 +785,7 @@ details p{margin-top:12px;color:var(--ink)}
   if (window.PorchlightAddress) PorchlightAddress.attach(el('dropoff'), function(){ fetchRoute(); });
   el('dropoff').addEventListener('change', fetchRoute);
   el('dropoff').addEventListener('blur', function(){ setTimeout(fetchRoute, 250); });
-  townSel.addEventListener('change', function(){ if (el('dropoff').value.trim()) fetchRoute(); });
+  townSel.addEventListener('change', function(){ if (el('dropoff').value.trim()) fetchRoute(); loadSitters().then(loadSlots); });
   renderRoute();
   serviceButtons.forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.service); }); });
   document.querySelectorAll('[data-pick]').forEach(function(a){
@@ -784,7 +793,6 @@ details p{margin-top:12px;color:var(--ink)}
   });
   townSel.addEventListener('change', function(){
     if (state.cart.length) { state.cart = []; renderCart(); addMsg.textContent = 'Your list was cleared because the town changed.'; }
-    loadSlots();
   });
   dateIn.addEventListener('change', function(){ syncRepeat(true); loadSlots(); });
 
@@ -848,6 +856,7 @@ details p{margin-top:12px;color:var(--ink)}
       var info = document.createElement('div');
       var top = document.createElement('span');
       top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (c.service === 'meet' ? ' · Free' : unitPrice(c.service) ? ' · ' + money(unitPrice(c.service)) + (isTaxiSvc(c.service) && state.route ? ' est.' : isTaxiSvc(c.service) ? ' and up' : '') : '');
+      if (c.sitterName) top.textContent += ' · with ' + c.sitterName;
       info.appendChild(top);
       if (c.series) { var sm = document.createElement('small'); sm.textContent = c.series; info.appendChild(sm); }
       var x = document.createElement('button');
@@ -906,21 +915,24 @@ details p{margin-top:12px;color:var(--ink)}
     if (!dates.length) { addMsg.textContent = 'None of those days fall before your end date.'; return Promise.resolve(); }
     var job;
     if (state.often === 'once') {
-      job = Promise.resolve(picked.map(function(p){ return { day: dateIn.value, slot_label: p.label, start_at: p.start_at, available: true }; }));
+      job = Promise.resolve(picked.map(function(p){ return { day: dateIn.value, slot_label: p.label, start_at: p.start_at, available: true, sitter: p.sitter, sitterName: p.sitterName }; }));
     } else {
       addBtn.disabled = true; addMsg.textContent = 'Checking ' + dates.length + ' day' + (dates.length > 1 ? 's' : '') + '…';
       var primeAll = state.place && window.PorchlightAddress ? PorchlightAddress.prime(dates[0], state.place, dates.length) : Promise.resolve();
       job = primeAll.then(function(){
-        return api('rpc/porchlight_check_slots', { body: withGeo({ p_service: svc, p_town: townSel.value, p_dates: dates, p_times: picked.map(function(p){ return p.label; }) }) });
+        return api('rpc/porchlight_check_slots', { body: withGeo({ p_service: svc, p_town: townSel.value, p_dates: dates, p_times: picked.map(function(p){ return p.label; }), p_sitter: state.sitter }) });
       });
     }
     return job.then(function(rows){
       var added = 0, skipped = [];
       (rows || []).forEach(function(r){
         var when = shortDay(r.day) + ' ' + r.slot_label;
+        var rowSitter = state.sitter ? state.sitter : null;
+        if (state.sitter && r.sitter_ok === false) { skipped.push(when + ' (' + (sitterName(state.sitter) || 'your sitter') + ' is busy)'); return; }
         if (!r.available) { skipped.push(when); return; }
         if (inCart(r.start_at)) { skipped.push(when + ' (already listed)'); return; }
-        state.cart.push({ service: svc, start_at: r.start_at, time: r.slot_label, series: series });
+        if (state.often === 'once' && r.sitter !== undefined) rowSitter = r.sitter;
+        state.cart.push({ service: svc, start_at: r.start_at, time: r.slot_label, series: series, sitter: rowSitter, sitterName: state.often === 'once' && r.sitter !== undefined ? r.sitterName : sitterName(rowSitter) });
         added++;
       });
       var msg = added ? 'Added ' + added + ' visit' + (added > 1 ? 's' : '') + '.' : 'Nothing new was added.';
@@ -938,6 +950,34 @@ details p{margin-top:12px;color:var(--ink)}
     slotsBox.querySelectorAll('.slot[aria-pressed]').forEach(function(x){ x.setAttribute('aria-pressed', 'false'); });
   }
 
+  // ---- Choosing a sitter ----
+  var sitterBox = el('sitter-box'), sitterRow = el('sitter-row'), sitterBio = el('sitter-bio');
+  function renderSitters(){
+    sitterRow.innerHTML = '';
+    function mk(id, label){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'choice'; b.textContent = label;
+      b.setAttribute('aria-pressed', state.sitter === id ? 'true' : 'false');
+      b.addEventListener('click', function(){ state.sitter = id; renderSitters(); loadSlots(); });
+      sitterRow.appendChild(b);
+    }
+    mk(null, 'Anyone available');
+    state.sitters.forEach(function(s){ mk(s.id, s.display_name); });
+    var cur = state.sitters.filter(function(s){ return s.id === state.sitter; })[0];
+    sitterBio.textContent = cur ? (cur.bio || '') : 'We’ll match you with a sitter who’s free at the time you pick.';
+  }
+  var sitterToken = 0;
+  function loadSitters(){
+    var token = ++sitterToken;
+    return api('rpc/porchlight_public_sitters', { body: { p_town: townSel.value, p_service: state.service } }).then(function(rows){
+      if (token !== sitterToken) return;
+      state.sitters = rows || [];
+      if (!state.sitters.some(function(s){ return s.id === state.sitter; })) state.sitter = null;
+      sitterBox.hidden = !state.sitters.length;
+      renderSitters();
+    }).catch(function(){ state.sitters = []; state.sitter = null; sitterBox.hidden = true; });
+  }
+  function sitterName(id){ var m = state.sitters.filter(function(s){ return s.id === id; })[0]; return m ? m.display_name : null; }
+
   var loadToken = 0;
   function loadSlots(){
     var token = ++loadToken;
@@ -948,7 +988,7 @@ details p{margin-top:12px;color:var(--ink)}
     slotsBox.innerHTML = '<p class="slot-status">Checking the schedule…</p>';
     var primed = state.place && window.PorchlightAddress ? PorchlightAddress.prime(dateIn.value, state.place) : Promise.resolve();
     primed.then(function(){
-      return api('rpc/porchlight_available_slots', { body: withGeo({ p_date: dateIn.value, p_service: state.service, p_town: townSel.value }) });
+      return api('rpc/porchlight_available_slots', { body: withGeo({ p_date: dateIn.value, p_service: state.service, p_town: townSel.value, p_sitter: state.sitter }) });
     })
       .then(function(rows){
         if (token !== loadToken) return;
@@ -957,22 +997,33 @@ details p{margin-top:12px;color:var(--ink)}
         (rows || []).forEach(function(s){
           var b = document.createElement('button');
           b.type = 'button'; b.className = 'slot'; b.textContent = s.slot_label;
+          var alt = state.sitter && !s.sitter_ok && s.available && s.sitters && s.sitters[0] ? s.sitters[0] : null;
           if (!s.available || inCart(s.start_at)) {
             b.disabled = true;
             b.setAttribute('aria-label', s.slot_label + (s.available ? ', already in your list' : ', unavailable'));
           } else {
             open++;
+            if (alt) {
+              b.classList.add('alt');
+              var sm = document.createElement('small'); sm.textContent = 'with ' + alt.name; b.appendChild(sm);
+              b.setAttribute('aria-label', s.slot_label + ', ' + (sitterName(state.sitter) || 'your sitter') + ' is busy; ' + alt.name + ' is free');
+            }
             b.setAttribute('aria-pressed', 'false');
             b.addEventListener('click', function(){
               var on = b.getAttribute('aria-pressed') !== 'true';
               b.setAttribute('aria-pressed', on ? 'true' : 'false');
-              if (on) state.picked.push({ label: s.slot_label, start_at: s.start_at });
+              if (on) state.picked.push({ label: s.slot_label, start_at: s.start_at, sitter: alt ? alt.id : state.sitter, sitterName: alt ? alt.name : sitterName(state.sitter) });
               else state.picked = state.picked.filter(function(p){ return p.start_at !== s.start_at; });
               updateButtons();
             });
           }
           slotsBox.appendChild(b);
         });
+        if (state.sitter && slotsBox.querySelector('.slot.alt')) {
+          var ap = document.createElement('p'); ap.className = 'slot-status'; ap.style.gridColumn = '1 / -1';
+          ap.textContent = 'Dashed times: ' + (sitterName(state.sitter) || 'your sitter') + ' isn’t free then, but the sitter shown is.';
+          slotsBox.appendChild(ap);
+        }
         if (!open) {
           var p = document.createElement('p');
           p.className = 'slot-status'; p.style.gridColumn = '1 / -1';
@@ -1031,7 +1082,7 @@ details p{margin-top:12px;color:var(--ink)}
     submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
     api('rpc/porchlight_request_bookings', { body: withGeo({
       p_town: townSel.value,
-      p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series }; }),
+      p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series, sitter: c.sitter || null }; }),
       p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
       p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
       p_new_client: el('new-client').checked,
@@ -1116,7 +1167,7 @@ details p{margin-top:12px;color:var(--ink)}
   var qs = new URLSearchParams(location.search), preset = qs.get('service'), presetTown = qs.get('town');
   if (presetTown && townSel.querySelector('option[value="' + presetTown + '"]')) townSel.value = presetTown;
   syncRepeat(true);
-  if (preset && state.labels[preset]) setService(preset); else loadSlots();
+  if (preset && state.labels[preset]) setService(preset); else loadSitters().then(loadSlots);
 })();
 </script>
 <script>

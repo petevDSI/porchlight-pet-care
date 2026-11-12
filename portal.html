@@ -446,7 +446,7 @@
 
   /* ================= Sitters (contracted sitters: open requests, schedule, earnings) ================= */
   function sitterTabs(current) {
-    return tabs([['#/open', 'open', 'Open requests'], ['#/schedule', 'schedule', 'My schedule'], ['#/earnings', 'earnings', 'Earnings'], ['#/profile', 'profile', 'Profile']], current);
+    return tabs([['#/open', 'open', 'Open requests'], ['#/schedule', 'schedule', 'My schedule'], ['#/availability', 'availability', 'Availability'], ['#/earnings', 'earnings', 'Earnings'], ['#/profile', 'profile', 'Profile']], current);
   }
   function navTabs(current) { return me && me.is_staff ? staffTabs(current) : sitterTabs(current); }
 
@@ -455,6 +455,7 @@
     page().appendChild(h('p', { class: 'muted', text: 'Loading…' }));
     Promise.resolve().then(function () {
       if (p[0] === 'visit' && p[1]) return staffVisit(p[1]);
+      if (p[0] === 'availability') return sitterAvailability();
       if (p[0] === 'earnings') return sitterEarnings();
       if (p[0] === 'profile') return sitterProfile();
       if (p[0] === 'schedule') return sitterSchedule();
@@ -576,6 +577,100 @@
           h('div', { class: 'acts' }, h('strong', { text: usd(e.share_cents) }), state)));
       });
       box.appendChild(list);
+    }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+
+  var DOW_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  function hhmm(t) { return String(t || '').slice(0, 5); }
+
+  function sitterAvailability() {
+    var root = page();
+    root.appendChild(sitterTabs('availability'));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Availability' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Pet owners can only book you inside these hours, and never on days you’re off. Visits you already have stay on your schedule, so use Give back on any you can’t keep.' }));
+    var box = h('div', { class: 'stack narrow' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(box);
+    var sid = me.sitter.id;
+    Promise.all([
+      sb.from('porchlight_sitter_hours').select('*').eq('sitter_id', sid).then(guard),
+      sb.from('porchlight_sitter_timeoff').select('*').eq('sitter_id', sid).gte('end_date', new Date().toISOString().slice(0, 10)).order('start_date').then(guard),
+      sb.from('porchlight_sitters').select('display_name,bio,name').eq('id', sid).single().then(guard)
+    ]).then(function (res) {
+      P.clear(box);
+      var hours = res[0], off = res[1], prof = res[2];
+
+      // --- weekly hours: one window per day
+      var rows = [];
+      box.appendChild(h('h2', { style: 'font-size:20px', text: 'Weekly hours' }));
+      [1, 2, 3, 4, 5, 6, 0].forEach(function (d) {
+        var cur = hours.filter(function (x) { return x.dow === d; })[0];
+        var on = h('input', { type: 'checkbox', 'aria-label': DOW_NAMES[d] }); on.checked = !!cur;
+        var from = h('input', { type: 'time', value: cur ? hhmm(cur.start_time) : '08:00', 'aria-label': DOW_NAMES[d] + ' from' });
+        var to = h('input', { type: 'time', value: cur ? hhmm(cur.end_time) : '18:00', 'aria-label': DOW_NAMES[d] + ' until' });
+        rows.push({ d: d, on: on, from: from, to: to });
+        box.appendChild(h('div', { class: 'row', style: 'gap:10px' }, h('label', { style: 'min-width:120px;display:inline-flex;gap:6px;align-items:center' }, on, DOW_NAMES[d]), from, 'to', to));
+      });
+      var saveHours = h('button', { class: 'btn', type: 'button', text: 'Save hours', onclick: function () {
+        var out = [];
+        for (var i = 0; i < rows.length; i++) {
+          var r = rows[i];
+          if (!r.on.checked) continue;
+          if (!r.from.value || !r.to.value || r.to.value <= r.from.value) { P.toast(DOW_NAMES[r.d] + ': the end time must be after the start time'); return; }
+          out.push({ sitter_id: sid, dow: r.d, start_time: r.from.value, end_time: r.to.value });
+        }
+        saveHours.disabled = true;
+        sb.from('porchlight_sitter_hours').delete().eq('sitter_id', sid).then(guard).then(function () {
+          return out.length ? sb.from('porchlight_sitter_hours').insert(out).then(guard) : null;
+        }).then(function () { P.toast(out.length ? 'Hours saved' : 'Saved. You have no open hours, so no one can book you.'); saveHours.disabled = false; })
+          .catch(function (e) { P.toast(P.errMsg(e) + ' Reload to see what was saved.'); saveHours.disabled = false; });
+      } });
+      box.appendChild(saveHours);
+
+      // --- time off
+      box.appendChild(h('h2', { style: 'font-size:20px;margin-top:24px', text: 'Days off' }));
+      var offList = h('div', { class: 'list' });
+      function drawOff() {
+        P.clear(offList);
+        if (!off.length) offList.appendChild(h('div', { class: 'empty', text: 'No time off scheduled.' }));
+        off.forEach(function (t) {
+          offList.appendChild(h('div', { class: 'item' },
+            h('div', { class: 'main' }, h('strong', { text: t.start_date === t.end_date ? P.fmtDay(t.start_date + 'T12:00:00') : P.fmtDay(t.start_date + 'T12:00:00') + ' to ' + P.fmtDay(t.end_date + 'T12:00:00') }),
+              t.note ? h('div', { class: 'small muted', text: t.note }) : null),
+            h('div', { class: 'acts' }, h('button', { class: 'btn ghost sm', type: 'button', text: 'Remove', onclick: function (ev) {
+              ev.target.disabled = true;
+              sb.from('porchlight_sitter_timeoff').delete().eq('id', t.id).then(guard).then(function () { off = off.filter(function (x) { return x.id !== t.id; }); drawOff(); })
+                .catch(function (e) { P.toast(P.errMsg(e)); ev.target.disabled = false; });
+            } }))));
+        });
+      }
+      drawOff(); box.appendChild(offList);
+      var today = new Date().toISOString().slice(0, 10);
+      var d1 = h('input', { type: 'date', min: today, 'aria-label': 'First day off' }), d2 = h('input', { type: 'date', min: today, 'aria-label': 'Last day off' });
+      var note = h('input', { type: 'text', placeholder: 'Note (optional)', 'aria-label': 'Note', style: 'max-width:220px' });
+      var addOff = h('button', { class: 'btn ghost sm', type: 'button', text: 'Add days off', onclick: function () {
+        if (!d1.value) { P.toast('Pick the first day'); return; }
+        var end = d2.value || d1.value;
+        if (end < d1.value) { P.toast('The last day is before the first'); return; }
+        addOff.disabled = true;
+        sb.from('porchlight_sitter_timeoff').insert({ sitter_id: sid, start_date: d1.value, end_date: end, note: note.value.trim() || null }).select().single().then(guard)
+          .then(function (row) { off.push(row); off.sort(function (a, b) { return a.start_date < b.start_date ? -1 : 1; }); drawOff(); d1.value = d2.value = note.value = ''; addOff.disabled = false; })
+          .catch(function (e) { P.toast(P.errMsg(e)); addOff.disabled = false; });
+      } });
+      box.appendChild(h('div', { class: 'row small', style: 'margin-top:8px' }, d1, 'to', d2, note, addOff));
+
+      // --- what pet owners see
+      box.appendChild(h('h2', { style: 'font-size:20px;margin-top:24px', text: 'What pet owners see' }));
+      var dn = h('input', { type: 'text', maxlength: '40', value: prof.display_name || '', placeholder: 'Shown as first name and last initial', 'aria-label': 'Display name' });
+      var bio = h('textarea', { rows: 3, maxlength: '400', placeholder: 'A sentence or two: your pets, your experience, what you love about the job', 'aria-label': 'About you' }); bio.value = prof.bio || '';
+      var saveProf = h('button', { class: 'btn ghost sm', type: 'button', text: 'Save', onclick: function () {
+        saveProf.disabled = true;
+        sb.rpc('porchlight_sitter_set_public', { p_display: dn.value, p_bio: bio.value }).then(guard)
+          .then(function () { P.toast('Saved'); saveProf.disabled = false; }).catch(function (e) { P.toast(P.errMsg(e)); saveProf.disabled = false; });
+      } });
+      box.appendChild(h('label', { class: 'f' }, 'Name shown on the booking page', dn));
+      box.appendChild(h('label', { class: 'f' }, 'About you', bio));
+      box.appendChild(saveProf);
     }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
   }
 

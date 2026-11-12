@@ -22,6 +22,15 @@ Supabase tables are all prefixed `porchlight_` (towns, services, bookings, clien
 
 To give someone sitter access, add their email to `porchlight_staff` after they create a portal login.
 
+## Contracted sitters and payouts
+
+Migration `20261113_sitters.sql` adds `porchlight_sitters`, `porchlight_payouts` and `sitter_id` / `sitter_keep_pct` / `payout_id` on bookings.
+
+- **Onboarding:** an applicant is approved in Portal > Sitters (towns + keep %). That creates the sitter row; they then sign up at /portal with the same email.
+- **Claiming:** sitters see open requests (no client names or addresses) and accept first-come. Claims are race-safe and reject overlapping visits. A sitter can give a visit back up to 24 hours before it starts.
+- **Privacy:** a sitter sees client details only for assigned, confirmed visits, until 3 days after the visit.
+- **Pay:** the sitter keeps `keep_pct` (default 88) of cash actually collected, plus 100% of tips. The percentage is snapshotted when the visit is assigned. Staff record payouts in Portal > Sitters > Payouts after sending the money; each visit is paid once.
+
 ## Changing prices
 
 Prices come from the `porchlight_services` table (`price_cents`). Change them there; the site reads them on load.

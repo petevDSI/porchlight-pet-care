@@ -63,6 +63,38 @@ const CAT = {
   "Getting Started": "🏡", "Health & Vet": "🩺", "Walking & Exercise": "🦮", "Safety": "🛟",
   "Travel Prep": "🧳", "Cats & Small Pets": "🐈", "Seasonal": "🍂",
 };
+
+// ---------- images ----------
+// Personal photos live in /assets/img/blog (resized from assets/img/pack); the rest are Unsplash.
+const U = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&h=675&q=75`;
+const L = (n, pos) => ({ src: `/assets/img/blog/${n}.jpg`, pos });
+const IMG = {
+  "pet-sitter-meet-and-greet": { ...L("kraig-bowie", "50% 35%"), alt: "Kraig relaxing at a table with a dog beside him" },
+  "hot-weather-dog-walking": { src: U("1663501258049-77f9638cbaea"), alt: "A dog drinking water on a warm day" },
+  "overnight-stay-checklist": { ...L("maizy-bedtime", "50% 45%"), alt: "A small dog tucked into pillows at bedtime" },
+  "fireworks-and-storm-anxiety": { src: U("1636289571953-da28b660ee2d"), alt: "Fireworks lighting up the night sky" },
+  "pet-sitter-vs-boarding": { ...L("couch-pile", "50% 35%"), alt: "Dogs and cats snuggled together on a couch at home" },
+  "dog-vaccines-before-a-stay": { src: U("1630359486912-4b085e38f1e7"), alt: "A veterinarian examining a dog" },
+  "cat-vaccines-and-health-checks": { ...L("cat-silver-longhair", "50% 45%"), alt: "A silver long-haired cat sitting upright" },
+  "pet-care-instruction-sheet": { src: U("1761322572550-967ea8c0bfd9"), alt: "An open notebook and pen on a desk" },
+  "pet-medications-while-away": { src: U("1629225303555-755fd9c64ea2"), alt: "A person giving a dog a tablet" },
+  "dog-walking-basics": { ...L("pack-hilltop", "50% 60%"), alt: "Three dogs resting in a grassy field on a hilltop walk" },
+  "flea-tick-heartworm-prevention": { src: U("1554039533-eb4a99deaf72"), alt: "A dog standing in grass outdoors" },
+  "caring-for-cats-while-away": { ...L("cat-kitten-eating", "50% 40%"), alt: "A kitten eating from a dish on the living room floor" },
+  "separation-anxiety-in-dogs": { ...L("maizy-window", "50% 55%"), alt: "A small dog watching from a window bed" },
+  "pet-emergency-plan": { ...L("flight-cat-carrier", "50% 40%"), alt: "A cat in a carrier ready to travel" },
+  "halloween-pet-hazards": { src: U("1539477436787-f6bb31522b39"), alt: "Halloween pumpkins" },
+  "microchips-and-pet-id": { src: U("1667716705760-233650f8f3fe"), alt: "A dog wearing an ID tag on its collar" },
+  "exotic-and-small-pet-care": { src: U("1758206411649-1e4e76ac0e1d"), alt: "A bearded dragon resting on a branch" },
+  "senior-pet-care-while-traveling": { src: U("1608469926865-b2d2200bb2f6"), alt: "A senior dog resting calmly" },
+  "puppy-and-kitten-care": { ...L("eden-puppy", "50% 68%"), alt: "A happy puppy running across the grass" },
+  "holiday-pet-sitting-planning": { ...L("maizy-car", "50% 65%"), alt: "A dog riding in the front seat of a car" },
+};
+const imgTag = (p, hero) => {
+  const i = IMG[p.slug];
+  if (!i) return "";
+  return `<img src="${i.src}" alt="${esc(i.alt)}" width="1200" height="675"${i.pos ? ` style="object-position:${i.pos}"` : ""} ${hero ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+};
 // Related service page per category, shown in the end-of-article box
 const SERVICE_LINKS = {
   default: [["Overnight pet sitting", "/services/overnight-pet-sitting"], ["Dog walking", "/services/dog-walking"], ["Drop-in visits", "/services/drop-in-visits"]],
@@ -140,7 +172,7 @@ const footer = () => `<footer class="site-footer">
 </footer>`;
 
 const card = (p) => `<article class="card" data-cat="${esc(p.category)}">
-<a class="thumb" href="${urlOf(p)}" tabindex="-1" aria-hidden="true"><span>${p.icon}</span></a>
+<a class="thumb" href="${urlOf(p)}" tabindex="-1" aria-hidden="true">${imgTag(p) || `<span>${p.icon}</span>`}</a>
 <div class="card-body">
 <p class="meta"><span class="tag">${esc(p.category)}</span> <time datetime="${p.date}">${fmtDate(p.date)}</time></p>
 <h3 class="display"><a href="${urlOf(p)}">${esc(p.title)}</a></h3>
@@ -167,7 +199,7 @@ ${header()}
 </div></section>
 <section class="blog-body"><div class="wrap">
 <article class="feature">
-<a class="thumb big" href="${urlOf(feat)}" tabindex="-1" aria-hidden="true"><span>${feat.icon}</span></a>
+<a class="thumb big" href="${urlOf(feat)}" tabindex="-1" aria-hidden="true">${imgTag(feat) || `<span>${feat.icon}</span>`}</a>
 <div class="feature-text">
 <p class="meta"><span class="tag tag-amber">Latest</span> <span class="tag">${esc(feat.category)}</span> <time datetime="${feat.date}">${fmtDate(feat.date)}</time></p>
 <h2 class="display"><a href="${urlOf(feat)}">${esc(feat.title)}</a></h2>
@@ -223,6 +255,7 @@ ${header()}
 <h1 class="display">${esc(p.title)}</h1>
 <p class="byline">By ${esc(cfg.author)} &middot; <time datetime="${p.date}">${fmtDate(p.date)}</time> &middot; ${p.minutes} min read</p>
 </header>
+${imgTag(p, true) ? `<figure class="hero">${imgTag(p, true)}</figure>` : ""}
 <div class="prose">
 ${p.html}
 </div>

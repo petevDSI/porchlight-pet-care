@@ -395,7 +395,7 @@ const SERVICES = [
     gallery: [
       [img('photo-1789352050543-b1bbc066fefc', 1200, 800), 'View from a covered front porch onto a quiet street'],
       ['/assets/img/pack/squirrel-window-feeder.jpg', 'A gray squirrel peering through a kitchen window next to a window bird feeder'],
-      ['/assets/img/pack/eden-oskar-deck.jpg', 'Eden and Oskar on a back deck with planters of flowers']
+      [img('photo-1784958676531-d019515a7d54', 1200, 800), 'Warm porch light glowing at a front door in the evening']
     ],
     cta: 'Book a check-in',
     included: [

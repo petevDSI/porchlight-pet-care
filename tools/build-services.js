@@ -55,10 +55,10 @@ const SERVICES = [
     slug: 'overnight-pet-sitting', id: 'overnight', name: 'Overnight stays', short: 'Overnight stays',
     title: 'Overnight Pet Sitting in Belmont, NC',
     metaTitle: 'Overnight Pet Sitting in Belmont, NC | Porchlight Pet & Home Care',
-    metaDesc: 'In-home overnight pet sitting in Belmont, Mt. Holly, Cramerton and Lake Wylie. Your sitter stays the night: evening and morning walks, meals, meds, playtime and photo updates. $95 a night.',
+    metaDesc: 'In-home overnight pet sitting in Belmont, Mt. Holly, Cramerton and Lake Wylie. Your sitter stays the night: evening and morning walks, meals, meds, playtime and photo updates. $99 a night.',
     h1: 'Overnight pet sitting, in your own home.',
     lede: 'Your sitter arrives in the evening and stays until morning, so your pets keep their own beds, their own yard and their own routine, and your house never sits empty.',
-    price: 95, unit: 'per night',
+    price: 99, unit: 'per night',
     hero: '/assets/img/pack/oskar-eden-nap.jpg', heroAlt: 'Oskar the dachshund napping on top of Eden, curled up on a blanket',
     gallery: [
       ['/assets/img/pack/couch-pile.jpg', 'Maizy and Oskar piled together on the couch, with Bowie asleep in front'],
@@ -111,9 +111,9 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['Overnight stay', 'About 6:30 pm to 8:00 am, one or two pets', '$95'],
+      ['Overnight stay', 'About 6:30 pm to 8:00 am, one or two pets', '$99'],
       ['Each additional pet', 'Per night', '+$5'],
-      ['Midday check-in during your trip', '30-minute visit on days you’re away', '$25'],
+      ['Midday check-in during your trip', '30-minute visit on days you’re away', '$30'],
       ['Holidays', 'Thanksgiving, Christmas, New Year’s, July 4th and similar', '+$20']
     ],
     faq: [
@@ -190,10 +190,10 @@ const SERVICES = [
     slug: 'drop-in-visits', id: 'visit', name: 'Drop-in visits', short: 'Drop-in visits',
     title: 'Cat Sitting and Drop-In Pet Visits in Belmont, NC',
     metaTitle: 'Cat Sitting & Drop-In Pet Visits in Belmont, NC | Porchlight',
-    metaDesc: 'In-home drop-in visits for cats, senior dogs and small pets in Belmont, Mt. Holly, Cramerton and Lake Wylie. Meals, litter, medication and real company. $25 per 30-minute visit.',
+    metaDesc: 'In-home drop-in visits for cats, senior dogs and small pets in Belmont, Mt. Holly, Cramerton and Lake Wylie. Meals, litter, medication and real company. $30 per 30-minute visit.',
     h1: 'Drop-in visits for cats, seniors and homebodies.',
     lede: 'Thirty minutes of real care in your home: meals, litter, medication and company, for pets who are happiest staying put.',
-    price: 25, unit: 'per 30-minute visit',
+    price: 30, unit: 'per 30-minute visit',
     hero: img('photo-1777660554959-658d19a195fa', 1200), heroAlt: 'A fluffy cat looking out of a window',
     gallery: [
       [img('photo-1607539678863-ba64f95124bc', 1200, 800), 'A cat waiting on a table for its food'],
@@ -237,7 +237,7 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['30-minute visit', 'One or two pets', '$25'],
+      ['30-minute visit', 'One or two pets', '$30'],
       ['Each additional pet', 'Per visit', '+$5'],
       ['Holidays', 'Per visit', '+$10']
     ],
@@ -252,10 +252,10 @@ const SERVICES = [
     slug: 'cat-sitting', id: 'visit', name: 'Cat sitting', short: 'Cat sitting',
     title: 'Cat Sitting in Belmont, NC',
     metaTitle: 'Cat Sitting in Belmont, NC | Porchlight Pet & Home Care',
-    metaDesc: 'In-home cat sitting in Belmont, Mt. Holly, Cramerton and Lake Wylie. Your cat stays home: meals, litter, medication, play and a photo update every visit. $25 per 30-minute visit.',
+    metaDesc: 'In-home cat sitting in Belmont, Mt. Holly, Cramerton and Lake Wylie. Your cat stays home: meals, litter, medication, play and a photo update every visit. $30 per 30-minute visit.',
     h1: 'Cat sitting that keeps your cat at home.',
     lede: 'Most cats are happiest in their own space. We come to you for 30 minutes of real care: fresh food and water, a clean litter box, medication if needed, play, and a note and photos so you know how they are.',
-    price: 25, unit: 'per 30-minute visit',
+    price: 30, unit: 'per 30-minute visit',
     includesTitle: 'Every cat visit includes',
     hero: '/assets/img/pack/cat-silver-longhair.jpg', heroAlt: 'A fluffy silver tabby cat sitting upright on a scratching pad',
     gallery: [
@@ -301,10 +301,10 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['Cat visit', 'About 30 minutes, one or two cats', '$25'],
+      ['Cat visit', 'About 30 minutes, one or two cats', '$30'],
       ['Each additional pet', 'Per visit', '+$5'],
       ['Holidays', 'Per visit', '+$10'],
-      ['Overnight stay', 'Your sitter stays the night, for cats who do best with company', '$95', 'overnight']
+      ['Overnight stay', 'Your sitter stays the night, for cats who do best with company', '$99', 'overnight']
     ],
     faq: [
       ['How often should someone visit my cat?', 'Once a day works for most healthy adult cats on a short trip. Twice a day is better for kittens, seniors, cats on medication, and trips longer than a few days.'],
@@ -319,10 +319,10 @@ const SERVICES = [
     slug: 'exotic-pet-sitting', id: 'visit', name: 'Birds, reptiles, fish and small pets', short: 'Birds, reptiles and fish',
     title: 'Bird, Reptile, Fish and Small Pet Sitting in Belmont, NC',
     metaTitle: 'Bird, Reptile & Fish Pet Sitting in Belmont, NC | Porchlight',
-    metaDesc: 'In-home care for birds, reptiles, fish, rabbits and other small pets in Belmont, Mt. Holly, Cramerton and Lake Wylie. Feeding, habitat checks, medication and photo updates. $25 per visit.',
+    metaDesc: 'In-home care for birds, reptiles, fish, rabbits and other small pets in Belmont, Mt. Holly, Cramerton and Lake Wylie. Feeding, habitat checks, medication and photo updates. $30 per visit.',
     h1: 'Care for birds, reptiles, fish and small pets.',
     lede: 'Habitats are hard to travel with and easy to get wrong. We come to your home, follow your care notes exactly, check the habitat, and send photos so you know everyone is fine.',
-    price: 25, unit: 'per 30-minute visit',
+    price: 30, unit: 'per 30-minute visit',
     includesTitle: 'Every visit includes',
     hero: img('photo-1758206411649-1e4e76ac0e1d', 1200), heroAlt: 'A bearded dragon resting on a branch',
     gallery: [
@@ -370,7 +370,7 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['Visit', 'About 30 minutes, one or two pets or habitats', '$25'],
+      ['Visit', 'About 30 minutes, one or two pets or habitats', '$30'],
       ['Each additional pet or habitat', 'Per visit', '+$5'],
       ['Holidays', 'Per visit', '+$10']
     ],
@@ -380,17 +380,17 @@ const SERVICES = [
       ['How often do my pets need a visit?', 'It depends on the species. Birds and small mammals generally need a visit every day, while fish and some reptiles may need less. We set the schedule with you at the meet-and-greet.'],
       ['What if a heat lamp, heater or filter stops working?', 'We check them every visit. If something fails, we call you right away, fix what we safely can, such as a reset timer or a spare you’ve left out, and contact your vet if your pet needs it.'],
       ['Do you need vaccination records for my pets?', 'Not for birds, reptiles, fish or most small pets. We ask for a current rabies certificate for dogs, cats and ferrets only.'],
-      ['Is the price different from a regular visit?', 'No. Visits for these pets are the same $25 as any 30-minute visit, with +$5 for each additional pet or habitat.']
+      ['Is the price different from a regular visit?', 'No. Visits for these pets are the same $30 as any 30-minute visit, with +$5 for each additional pet or habitat.']
     ]
   },
   {
     slug: 'home-check-ins', id: 'home', name: 'Home check-ins', short: 'Home check-ins',
     title: 'House Sitting and Home Check-Ins in Belmont, NC',
     metaTitle: 'House Sitting & Home Check-Ins in Belmont, NC | Porchlight',
-    metaDesc: 'Home check-ins while you travel in Belmont, Mt. Holly, Cramerton and Lake Wylie. Mail and packages in, plants watered, lights rotated, a walk-through for leaks and problems. No pets needed. $30 a visit.',
+    metaDesc: 'Home check-ins while you travel in Belmont, Mt. Holly, Cramerton and Lake Wylie. Mail and packages in, plants watered, lights rotated, a walk-through for leaks and problems. No pets needed. $35 a visit.',
     h1: 'Your house, looked after while you’re away.',
     lede: 'No pets required. We bring in the mail, water the plants, rotate the lights and walk through the house, so it looks lived in and nothing goes wrong unnoticed.',
-    price: 30, unit: 'per visit',
+    price: 35, unit: 'per visit',
     hero: img('photo-1605449669747-35d71b9436f8', 1200), heroAlt: 'Houseplants being watered',
     gallery: [
       [img('photo-1789352050543-b1bbc066fefc', 1200, 800), 'View from a covered front porch onto a quiet street'],
@@ -436,7 +436,7 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['Home check-in', 'About 30 minutes', '$30'],
+      ['Home check-in', 'About 30 minutes', '$35'],
       ['Holidays', 'Per visit', '+$10']
     ],
     faq: [

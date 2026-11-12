@@ -55,3 +55,13 @@ The border is one polygon stored in the database table `porchlight_area` (row `m
 ## Pet taxi fares and tips
 
 Pet taxi is metered like a cab. Rates live in the table `porchlight_taxi_rates` (edit there): $20 base, $2 per mile one way ($30 minimum), $3 per mile round trip ($40 minimum), waiting free for 10 minutes then $10 per 15. The booking form asks the `porchlight-geo` function (action `route`) for the driving distance from the pickup to the drop-off and shows an estimate; the database recomputes the fare when the request is saved. Kraig records minutes waited in the Payments tab and the amount due updates. At checkout clients can add a tip (10, 15, 20 percent or a custom amount); it is stored on the bookings and pre-filled when Kraig marks the visit paid.
+
+## Vaccination records
+
+- The new client form has a **Vaccination records** box under each pet: a rabies certificate upload, an optional "other vaccine records" upload, and a **Rabies vaccine expires** date. Uploading is optional on the form; the portal asks for anything missing before the first visit.
+- Files (PDF or photo, 10 MB each) live in the private `porchlight-records` storage bucket. Each file has a row in `porchlight_pet_docs` (pet, kind `rabies` or `other`, path). Only the client and staff can open them, through links that expire after an hour.
+- The form is filled out before a login exists, so it may only add files under `intake/<form id>/`; it can never read or list them. `porchlight_submit_intake` attaches those files to the new pets. Uploads from the form are capped at 60 an hour.
+- `P.vaxStatus()` in `assets/app.js` decides what is shown: current, expires within 30 days, expired, or needed. It applies to dogs, cats and ferrets. Kraig sees a "Vaccine record needed" chip on the client list and a note on the visit screen.
+- The vet section asks whether Porchlight may confirm records with the vet (`vet_records_ok`).
+- Database changes are in `supabase/migrations/20261112_vaccination_records.sql`.
+

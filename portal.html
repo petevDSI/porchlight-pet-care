@@ -392,24 +392,28 @@
     root.appendChild(box);
     Promise.all([
       sb.from('porchlight_services').select('id,price_cents').then(guard),
-      sb.from('porchlight_bookings').select('id,start_at,service_id,client_id,client_name,client_email,porchlight_clients(name),porchlight_payments(id,amount_cents,tip_cents,method,reference,paid_at)')
+      sb.from('porchlight_bookings').select('id,start_at,service_id,client_id,client_name,client_email,fare_cents,wait_min,tip_cents,trip_miles,dropoff_address,porchlight_clients(name),porchlight_payments(id,amount_cents,tip_cents,method,reference,paid_at)')
         .eq('status', 'completed').order('start_at', { ascending: false }).limit(400).then(guard)
+      ,sb.from('porchlight_taxi_rates').select('*').eq('id', 'main').then(guard)
     ]).then(function (res) {
       var price = {}; res[0].forEach(function (s) { price[s.id] = s.price_cents; });
+      var rates = (res[2] || [])[0] || null;
+      function waitCharge(m) { return !rates || (m || 0) <= rates.wait_free_min ? 0 : Math.ceil(((m || 0) - rates.wait_free_min) / rates.wait_block_min) * rates.wait_block_cents; }
+      function owedFor(b) { var isT = b.service_id === 'taxi' || b.service_id === 'taxi_rt'; return isT ? (b.fare_cents != null ? b.fare_cents : (price[b.service_id] || 0)) + waitCharge(b.wait_min) : (price[b.service_id] || 0); }
       var unpaid = {}, order = [], paid = [];
       res[1].forEach(function (b) {
         var pay = paidOf(b);
         if (pay) { paid.push({ b: b, pay: pay }); return; }
         var key = b.client_id || b.client_email;
         if (!unpaid[key]) { unpaid[key] = { name: (b.porchlight_clients && b.porchlight_clients.name) || b.client_name, email: b.client_email, items: [] }; order.push(key); }
-        unpaid[key].items.push({ b: b, cents: price[b.service_id] || 0 });
+        unpaid[key].items.push({ b: b, cents: owedFor(b), wait: waitCharge(b.wait_min) });
       });
       P.clear(box);
       var owed = order.reduce(function (t, k) { return t + unpaid[k].items.reduce(function (a, i) { return a + i.cents; }, 0); }, 0);
       box.appendChild(h('div', { class: 'panel' }, h('div', { class: 'spread' },
         h('div', null, h('p', { class: 'eyebrow', text: 'Unpaid' }), h('p', { class: 'display', style: 'font-size:32px', text: usd(owed) })),
         h('p', { class: 'muted', text: order.length ? 'across ' + order.length + ' client' + (order.length > 1 ? 's' : '') : 'Everyone is paid up.' }))));
-      order.forEach(function (k) { box.appendChild(unpaidClient(unpaid[k])); });
+      order.forEach(function (k) { box.appendChild(unpaidClient(unpaid[k], rates)); });
       if (paid.length) {
         var l = h('div', { class: 'list' });
         paid.slice(0, 25).forEach(function (x) {
@@ -424,10 +428,11 @@
     }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
   }
 
-  function unpaidClient(g) {
+  function unpaidClient(g, rates) {
     var sum = g.items.reduce(function (a, i) { return a + i.cents; }, 0);
     var amount = h('input', { type: 'number', min: '0', step: '0.01', value: (sum / 100).toFixed(2), 'aria-label': 'Amount received in dollars', style: 'max-width:130px' });
-    var tip = h('input', { type: 'number', min: '0', step: '0.01', placeholder: 'Tip $', 'aria-label': 'Tip in dollars', style: 'max-width:100px' });
+    var planned = g.items.reduce(function (a, i) { return a + (i.b.tip_cents || 0); }, 0);
+    var tip = h('input', { type: 'number', min: '0', step: '0.01', placeholder: 'Tip $', value: planned ? (planned / 100).toFixed(2) : '', 'aria-label': 'Tip in dollars', style: 'max-width:100px' });
     var method = h('select', { 'aria-label': 'Payment method', style: 'max-width:140px' });
     PAY_METHODS.forEach(function (m) { method.appendChild(h('option', { value: m[0], text: m[1] })); });
     var ref = h('input', { maxlength: '80', placeholder: 'Check # or note', 'aria-label': 'Check number or note', style: 'max-width:180px' });
@@ -444,7 +449,22 @@
         .catch(function (e) { P.toast(P.errMsg(e)); btn.disabled = false; });
     } });
     var list = h('ul', { class: 'small', style: 'margin:6px 0 0;padding-left:18px' });
-    g.items.forEach(function (i) { list.appendChild(h('li', { text: P.fmtDay(i.b.start_at) + ' · ' + (SERVICE_LABEL[i.b.service_id] || i.b.service_id) + ' · ' + usd(i.cents) })); });
+    g.items.forEach(function (i) {
+      var isT = i.b.service_id === 'taxi' || i.b.service_id === 'taxi_rt';
+      var li = h('li', { text: P.fmtDay(i.b.start_at) + ' · ' + (SERVICE_LABEL[i.b.service_id] || i.b.service_id) + ' · ' + usd(i.cents) +
+        (isT && i.b.trip_miles != null ? ' (' + i.b.trip_miles + ' mi' + (i.wait ? ', incl. ' + usd(i.wait) + ' waiting' : '') + ')' : '') });
+      if (isT) {
+        var w = h('input', { type: 'number', min: '0', max: '600', step: '5', value: String(i.b.wait_min || 0), 'aria-label': 'Minutes waited', style: 'max-width:80px;margin:0 6px' });
+        var wb = h('button', { class: 'linkbtn', type: 'button', text: 'Save wait', onclick: function () {
+          var m = parseInt(w.value, 10); if (isNaN(m) || m < 0) { P.toast('Enter the minutes waited'); return; }
+          sb.from('porchlight_bookings').update({ wait_min: m }).eq('id', i.b.id).then(guard).then(function () { P.toast('Wait time saved'); render(); }).catch(function (e) { P.toast(P.errMsg(e)); });
+        } });
+        li.appendChild(h('div', { class: 'small muted', style: 'margin-top:4px' }, 'Minutes waited:', w, wb,
+          rates ? ' (' + rates.wait_free_min + ' free, then ' + usd(rates.wait_block_cents) + ' per ' + rates.wait_block_min + ')' : ''));
+      }
+      list.appendChild(li);
+    });
+    if (planned) list.appendChild(h('li', { text: 'Client planned a tip of ' + usd(planned) + ' (filled in below).' }));
     return h('section', { class: 'panel stack' },
       h('div', { class: 'spread' }, h('h3', { text: g.name }), h('strong', { text: usd(sum) + ' for ' + g.items.length + ' visit' + (g.items.length > 1 ? 's' : '') })),
       list,

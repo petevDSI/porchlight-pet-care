@@ -51,3 +51,7 @@ Prices come from the `porchlight_services` table (`price_cents`). Change them th
 ## Service area border
 
 The border is one polygon stored in the database table `porchlight_area` (row `main`, vertices as `[lat, lng]`). It runs down the middle of the Catawba River and Lake Wylie and along Celanese Rd in Rock Hill, and it is enforced by `porchlight_in_area()` inside `porchlight_available_slots` (every booking) and `porchlight_submit_intake`. `assets/address.js` carries a copy (`AREA`) so the address box can warn right away; change both together. A 75-minute drive-time check remains as a second safety net.
+
+## Pet taxi fares and tips
+
+Pet taxi is metered like a cab. Rates live in the table `porchlight_taxi_rates` (edit there): $20 base, $2 per mile one way ($30 minimum), $3 per mile round trip ($40 minimum), waiting free for 10 minutes then $10 per 15. The booking form asks the `porchlight-geo` function (action `route`) for the driving distance from the pickup to the drop-off and shows an estimate; the database recomputes the fare when the request is saved. Kraig records minutes waited in the Payments tab and the amount due updates. At checkout clients can add a tip (10, 15, 20 percent or a custom amount); it is stored on the bookings and pre-filled when Kraig marks the visit paid.

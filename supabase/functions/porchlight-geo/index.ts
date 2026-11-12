@@ -1,5 +1,6 @@
 // Porchlight geo helper.
 //  POST { action: "geocode", address }            -> { ok, lat, lng, formatted }
+//  POST { action: "route", dest, lat?, lng?, origin? } -> { ok, miles, minutes, dest_formatted }  (pet taxi fares)
 //  POST { action: "prime", date, days?, lat, lng } -> fills porchlight_drive_cache with Google drive times
 //                                                    between this address and that day's booked stops.
 // Without the GOOGLE_MAPS_SERVER_KEY secret it answers { ok:false, reason:"no_key" } and the
@@ -57,6 +58,36 @@ async function matrix(origins: Pt[], dests: Pt[]) {
   }));
 }
 
+// Driving distance and time from a pickup point to any destination address (pet taxi fares).
+async function lookup(address: string) {
+  const u = new URL("https://maps.googleapis.com/maps/api/geocode/json");
+  u.searchParams.set("address", address);
+  u.searchParams.set("components", "country:US");
+  u.searchParams.set("bounds", "34.9,-81.5|35.5,-80.7");
+  u.searchParams.set("key", KEY);
+  const j = await (await fetch(u)).json();
+  const hit = j.results?.[0];
+  if (!hit) return null;
+  return { lat: hit.geometry.location.lat as number, lng: hit.geometry.location.lng as number, formatted: hit.formatted_address as string };
+}
+async function route(body: any) {
+  const dest = String(body.dest ?? "").trim();
+  if (dest.length < 4 || dest.length > 300) return json({ ok: false, reason: "bad_dest" }, 400);
+  let from: Pt | null = okPoint(body.lat, body.lng) ? { lat: body.lat, lng: body.lng } : null;
+  if (!from) {
+    const o = String(body.origin ?? "").trim();
+    if (o.length < 4 || o.length > 300) return json({ ok: false, reason: "bad_origin" }, 400);
+    const g = await lookup(o);
+    if (!g) return json({ ok: false, reason: "origin_not_found" });
+    from = { lat: g.lat, lng: g.lng };
+  }
+  const d = await lookup(dest);
+  if (!d || !(d.lat > 24 && d.lat < 50 && d.lng > -125 && d.lng < -66)) return json({ ok: false, reason: "dest_not_found" });
+  const m = await matrix([from], [{ lat: d.lat, lng: d.lng }]);
+  if (!m.length || m[0].meters == null) return json({ ok: false, reason: "no_route" });
+  return json({ ok: true, miles: Math.round((m[0].meters / 1609.344) * 10) / 10, minutes: m[0].minutes, dest_formatted: d.formatted.replace(/, USA$/, "") });
+}
+
 async function prime(date: string, me: Pt, days = 1) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return json({ ok: false, reason: "bad_date" }, 400);
   const day = new Date(date + "T12:00:00Z");
@@ -112,6 +143,7 @@ Deno.serve(async (req) => {
       if (a.length < 5 || a.length > 200) return json({ ok: false, reason: "bad_address" }, 400);
       return await geocode(a);
     }
+    if (body.action === "route") return await route(body);
     if (body.action === "prime") {
       if (!okPoint(body.lat, body.lng)) return json({ ok: false, reason: "bad_point" }, 400);
       const me = { lat: body.lat, lng: body.lng };

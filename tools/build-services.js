@@ -303,10 +303,10 @@ const SERVICES = [
     slug: 'pet-taxi', id: 'taxi', name: 'Pet taxi', short: 'Pet taxi',
     title: 'Pet Taxi in Belmont, NC',
     metaTitle: 'Pet Taxi in Belmont, NC | Rides to the Vet and Groomer | Porchlight',
-    metaDesc: 'Pet taxi from homes in Belmont, Mt. Holly, Cramerton, Lake Wylie, Clover, York and nearby. A safe, secured ride to the vet, groomer or boarding, door to door, with a text at pickup and drop-off. $35 one way, $65 round trip.',
+    metaDesc: 'Pet taxi from homes in Belmont, Mt. Holly, Cramerton, Lake Wylie, Clover, York and nearby. A safe, secured ride to the vet, groomer or boarding, door to door, with a text at pickup and drop-off. From $30 one way and $40 round trip.',
     h1: 'A safe ride to the vet, the groomer or the kennel.',
     lede: 'Can’t get off work for the appointment? We pick your pet up at your door, ride them there secured and calm, hand them to the clinic, and bring them home, with a text at every step.',
-    price: 35, unit: 'one way, anywhere you need to go',
+    price: 30, unit: 'and up, metered by the mile',
     hero: img('photo-1711654783635-c65873cdae66', 1200), heroAlt: 'A cocker spaniel looking out of a car window',
     gallery: [
       [img('photo-1703733565148-0a33aa10184e', 1200, 800), 'Two dogs sitting in a car, looking out the window'],
@@ -352,13 +352,14 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['Pet taxi, one way', 'Pickup at your home, drop-off anywhere you need', '$35', 'taxi'],
-      ['Pet taxi, round trip', 'There and back, with a short wait or a scheduled return pickup', '$65', 'taxi_rt'],
-      ['A very long drive, or a long wait', 'We’ll tell you the price before you book', 'Quoted']
+      ['Pet taxi, one way (from)', '$20 plus $2 a mile. You see the exact fare for your trip before you book', '$30', 'taxi'],
+      ['Pet taxi, round trip (from)', '$20 plus $3 a mile for the whole trip. Cheaper per leg than two one-way rides, 10 minutes of waiting included', '$40', 'taxi_rt'],
+      ['Waiting at the vet or groomer', 'The first 10 minutes are free, then $10 for each 15 minutes', '$10'],
+      ['A very long drive', 'Past about 150 miles it is a transport trip, quoted for you', 'Quoted']
     ],
     faq: [
       ['Which pets can ride?', 'Dogs, cats and small pets in a carrier. Tell us the breed and weight when you book so we can confirm they ride safely in our vehicle.'],
-      ['Do you stay with my pet at the vet?', 'We check your pet in and hand them to the staff. On a round trip we come back for them when they’re ready. We don’t make medical decisions: you, or a contact you list, approve treatment.'],
+      ['Do you stay with my pet at the vet?', 'We check your pet in and hand them to the staff. On a round trip we come back for them when they’re ready. If we wait with your pet, the first 10 minutes are free and then it’s $10 for each 15 minutes. We don’t make medical decisions: you, or a contact you list, approve treatment.'],
       ['Who pays the vet or groomer?', 'You do, directly. We bring your pet and bring them home; we don’t pay for or collect for the clinic.'],
       ['What if the appointment runs long?', 'Text us. A short delay is part of a round trip. For long waits we’ll agree on the extra cost with you first.'],
       ['Can I book the same ride every week?', 'Yes. Weekly rides to a groomer, daycare or physical therapy can be booked as a repeating request.']

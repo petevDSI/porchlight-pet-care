@@ -288,7 +288,7 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="card-body">
 <h3><a class="card-link" href="/services/pet-taxi">Pet taxi</a></h3>
 <p>A secured ride to the vet, groomer or boarding, door to door, with a text at pickup and drop-off.</p>
-<div class="card-foot"><p class="price"><span data-price="taxi">$35</span> <small>one way</small></p><a href="/services/pet-taxi">What’s included</a></div>
+<div class="card-foot"><p class="price"><small>From</small> <span data-price="taxi">$30</span> <small>by the mile</small></p><a href="/services/pet-taxi">What’s included</a></div>
 </div>
 </article>
 <article class="card">
@@ -343,12 +343,13 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 <div id="taxi-box" hidden style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
 <div class="choice-row" id="taxi-trip" role="group" aria-label="Trip type">
-<button type="button" class="choice" data-trip="taxi" aria-pressed="true">One way <span data-price="taxi">$35</span></button>
-<button type="button" class="choice" data-trip="taxi_rt" aria-pressed="false">Round trip <span data-price="taxi_rt">$65</span></button>
+<button type="button" class="choice" data-trip="taxi" aria-pressed="true">One way</button>
+<button type="button" class="choice" data-trip="taxi_rt" aria-pressed="false">Round trip</button>
 </div>
 <div><label class="field-label" for="dropoff">Where is your pet going?</label>
 <input id="dropoff" maxlength="300" placeholder="Vet, groomer or boarding address">
-<p class="hint">We pick up at your home and take your pet anywhere they need to go. Long wait or a very long drive? We’ll tell you the price before you book. Flying with your pet, or moving across the country? <a href="/services/flight-companion">Flight companion</a> and <a href="/services/pet-transport">pet transport</a> are quoted by the trip.</p></div>
+<p class="hint" id="fare-note" aria-live="polite">Enter the address to see your fare.</p>
+<p class="hint">We pick up at your home and take your pet anywhere they need to go. Flying with your pet, or moving across the country? <a href="/services/flight-companion">Flight companion</a> and <a href="/services/pet-transport">pet transport</a> are quoted by the trip.</p></div>
 </div>
 </fieldset>
 
@@ -420,6 +421,18 @@ details p{margin-top:12px;color:var(--ink)}
 <div><label class="field-label" for="pets">Your pets</label><input id="pets" placeholder="e.g. Bailey, 70 lb lab; Miso, cat" maxlength="1000"></div>
 <div><label class="field-label" for="notes">Anything we should know</label><textarea id="notes" placeholder="Feeding, meds, gate codes, quirks" maxlength="2000"></textarea></div>
 <label class="check"><input id="new-client" type="checkbox" checked> This is my first time booking with Porchlight</label>
+<div id="tip-box" hidden>
+<p class="field-label" style="margin-bottom:8px">Add a tip for your sitter <span style="font-weight:400;color:var(--muted)">(optional)</span></p>
+<div class="choice-row" id="tip-row" role="group" aria-label="Tip amount">
+<button type="button" class="choice" data-tip="0" aria-pressed="true">No tip</button>
+<button type="button" class="choice" data-tip="10" aria-pressed="false">10% <span class="tipamt"></span></button>
+<button type="button" class="choice" data-tip="15" aria-pressed="false">15% <span class="tipamt"></span> <small>Suggested</small></button>
+<button type="button" class="choice" data-tip="20" aria-pressed="false">20% <span class="tipamt"></span></button>
+<button type="button" class="choice" data-tip="custom" aria-pressed="false">Other</button>
+</div>
+<input id="tip-custom" type="number" min="0" max="500" step="1" inputmode="decimal" placeholder="Tip in dollars" hidden style="margin-top:10px;max-width:200px" aria-label="Tip in dollars">
+<p class="hint" style="margin-top:8px">Pet-sitting guides suggest 10 to 20% (15 to 20% for in-home sitting). Tips are optional and go entirely to your sitter. You pay them with your visit payment, by cash, check or Venmo, and you can change the amount any time before you pay.</p>
+</div>
 </div>
 </div>
 
@@ -471,8 +484,8 @@ details p{margin-top:12px;color:var(--ink)}
 <div><dt><b>Drop-in visit</b><span>30 minutes, any pet</span></dt><dd data-price="visit">$25</dd></div>
 <div><dt><b>Overnight stay</b><span>Evening to morning, in your home</span></dt><dd data-price="overnight">$95</dd></div>
 <div><dt><b>Home check-in</b><span>Mail, plants, lights. No pets needed</span></dt><dd data-price="home">$30</dd></div>
-<div><dt><b>Pet taxi, one way</b><span>Door to the vet or groomer, or anywhere they need to go</span></dt><dd data-price="taxi">$35</dd></div>
-<div><dt><b>Pet taxi, round trip</b><span>There and back, with a short wait or a return pickup</span></dt><dd data-price="taxi_rt">$65</dd></div>
+<div><dt><b>Pet taxi, one way</b><span>Metered by the mile. We pick up in our area and drive anywhere. Waiting past 10 minutes is $10 per 15</span></dt><dd><small style="font-size:14px;font-weight:600">From </small><span data-price="taxi">$30</span></dd></div>
+<div><dt><b>Pet taxi, round trip</b><span>Cheaper per leg than two one-ways, with 10 minutes of waiting included</span></dt><dd><small style="font-size:14px;font-weight:600">From </small><span data-price="taxi_rt">$40</span></dd></div>
 <div><dt><b>Flight companion</b><span>Flies with your small pet in the cabin</span></dt><dd><a href="/quote?type=flight">Get a quote</a></dd></div>
 <div><dt><b>Pet transport by car</b><span>Moves, adoptions and long drives</span></dt><dd><a href="/quote?type=transport">Get a quote</a></dd></div>
 <div><dt><b>Each additional pet</b><span>Per visit or night</span></dt><dd>+$5</dd></div>
@@ -637,7 +650,57 @@ details p{margin-top:12px;color:var(--ink)}
     loadSlots();
   }
   document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.trip); }); });
-  if (window.PorchlightAddress) PorchlightAddress.attach(el('dropoff'), function(){});
+  // ---- Pet taxi fare, metered by distance ----
+  var rates = null, fareNote = el('fare-note');
+  state.route = null; state.routeErr = null;
+  api('porchlight_taxi_rates?select=*&id=eq.main').then(function(r){ rates = r && r[0]; renderRoute(); renderCart(); }).catch(function(){});
+  function fareFor(service){
+    if (!rates || !state.route) return null;
+    var mi = Math.min(Math.max(state.route.miles, 0), rates.max_miles), rt = service === 'taxi_rt';
+    return Math.max(rt ? rates.min_round_cents : rates.min_oneway_cents,
+      rates.base_cents + Math.round((rt ? rates.round_per_mile_cents : rates.oneway_per_mile_cents) * mi));
+  }
+  function isTaxiSvc(s){ return s === 'taxi' || s === 'taxi_rt'; }
+  function unitPrice(s){ if (isTaxiSvc(s)) { var f = fareFor(s); if (f != null) return f; } return state.prices[s] || 0; }
+  function renderRoute(){
+    if (!fareNote) return;
+    var wait = rates ? ' Waiting at the vet is free for ' + rates.wait_free_min + ' minutes, then ' + money(rates.wait_block_cents) + ' per ' + rates.wait_block_min + ' minutes.' : '';
+    if (state.route && rates) {
+      fareNote.textContent = 'About ' + state.route.miles + ' miles, ' + state.route.minutes + ' minutes each way. Estimated fare: one way ' + money(fareFor('taxi')) +
+        ', round trip ' + money(fareFor('taxi_rt')) + '. A round trip costs less per leg than two one-way rides.' + wait + ' We confirm the final fare with your ride.';
+    } else if (state.routeErr === 'far') {
+      fareNote.innerHTML = 'That is farther than our local rides. <a href="/quote?type=transport">Request a transport quote</a> and we will price the trip.';
+    } else if (state.routeErr === 'nf') {
+      fareNote.textContent = 'We could not find that address. Please check it and try again.';
+    } else {
+      fareNote.textContent = 'Enter the address to see your fare.' + (rates ? ' Rides start at ' + money(rates.min_oneway_cents) + ' one way and ' + money(rates.min_round_cents) + ' round trip.' : '');
+    }
+  }
+  function originArgs(){
+    if (state.place) return { lat: state.place.lat, lng: state.place.lng };
+    var w = el('where').value.trim() || el('address').value.trim();
+    return { origin: w || (townSel.options[townSel.selectedIndex].text + ', NC') };
+  }
+  function fetchRoute(){
+    var dest = el('dropoff').value.trim();
+    if (dest.length < 4) { state.route = null; state.routeErr = null; renderRoute(); renderCart(); return Promise.resolve(null); }
+    var o = originArgs(), key = JSON.stringify(o) + '|' + dest;
+    if (state.route && state.route.key === key) return Promise.resolve(state.route);
+    fareNote.textContent = 'Checking the distance…';
+    return fetch(SUPABASE_URL + '/functions/v1/porchlight-geo', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY},
+      body: JSON.stringify(Object.assign({ action: 'route', dest: dest }, o))
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if (j && j.ok && j.miles <= 150) { state.route = { key: key, miles: j.miles, minutes: j.minutes, dest: j.dest_formatted }; state.routeErr = null; }
+      else { state.route = null; state.routeErr = (j && j.ok) ? 'far' : 'nf'; }
+      renderRoute(); renderCart(); return state.route;
+    }).catch(function(){ state.route = null; state.routeErr = 'nf'; renderRoute(); renderCart(); return null; });
+  }
+  if (window.PorchlightAddress) PorchlightAddress.attach(el('dropoff'), function(){ fetchRoute(); });
+  el('dropoff').addEventListener('change', fetchRoute);
+  el('dropoff').addEventListener('blur', function(){ setTimeout(fetchRoute, 250); });
+  townSel.addEventListener('change', function(){ if (el('dropoff').value.trim()) fetchRoute(); });
+  renderRoute();
   serviceButtons.forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.service); }); });
   document.querySelectorAll('[data-pick]').forEach(function(a){
     a.addEventListener('click', function(){ setService(a.dataset.pick); });
@@ -707,7 +770,7 @@ details p{margin-top:12px;color:var(--ink)}
       var li = document.createElement('li');
       var info = document.createElement('div');
       var top = document.createElement('span');
-      top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (state.prices[c.service] ? ' · ' + money(state.prices[c.service]) : '');
+      top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (unitPrice(c.service) ? ' · ' + money(unitPrice(c.service)) + (isTaxiSvc(c.service) && state.route ? ' est.' : isTaxiSvc(c.service) ? ' and up' : '') : '');
       info.appendChild(top);
       if (c.series) { var sm = document.createElement('small'); sm.textContent = c.series; info.appendChild(sm); }
       var x = document.createElement('button');
@@ -722,7 +785,29 @@ details p{margin-top:12px;color:var(--ink)}
   }
   el('cart-clear').addEventListener('click', function(){ state.cart = []; addMsg.textContent = ''; renderCart(); });
 
+  // ---- Tip ----
+  state.tip = '0';
+  var tipBox = el('tip-box'), tipRow = el('tip-row'), tipCustom = el('tip-custom');
+  function cartTotal(){ return state.cart.reduce(function(t, c){ return t + unitPrice(c.service); }, 0); }
+  function tipCents(){
+    if (!state.cart.length) return 0;
+    if (state.tip === 'custom') { var d = parseFloat(tipCustom.value); return isNaN(d) || d < 0 ? 0 : Math.min(Math.round(d * 100), 50000); }
+    return Math.round(cartTotal() * parseInt(state.tip, 10) / 100);
+  }
+  function renderTip(){
+    tipBox.hidden = !state.cart.length;
+    tipRow.querySelectorAll('.choice').forEach(function(b){
+      b.setAttribute('aria-pressed', b.dataset.tip === state.tip ? 'true' : 'false');
+      var amt = b.querySelector('.tipamt');
+      if (amt) amt.textContent = cartTotal() ? '· ' + money(Math.round(cartTotal() * parseInt(b.dataset.tip, 10) / 100)) : '';
+    });
+    tipCustom.hidden = state.tip !== 'custom';
+  }
+  tipRow.querySelectorAll('.choice').forEach(function(b){ b.addEventListener('click', function(){ state.tip = b.dataset.tip; renderTip(); updateButtons(); if (state.tip === 'custom') tipCustom.focus(); }); });
+  tipCustom.addEventListener('input', updateButtons);
+
   function updateButtons(){
+    renderTip();
     var hasPick = state.picked.length > 0;
     var weeklyOk = state.often !== 'weekly' || Object.keys(state.dows).length > 0;
     addBtn.disabled = !hasPick || !weeklyOk;
@@ -730,8 +815,8 @@ details p{margin-top:12px;color:var(--ink)}
     if (!n && !hasPick) summary.textContent = 'Pick a time above';
     else if (!n) summary.textContent = state.picked.length + ' time' + (state.picked.length > 1 ? 's' : '') + ' picked';
     else {
-      var total = state.cart.reduce(function(t, c){ return t + (state.prices[c.service] || 0); }, 0);
-      summary.textContent = n + ' visit' + (n > 1 ? 's' : '') + (total ? ' · ' + money(total) : '');
+      var total = cartTotal(), tp = tipCents();
+      summary.textContent = n + ' visit' + (n > 1 ? 's' : '') + (total ? ' · ' + money(total) : '') + (tp ? ' + ' + money(tp) + ' tip' : '');
     }
     submitBtn.disabled = !(n || (hasPick && weeklyOk));
     submitBtn.textContent = details.hidden ? 'Continue' : 'Send request';
@@ -856,6 +941,15 @@ details p{margin-top:12px;color:var(--ink)}
       errBox.textContent = 'Please tell us where your pet is going (the vet, groomer or boarding address).';
       errBox.hidden = false; el('taxi-box').hidden = false; el('dropoff').focus(); return;
     }
+    if (needsDrop && !(state.route && state.route.key)) {
+      submitBtn.disabled = true; submitBtn.textContent = 'Checking the ride…';
+      fetchRoute().then(function(r){
+        if (r) return sendRequest();
+        errBox.textContent = state.routeErr === 'far' ? 'That drop-off is farther than a local ride. Please request a transport quote.' : 'We could not find the drop-off address. Please check it.';
+        errBox.hidden = false; el('taxi-box').hidden = false; el('dropoff').focus(); updateButtons();
+      });
+      return;
+    }
     var what = summary.textContent;
     submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
     api('rpc/porchlight_request_bookings', { body: withGeo({
@@ -864,7 +958,10 @@ details p{margin-top:12px;color:var(--ink)}
       p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
       p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
       p_new_client: el('new-client').checked,
-      p_dropoff: needsDrop ? el('dropoff').value.trim() : null
+      p_dropoff: needsDrop ? el('dropoff').value.trim() : null,
+      p_trip_miles: needsDrop && state.route ? state.route.miles : null,
+      p_trip_minutes: needsDrop && state.route ? state.route.minutes : null,
+      p_tip_cents: tipCents()
     })}).then(function(){
       var isNew = el('new-client').checked;
       el('success-text').textContent = 'Your request for ' + what + ' is in. ' +

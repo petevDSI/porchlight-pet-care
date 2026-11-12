@@ -1048,7 +1048,7 @@ function aboutPage() {
   const schema = ld({ '@context': 'https://schema.org', '@graph': [
     business,
     { '@type': 'AboutPage', url, name: 'Our story | Porchlight Pet & Home Care', about: { '@id': SITE + '/#business' } },
-    { '@type': 'Person', name: 'Pete Volk', jobTitle: 'Founder', worksFor: { '@id': SITE + '/#business' },
+    { '@type': 'Person', name: 'Pete Volk', jobTitle: 'Founder', image: SITE + '/assets/img/pete/pete-portrait.jpg', worksFor: { '@id': SITE + '/#business' },
       homeLocation: { '@type': 'Place', name: 'Belmont, NC' } }
   ] });
   return head('Our Story | Porchlight Pet &amp; Home Care, Belmont NC', esc(desc), url, schema, 'about') + `
@@ -1071,6 +1071,7 @@ function aboutPage() {
 <div class="section-head"><p class="eyebrow">Why Porchlight</p><h2 class="display">The kennel that looked great on the tour.</h2></div>
 <div class="story">
 <p>I’m Pete. Susan and I have four pets, and they aren’t pets in the way most people mean it. They’re our family. They have their couch, their beds, their toys and bones, and a routine they count on every day.</p>
+<figure class="story-photo"><img src="/assets/img/pete/pete-portrait.jpg" alt="Pete Volk, founder of Porchlight, standing outdoors in a denim shirt and suspenders" width="744" height="930" loading="lazy" style="max-width:340px"><figcaption>Pete, Porchlight’s founder.</figcaption></figure>
 <p>A while back we needed to board our dogs, and we did our homework. The kennel talked a good game and had decent reviews. The people were friendly when we toured, and the facility had the things we looked for: a TV in the room, cameras, all of it.</p>
 <p>Then we found out what it was really like. The TV didn’t work. The dogs were kept shut in a small room almost the entire day. They went without their couch and their beds, and they weren’t allowed their toys or their bones. When we picked them up, they smelled like urine. We vowed we would never do that to them again.</p>
 <p>What stayed with us was how convincing the tour had been. A tour shows you the best fifteen minutes of a place. It doesn’t show you the other twenty-three hours. If we couldn’t tell, how is anyone supposed to?</p>

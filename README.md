@@ -25,3 +25,18 @@ To give someone sitter access, add their email to `porchlight_staff` after they 
 ## Changing prices
 
 Prices come from the `porchlight_services` table (`price_cents`). Change them there; the site reads them on load.
+
+## Maps and drive times
+
+- `assets/address.js` adds Google address suggestions (browser key, locked to porchlightpetcare.com and the Vercel site).
+- `supabase/functions/porchlight-geo` turns addresses into map points and asks Google Routes for real drive
+  times, saved in `porchlight_drive_cache`. It needs the `GOOGLE_MAPS_SERVER_KEY` secret in Supabase.
+- `porchlight_drive_min_pts()` uses Google's minutes when cached, otherwise a road-factor estimate, and adds 25%
+  during weekday rush hours. A $20/month budget alert is set in Google Cloud billing.
+
+## Visits
+
+- Clients see 30-minute arrival windows (`P.WINDOW_MIN` in `assets/app.js`).
+- The visit screen has a "before you go in" box, a checklist, mood chips and a one-time GPS check-in/out.
+- Clients can skip a stretch of dates in a repeating request (`porchlight_skip_dates`).
+- Requests waiting more than 2 hours get a banner in the portal. Email alerts come once the domain is set up in Resend.

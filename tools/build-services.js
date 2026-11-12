@@ -301,7 +301,7 @@ const SERVICES = [
 ];
 
 /* ---------- Shared chrome ---------- */
-const head = (title, desc, canonical, extra) => `<!doctype html>
+const head = (title, desc, canonical, extra, current) => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -325,7 +325,8 @@ ${extra || ''}<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www
 <svg aria-hidden="true" width="38" height="44" viewBox="0 0 38 44" fill="none"><path d="M19 2v5" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/><path d="M6 16 19 7l13 9z" fill="#14233B"/><rect x="9" y="16" width="20" height="21" rx="3" fill="#F2B33D" stroke="#14233B" stroke-width="2.5"/><path d="M19 22c2.6 2.6 3.6 4.6 3.6 6.4a3.6 3.6 0 0 1-7.2 0c0-1.8 1-3.8 3.6-6.4z" fill="#FFFFFF"/><path d="M13 41h12" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/></svg>
 <span class="brand-name"><b>Porchlight</b><span>Pet &amp; Home Care</span></span></a>
 <nav class="nav" aria-label="Main">
-<a href="/services" aria-current="page">Services</a>
+<a href="/services"${current === 'services' ? ' aria-current="page"' : ''}>Services</a>
+<a href="/about"${current === 'about' ? ' aria-current="page"' : ''}>About</a>
 <a href="/#pricing">Pricing</a>
 <a href="/#area">Service area</a>
 <a href="/#faq">FAQ</a>
@@ -346,7 +347,7 @@ const footer = () => `
 <div class="foot-cols">
 <div style="max-width:340px"><p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p><p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p></div>
 <div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
-<div><h4>Clients</h4><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
 <div><h4>Contact</h4><a href="tel:[PHONE]">[PHONE]</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© 2026 Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
@@ -386,7 +387,7 @@ function servicePage(s) {
     ]
   });
   const others = SERVICES.filter(o => o !== s);
-  return head(esc(s.metaTitle), esc(s.metaDesc), url, `<meta property="og:image" content="${s.hero}">\n` + schema) + `
+  return head(esc(s.metaTitle), esc(s.metaDesc), url, `<meta property="og:image" content="${s.hero}">\n` + schema, 'services') + `
 <main>
 <section class="svc-hero"><div class="wrap">
 <div class="svc-hero-copy">
@@ -461,7 +462,7 @@ function hubPage() {
   const url = `${SITE}/services`;
   const desc = 'Overnight pet sitting, dog walking, drop-in visits and home check-ins in Belmont, Mt. Holly, Cramerton, McAdenville, Lake Wylie and Steele Creek, NC.';
   const schema = ld({ '@context': 'https://schema.org', '@graph': [business, { '@type': 'ItemList', itemListElement: SERVICES.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/${s.slug}`, name: s.title })) }] });
-  return head('Pet Sitting &amp; Home Care Services in Belmont, NC | Porchlight', desc, url, schema) + `
+  return head('Pet Sitting &amp; Home Care Services in Belmont, NC | Porchlight', desc, url, schema, 'services') + `
 <main>
 <section class="svc-hero"><div class="wrap" style="padding-bottom:56px">
 <div class="svc-hero-copy" style="flex-basis:100%">
@@ -476,11 +477,98 @@ ${SERVICES.map(s => `<a href="/services/${s.slug}"><img src="${s.hero.replace('w
 ` + footer();
 }
 
+/* ---------- About page ----------
+ * Written in Kraig's voice. Anything in [brackets] is a placeholder for him to fill in.
+ * Swap the photo placeholder for a real photo of Kraig with a dog as soon as there is one. */
+const ABOUT = {
+  promises: [
+    ['shield', 'Insured and bonded', 'Pet-care liability insurance and a bond, and I’m happy to show you the paperwork.'],
+    ['heart', 'Pet first aid and CPR', '[Certification name and year, once completed.]'],
+    ['camera', 'You’ll always know how it went', 'A note and photos after every visit, straight to your phone and your client portal.'],
+    ['clock', 'I show up when I say I will', 'My booking calendar only offers times I can actually make, drive included.'],
+    ['paw', 'Your routine, not mine', 'Same food, same walk, same bedtime ritual. Pets do best when nothing changes.'],
+    ['mail', 'Your home, respected', 'No guests, no snooping, keys labeled with a code and never your address.']
+  ],
+  facts: [
+    ['Home base', 'Belmont, NC'],
+    ['Studied at', 'UNC Charlotte'],
+    ['Before Porchlight', 'Banking and customer service, where the job was getting every detail right and being someone people could trust with their money'],
+    ['Pets in my life', '[e.g. grew up with a lab named ___, now have ___]'],
+    ['Favorite walk in town', '[e.g. the River Street loop, or Stowe Park]'],
+    ['Big dogs?', 'Love them. Strong pullers and all.']
+  ]
+};
+
+function aboutPage() {
+  const url = `${SITE}/about`;
+  const desc = 'Meet Kraig Harahus, the Belmont local behind Porchlight Pet & Home Care. Insured and bonded in-home pet sitting, dog walking and home check-ins in Belmont and nearby towns.';
+  const schema = ld({ '@context': 'https://schema.org', '@graph': [
+    business,
+    { '@type': 'AboutPage', url, name: 'About Porchlight Pet & Home Care', about: { '@id': SITE + '/#business' } },
+    { '@type': 'Person', name: 'Kraig Harahus', jobTitle: 'Owner and pet sitter', worksFor: { '@id': SITE + '/#business' },
+      homeLocation: { '@type': 'Place', name: 'Belmont, NC' }, alumniOf: { '@type': 'CollegeOrUniversity', name: 'University of North Carolina at Charlotte' } }
+  ] });
+  return head('About Kraig | Porchlight Pet &amp; Home Care, Belmont NC', esc(desc), url, schema, 'about') + `
+<main>
+<section class="svc-hero"><div class="wrap">
+<div class="svc-hero-copy">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">About</li></ol></nav>
+<p class="eyebrow">Meet your sitter</p>
+<h1 class="display">Hi, I’m Kraig.</h1>
+<p class="lede">I started Porchlight because leaving a pet behind shouldn’t feel like a gamble. When you’re away, I’m the one at your door: same face every time, someone you’ve met in person, who treats your home and your animals the way you would.</p>
+<div class="cta-row"><a class="btn btn-amber" href="/intake">Set up a free meet-and-greet</a><a class="btn btn-ghost" href="/services">See services</a></div>
+</div>
+<div class="svc-hero-media">
+<div class="photo-slot" role="img" aria-label="Photo of Kraig coming soon">
+<svg aria-hidden="true" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#14233B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${ICONS.camera}</svg>
+<p><b>[Photo of Kraig with a dog]</b><br>Natural light, outdoors, smiling. A real photo here does more for trust than anything else on the site.</p>
+</div>
+</div>
+</div></section>
+
+<section class="section"><div class="wrap about-story">
+<div class="section-head"><p class="eyebrow">Why Porchlight</p><h2 class="display">Someone home when you can’t be.</h2></div>
+<div class="story">
+<p>I grew up in a family that runs its own businesses, so I learned early that you build a reputation one promise at a time. Before Porchlight I worked in banking, where the whole job was getting the details exactly right and being someone people trusted with what mattered to them. Pet care turns out to be the same job.</p>
+<p>The name comes from the porch light you leave on when someone’s coming home. That’s what I want Porchlight to feel like: the house isn’t empty, the dog got walked, the cat got her medicine on time, and you get a photo to prove it.</p>
+<p>I live right here in Belmont, so I’m minutes away, not driving in from across Charlotte. I’m small on purpose. When Porchlight grows, every new sitter will be someone I’d trust with my own pets, and you’ll always meet them first.</p>
+<p>[Kraig: add a sentence or two in your own words about why you love animals, or a favorite pet story.]</p>
+</div>
+</div></section>
+
+<section class="section tint"><div class="wrap">
+<div class="section-head"><p class="eyebrow">My promises to you</p><h2 class="display">What you can count on</h2></div>
+<div class="included">
+${ABOUT.promises.map(([ic, t, d]) => `<article class="inc"><span class="ic">${icon(ic)}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></article>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="two-lists">
+<div class="checklist"><h3>A few things about me</h3><p class="sub">The quick version.</p>
+<dl class="facts">
+${ABOUT.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('\n')}
+</dl></div>
+<div class="checklist featured"><h3>How we start</h3><p class="sub">Every new client, every time.</p><ul>
+<li>${tick('#F2B33D')}<div><b>Fill out the new client form</b><span>Ten minutes: your pets, your routine, how to get in.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Free meet-and-greet at your home</b><span>Your pets meet me, I learn the routine, we sort out keys.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Book online, any time</b><span>Pick a service and an open time. I confirm personally.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Updates after every visit</b><span>Notes and photos in your client portal.</span></div></li>
+</ul>
+<div class="cta-row" style="margin-top:22px"><a class="btn btn-amber" href="/intake">Start the new client form</a></div>
+</div>
+</div>
+</div></section>
+</main>
+` + footer();
+}
+
 fs.mkdirSync(path.join(ROOT, 'services'), { recursive: true });
+fs.writeFileSync(path.join(ROOT, 'about.html'), aboutPage());
 SERVICES.forEach(s => fs.writeFileSync(path.join(ROOT, 'services', s.slug + '.html'), servicePage(s)));
 fs.writeFileSync(path.join(ROOT, 'services.html'), hubPage());
 
-const pages = ['', '/services'].concat(SERVICES.map(s => '/services/' + s.slug), ['/intake']);
+const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), ['/intake']);
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
   '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
   pages.map(p => `  <url><loc>${SITE}${p || '/'}</loc></url>`).join('\n') + '\n</urlset>\n');

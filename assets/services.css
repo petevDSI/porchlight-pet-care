@@ -131,3 +131,15 @@ details p{margin-top:10px;color:var(--ink)}
 .hub h2{font-family:'Bricolage Grotesque',sans-serif;font-size:28px}
 .hub p{color:var(--ink)}
 .hub .more{font-weight:700;margin-top:6px}
+
+/* About page */
+.photo-slot{height:520px;border-radius:28px 28px 28px 180px;background:var(--amber-soft);border:2px dashed #E3B867;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:40px;color:var(--ink)}
+.photo-slot p{max-width:320px}
+@media (max-width:600px){.photo-slot{height:340px;border-radius:24px 24px 24px 100px}}
+.story{max-width:760px;display:flex;flex-direction:column;gap:18px;font-size:18px;color:var(--ink)}
+.facts{margin:0;display:flex;flex-direction:column}
+.facts div{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.facts div:last-child{border-bottom:none}
+.facts dt{color:var(--muted);font-size:15px}
+.facts dd{margin:0}
+@media (max-width:520px){.facts div{grid-template-columns:1fr;gap:2px}}

@@ -119,10 +119,10 @@ const SERVICES = [
     slug: 'dog-walking', id: 'walk', name: 'Dog walking', short: 'Dog walking',
     title: 'Dog Walking in Belmont, NC',
     metaTitle: 'Dog Walking in Belmont, NC | Porchlight Pet & Home Care',
-    metaDesc: 'Private 30-minute dog walks in Belmont, Mt. Holly, Cramerton and Lake Wylie. One dog or household at a time, fresh water after, photo update every walk. Big dogs welcome. $26 a walk.',
+    metaDesc: 'Private 30-minute dog walks in Belmont, Mt. Holly, Cramerton and Lake Wylie. One dog or household at a time, fresh water after, photo update every walk. Big dogs welcome. $30 a walk.',
     h1: 'Dog walks that fit your workday.',
     lede: 'A private 30-minute walk at your dog’s pace, with fresh water after and a photo so you know it happened. One household at a time, never a pack.',
-    price: 26, unit: 'per 30-minute walk',
+    price: 30, unit: 'per 30-minute walk',
     hero: img('photo-1569992274375-e56b14e234f1', 1200), heroAlt: 'A man walking his dog along a tree-lined path',
     gallery: [
       ['/assets/img/pack/pack-hilltop.jpg', 'Bowie, Oskar, Eden and Maizy resting on leashes on a grassy hilltop after a hike'],
@@ -166,7 +166,7 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['30-minute walk', 'One dog, or two dogs from the same home walked together', '$26'],
+      ['30-minute walk', 'One dog, or two dogs from the same home walked together', '$30'],
       ['Each additional dog', 'Walked together', '+$5'],
       ['Holidays', 'Per walk', '+$10']
     ],

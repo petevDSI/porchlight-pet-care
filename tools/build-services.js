@@ -332,7 +332,7 @@ const SERVICES = [
     gallery: [
       [img('photo-1636045466232-539c7bd7817e', 1200, 800), 'A home aquarium with colorful fish'],
       [img('photo-1714993654469-5224dd8670dc', 700, 700), 'A blue parakeet perched on a branch in its cage'],
-      [img('photo-1555634819-ce681c6e258c', 1200, 800), 'A gray and white rabbit resting indoors']
+      ['/assets/img/family/pete-susan-snake.jpg', 'Pete and Susan holding a large snake in a tropical forest']
     ],
     cta: 'Book a visit',
     included: [
@@ -1078,6 +1078,7 @@ function aboutPage() {
 <p>So Porchlight is built around things you can check for yourself. You meet your sitter in your own home before the first visit. Your pets stay where they’re comfortable, with their own things around them. And after every visit you get a note and photos, so you never have to take anyone’s word for it.</p>
 <p>The name comes from the porch light you leave on when someone’s coming home. We’re building a small, local network of people who love animals, and every one of them has to pass one test: would we trust them with our own pets? If the answer isn’t an easy yes, they don’t join.</p>
 <p>Shamus, who was Kraig’s first dog and later ours, is a big part of why we do this. He was on every family hike, and he even shared the house with Pepper, Susan’s mom’s cat, without too much drama. We lost him, but the way we cared for him is the standard we hold ourselves to.</p>
+<figure class="story-photo"><img src="/assets/img/family/pete-susan-selfie.jpg" alt="Pete and Susan smiling in a selfie" width="1024" height="768" loading="lazy"><figcaption>Susan and me.</figcaption></figure>
 <figure class="story-photo"><img src="/assets/img/pack/family-hike-shamus.jpg" alt="Susan, Kraig, Pete and Shamus on a mountain hike" width="1024" height="768" loading="lazy"><figcaption>Susan, Kraig, me and Shamus on one of our hikes.</figcaption></figure>
 </div>
 </div></section>
@@ -1091,6 +1092,7 @@ ${ABOUT.promises.map(([ic, t, d]) => `<article class="inc"><span class="ic">${ic
 
 <section class="section"><div class="wrap">
 <div class="section-head"><p class="eyebrow">Meet the family</p><h2 class="display">The reason we’re so picky</h2><p class="lede">Big and small, high-energy and couch-shaped. Every sitter we bring on has to be someone we’d leave these faces with.</p></div>
+<figure class="story-photo" style="margin:0 0 28px;max-width:720px"><img src="/assets/img/family/susan-boat-oskar-eden-maizy.jpg" alt="Susan on a pontoon boat with Oskar, Eden and Maizy" width="1024" height="768" loading="lazy"><figcaption>Susan with Oskar, Eden and Maizy on the lake.</figcaption></figure>
 <div class="pack">
 ${PACK.map(([f, n, who, d, alt]) => `<figure class="pup"><img src="/assets/img/pack/${f}.jpg" alt="${esc(alt)}" loading="lazy" width="600" height="600"><figcaption><h3>${esc(n)}</h3><p class="who">${esc(who)}</p><p>${esc(d)}</p></figcaption></figure>`).join('\n')}
 </div>

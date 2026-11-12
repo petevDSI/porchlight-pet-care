@@ -121,11 +121,11 @@ module.exports = [
     metaDesc: 'Pet sitting, dog walking and pet taxi in York, SC, the White Rose City. Historic downtown walks, Moore Park, and a free meet-and-greet at your home.',
     h1: 'Pet sitting and dog walking in York, SC.',
     lede: 'York is the White Rose City, the county seat, and one of the prettiest old downtowns in the Carolina upcountry. We take care of the pets who live in it, from the courthouse square out into the countryside.',
-    facts: [['County', 'York County seat, SC'], ['Population (2020)', 'About 8,500'], ['Where it sits', 'About 27 miles southwest of Charlotte and 13 miles west of Rock Hill'], ['Nickname', 'The White Rose City; residents are called Yorkites']],
+    facts: [['County', 'York County seat, SC'], ['Population (2020)', 'About 8,500'], ['Where it sits', 'About 27 miles southwest of Charlotte and 13 miles west of Rock Hill'], ['Nickname', 'The White Rose City']],
     intro: [
       'York’s history is on display. The town started as Fergus’s Crossroads, named for a tavern, became the county seat in 1785 and was called Yorkville until it shortened the name in 1915. The downtown is a National Register historic district, and the old courthouse square is still its center.',
       'It is a good walking town. The streets around the courthouse square are quiet in the evening, the historic homes are fun to look at, and Moore Park is dog-friendly with grills, a gazebo and shade. It is not a fenced dog park, so dogs are on a leash there. For a bigger day out, Kings Mountain State Park and Kings Mountain National Military Park are both a short drive away.',
-      'York is the southwest corner of our area, so we group visits here and plan around drive time. That is why we ask for a free meet-and-greet first, so we know the house, the dog and the best time of day. A Yorkite who travels often can set up a standing weekly walk and let us handle the rest.'
+      'York is the southwest corner of our area, so we group visits here and plan around drive time. That is why we ask for a free meet-and-greet first, so we know the house, the dog and the best time of day. If you travel often can set up a standing weekly walk and let us handle the rest.'
     ],
     placesTitle: 'Walks and outings around York',
     places: [

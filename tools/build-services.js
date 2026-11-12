@@ -257,10 +257,10 @@ const SERVICES = [
     lede: 'Most cats are happiest in their own space. We come to you for 30 minutes of real care: fresh food and water, a clean litter box, medication if needed, play, and a note and photos so you know how they are.',
     price: 25, unit: 'per 30-minute visit',
     includesTitle: 'Every cat visit includes',
-    hero: img('photo-1764045929730-8f2a490616c5', 1200), heroAlt: 'A tabby cat on the back of a chair by a sunny window',
+    hero: '/assets/img/pack/cat-silver-longhair.jpg', heroAlt: 'A fluffy silver tabby cat sitting upright on a scratching pad',
     gallery: [
-      [img('photo-1768859336207-3c3ba2027cca', 1200, 800), 'A fluffy orange cat playing with a toy on a bed'],
-      [img('photo-1638826595775-e2eae86cda8e', 1200, 800), 'A cat playing with a toy on the floor'],
+      ['/assets/img/pack/cat-kitten-eating.jpg', 'A gray tabby kitten eating from a small red dish on a striped towel'],
+      ['/assets/img/pack/cat-kitten-dish.jpg', 'A gray tabby kitten licking a red dish clean'],
       ['/assets/img/pack/akita-cat.jpg', 'Shamus and Pepper the cat meeting nose to nose on the porch']
     ],
     cta: 'Book a cat visit',

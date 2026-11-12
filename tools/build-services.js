@@ -48,11 +48,11 @@ const SERVICES = [
     h1: 'Overnight pet sitting, in your own home.',
     lede: 'Your sitter arrives in the evening and stays until morning, so your pets keep their own beds, their own yard and their own routine, and your house never sits empty.',
     price: 95, unit: 'per night',
-    hero: img('photo-1753685728517-99147e84978e', 1200), heroAlt: 'A dog resting on a bed beside a sleeping person',
+    hero: '/assets/img/pack/oskar-eden-nap.jpg', heroAlt: 'Oskar the dachshund napping on top of Eden, curled up on a blanket',
     gallery: [
-      [img('photo-1794071197004-a1275a3e0d09', 1200, 800), 'A man relaxing on a sofa with two dogs'],
-      [img('photo-1794067096725-f68ccca0c83f', 700, 700), 'A beagle resting on a sofa'],
-      [img('photo-1530700131180-d43d9b8cc41f', 700, 700), 'A golden retriever out for an evening walk']
+      ['/assets/img/pack/couch-pile.jpg', 'Maizy and Oskar piled together on the couch, with Bowie asleep in front'],
+      ['/assets/img/pack/maizy-bedtime.jpg', 'Maizy asleep in bed, tucked under the covers'],
+      ['/assets/img/pack/maizy-home-pillow.jpg', 'Maizy dozing in front of a pillow that reads Home is wherever']
     ],
     cta: 'Check overnight dates',
     included: [
@@ -123,9 +123,9 @@ const SERVICES = [
     price: 26, unit: 'per 30-minute walk',
     hero: img('photo-1569992274375-e56b14e234f1', 1200), heroAlt: 'A man walking his dog along a tree-lined path',
     gallery: [
-      [img('photo-1530700131180-d43d9b8cc41f', 1200, 800), 'A golden retriever walking on a leash'],
-      [img('photo-1788876727679-fd88c2e84a2d', 700, 700), 'A husky on a leash'],
-      [img('photo-1504199098938-e4bbcee5e4a9', 700, 700), 'A black lab walking in a field']
+      ['/assets/img/pack/pack-hilltop.jpg', 'Bowie, Oskar, Eden and Maizy resting on leashes on a grassy hilltop after a hike'],
+      ['/assets/img/pack/akita-uptown.jpg', 'An Akita on a leash on a walk in uptown Charlotte'],
+      ['/assets/img/pack/eden-puppy.jpg', 'A red puppy bounding across the grass']
     ],
     cta: 'Book a walk',
     included: [
@@ -186,8 +186,8 @@ const SERVICES = [
     hero: img('photo-1777660554959-658d19a195fa', 1200), heroAlt: 'A fluffy cat looking out of a window',
     gallery: [
       [img('photo-1607539678863-ba64f95124bc', 1200, 800), 'A cat waiting on a table for its food'],
-      [img('photo-1605001550694-0f6323037433', 700, 700), 'A tabby cat at its bowl'],
-      [img('photo-1794067096725-f68ccca0c83f', 700, 700), 'A beagle resting on a sofa']
+      ['/assets/img/pack/oskar-window.jpg', 'Oskar on his window perch, watching for someone to come home'],
+      ['/assets/img/pack/akita-cat.jpg', 'An Akita and an orange cat meeting nose to nose on a porch']
     ],
     cta: 'Book a visit',
     included: [
@@ -249,7 +249,7 @@ const SERVICES = [
     gallery: [
       [img('photo-1789352050543-b1bbc066fefc', 1200, 800), 'View from a covered front porch onto a quiet street'],
       [img('photo-1759693726718-10912942c0fb', 700, 700), 'A mailbox on a front door'],
-      [img('photo-1607539678863-ba64f95124bc', 700, 700), 'A cat waiting at home']
+      ['/assets/img/pack/eden-oskar-deck.jpg', 'Eden and Oskar on a back deck with planters of flowers']
     ],
     cta: 'Book a check-in',
     included: [
@@ -493,11 +493,18 @@ const ABOUT = {
     ['Home base', 'Belmont, NC'],
     ['Studied at', 'UNC Charlotte'],
     ['Before Porchlight', 'Banking and customer service, where the job was getting every detail right and being someone people could trust with their money'],
-    ['Pets in my life', '[e.g. grew up with a lab named ___, now have ___]'],
+    ['Pets in my life', 'My dog Bowie, plus Oskar, Eden and Maizy, my mom and stepdad’s crew, who I know as well as my own'],
     ['Favorite walk in town', '[e.g. the River Street loop, or Stowe Park]'],
     ['Big dogs?', 'Love them. Strong pullers and all.']
   ]
 };
+
+const PACK = [
+  ['bowie-chair', 'Bowie', 'My dog', 'Black and white, all legs, and the first to claim the comfy chair. Walk buddy and official taste-tester.', 'Bowie mid-yawn, sprawled across an armchair'],
+  ['oskar-portrait', 'Oskar', 'Family dog', 'A dapple dachshund who runs the window-perch neighborhood watch.', 'Oskar the dachshund looking at the camera on a deck'],
+  ['eden-portrait', 'Eden', 'Family dog', 'Red, sweet and built for long walks, then long naps with Oskar on top of her.', 'Eden, a red hound mix, looking out from a porch railing'],
+  ['maizy-grin', 'Maizy', 'Family dog', 'Small, loud about it, and never under the covers alone if she can help it.', 'Maizy, a small black-and-tan dog, grinning at the camera']
+];
 
 function aboutPage() {
   const url = `${SITE}/about`;
@@ -519,9 +526,7 @@ function aboutPage() {
 <div class="cta-row"><a class="btn btn-amber" href="/intake">Set up a free meet-and-greet</a><a class="btn btn-ghost" href="/services">See services</a></div>
 </div>
 <div class="svc-hero-media">
-<div class="photo-slot" role="img" aria-label="Photo of Kraig coming soon">
-<svg aria-hidden="true" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#14233B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${ICONS.camera}</svg>
-<p><b>[Photo of Kraig with a dog]</b><br>Natural light, outdoors, smiling. A real photo here does more for trust than anything else on the site.</p>
+<figure class="pack-hero"><img src="/assets/img/pack/pack-hilltop.jpg" alt="Bowie, Oskar, Eden and Maizy lying on a grassy hilltop with mountains behind them" width="1024" height="768" fetchpriority="high"><figcaption>Bowie, Oskar, Eden and Maizy, taking a break on a hike.</figcaption></figure>
 </div>
 </div>
 </div></section>
@@ -536,7 +541,15 @@ function aboutPage() {
 </div>
 </div></section>
 
+
 <section class="section tint"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Meet the pack</p><h2 class="display">The dogs I practice on every day</h2><p class="lede">Big and small, high-energy and couch-shaped. Between my dog and my family’s, I’ve handled just about every kind of walk, bedtime and mealtime routine.</p></div>
+<div class="pack">
+${PACK.map(([f, n, who, d, alt]) => `<figure class="pup"><img src="/assets/img/pack/${f}.jpg" alt="${esc(alt)}" loading="lazy" width="600" height="600"><figcaption><h3>${esc(n)}</h3><p class="who">${esc(who)}</p><p>${esc(d)}</p></figcaption></figure>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
 <div class="section-head"><p class="eyebrow">My promises to you</p><h2 class="display">What you can count on</h2></div>
 <div class="included">
 ${ABOUT.promises.map(([ic, t, d]) => `<article class="inc"><span class="ic">${icon(ic)}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></article>`).join('\n')}

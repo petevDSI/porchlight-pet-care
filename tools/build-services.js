@@ -644,6 +644,87 @@ const SERVICES = [
       ['What health papers do I need?', 'It depends on the route. For many interstate trips, a Certificate of Veterinary Inspection from a licensed vet is required, plus current rabies vaccination. We’ll tell you what applies when we quote.'],
       ['How do I get a price?', 'Send a quote request with the route and dates. We’ll reply with a written price, usually within a day.']
     ]
+  },
+  {
+    slug: 'pet-wedding-attendant', id: 'event', quote: 'event', name: 'Pet wedding & event attendant', short: 'Wedding & event attendant',
+    title: 'Pet Wedding & Special Event Attendant in Belmont, NC',
+    metaTitle: 'Pet Wedding & Event Attendant in Belmont, NC | Porchlight Pet & Home Care',
+    metaDesc: 'A dedicated sitter brings your dog to your wedding or special event for photos and the ceremony, handles walks and breaks, and gets them home. Packages from $300.',
+    h1: 'Your dog at your wedding, without the worry.',
+    lede: 'A dedicated sitter takes your dog to the venue for photos, handles the walks and potty breaks, and manages them through the ceremony or the party, so the only thing you have to do is enjoy the day.',
+    price: null, unit: 'packages from $300', priceTag: 'From $300', fromLine: 'Packages from $300',
+    hero: img('photo-1664468975082-44f1eb1d8690', 1200), heroAlt: 'A golden retriever sniffing a bridal bouquet',
+    gallery: [
+      [img('photo-1594824083717-a85ecffd0c1f', 1200, 800), 'A woman in a white dress holding a brown dog'],
+      [img('photo-1596381421074-87bf109a032b', 1200, 800), 'A couple holding their white dog'],
+      [img('photo-1723646743440-0996da5ced6e', 1200, 800), 'A couple in wedding clothes posing for photographs with their dogs']
+    ],
+    cta: 'Request an event quote',
+    includesTitle: 'Every event includes',
+    included: [
+      ['car', 'Pickup and the ride home', 'We collect your dog from your home or hotel, secured in the car, and bring them back when their part of the day is done. Ride time counts toward your hours.'],
+      ['heart', 'One dedicated sitter', 'One person with your dog for the whole event. Not a rotation, and never someone else’s pets.'],
+      ['camera', 'Photo-ready help', 'A brush-up, the bandana, bow tie or flower collar you pick out, and a steady hand while the photographer works. Treats and patience included.'],
+      ['leash', 'The aisle walk or a hand-off', 'Down the aisle on leash with your sitter, a hand-off to you at the end, or waiting nearby until you want them. Your venue and officiant sign off on the plan.'],
+      ['water', 'Water, walks and potty breaks', 'Regular breaks at a quiet spot away from the crowd, with fresh water and every mess picked up.'],
+      ['shield', 'A calm place to rest', 'Shade, a bed or crate from home, and some distance from the music and the crowd, so your dog can switch off between moments.'],
+      ['bowl', 'Meals and treats on your schedule', 'Fed the way you’d feed them. We keep guests from sharing food, and cake and chocolate stay out of reach.'],
+      ['clock', 'Timeline planning with your team', 'We work with your planner and photographer so your sitter is there for the moments your dog is needed, and resting for the rest.'],
+      ['mail', 'Updates to your point person', 'A text to the friend or planner you choose, so you hear how your dog is doing without having to check.']
+    ],
+    timelineTitle: 'A typical wedding day',
+    timeline: [
+      ['2:00 pm', 'Pickup', 'We meet at your home or hotel, check the collar, leash and tags, and fit in a potty break before the car.'],
+      ['2:45 pm', 'Arrive and settle in', 'We find the quiet spot, set up the bed and water, and say hello to your planner and photographer.'],
+      ['3:15 pm', 'Getting-ready photos', 'The bandana or bow tie goes on, a quick brush, and a calm first look with the two of you.'],
+      ['4:00 pm', 'Ceremony', 'Down the aisle on leash, or waiting with your sitter until the moment you want them.'],
+      ['4:30 pm', 'Family portraits', 'Back in for photos, then water and a potty break as soon as the photographer is done.'],
+      ['5:15 pm', 'Rest and cocktail hour', 'A quiet spot, a snack and a walk away from the crowd.'],
+      ['6:00 pm', 'The ride home', 'Your dog heads home before dinner and the music get loud. Add a wedding-night stay if you’d like someone to stay with them.']
+    ],
+    needs: {
+      title: 'What we need from you',
+      sub: 'Send these with your quote request and we’ll build the timeline together.',
+      items: [
+        ['The date, venue and timeline', 'Venue name and address, ceremony start time, and when you’d like your dog in photos.'],
+        ['The venue’s okay', 'Confirm the venue and your planner allow dogs, and ask where a quiet resting spot can be.'],
+        ['Current vaccinations', 'Rabies and the vaccines your vet recommends, plus flea and tick prevention. You can upload records on the new client form.'],
+        ['A free meet-and-greet', 'We meet your dog before the date and see how they handle strangers, noise and crowds. If the day would be too much, we’ll tell you honestly.'],
+        ['Their outfit and gear', 'Bandana, bow tie or collar, plus a leash, a bed or crate, and any treats. We bring the rest.'],
+        ['A point person for the day', 'A friend or your planner who can answer a text, so you don’t have to.'],
+        ['Your dog’s routine', 'Meal times, medications, commands, and anything that worries them, like clapping or balloons.']
+      ]
+    },
+    brings: {
+      title: 'What your sitter brings',
+      sub: 'You don’t need to supply any of this.',
+      items: [
+        ['Water, bowls and poop bags', 'Plus towels for muddy paws and a lint roller for the dress and the suit.'],
+        ['A pet first-aid kit', 'In the car, restocked regularly.'],
+        ['A calm, patient presence', 'Quiet around nervous dogs and ready to step away from the crowd the moment your dog needs a break.']
+      ]
+    },
+    pricing: [
+      ['Ceremony and photos', 'Up to 3 hours, one dog. Pickup, portraits, the ceremony and the ride home', '$300'],
+      ['Half day', 'Up to 5 hours, one dog. Adds family photos and the cocktail hour', '$450'],
+      ['Full day', 'Up to 8 hours, one dog. From getting ready through the reception', '$700'],
+      ['Extra hours', 'Past your package, per hour', '$75'],
+      ['Additional dog', 'Same household, same event. One sitter can manage two dogs', '+$50'],
+      ['Second sitter', 'For three or more dogs or a packed timeline, per hour', '+$50'],
+      ['Rehearsal or engagement photos', 'Up to 2 hours, one dog', '$150'],
+      ['Wedding-night stay', 'Your sitter stays at your home overnight after the event, with the morning walk and breakfast', '$125'],
+      ['Travel', 'No charge inside our service area. Farther venues are quoted, at $2 a mile each way past it', 'In the quote']
+    ],
+    payBanner: ['50% to book', 'A 50% deposit holds your date, and the balance is due 14 days before the event.', 'Pay by Venmo, Zelle, check or card. Cancel 30 or more days ahead for a full deposit refund. The meet-and-greet is free.'],
+    faq: [
+      ['Can my dog be in the ceremony?', 'Yes. Your dog can walk the aisle on leash with your sitter, be handed to you at the end, or join just for photos. We agree the plan ahead with you, your officiant and the venue.'],
+      ['What if my dog gets overwhelmed?', 'Your sitter watches your dog’s body language and moves them to a quiet spot for a break at the first sign of stress. If the day is clearly too much, we take them home. You decide in advance who we text when that happens.'],
+      ['Do you only do weddings?', 'No. The same packages cover engagement and family photos, rehearsals, vow renewals, graduations, birthday and holiday parties, and open houses.'],
+      ['Will guests be able to pet my dog?', 'Only when your sitter says yes. The leash stays with your sitter, and guests can say hello when your dog is calm and you’ve said it’s fine.'],
+      ['What about cats and other pets?', 'Most of our wedding guests are dogs. A calm cat or small pet can join for photos in a carrier or on harness, so ask when you request your quote.'],
+      ['How far ahead should I book?', 'As soon as you have your date and venue. Popular dates fill up, and an early start leaves time for a meet-and-greet and a plan with your photographer.'],
+      ['How do I get an exact price?', 'Send a quote request with your date, venue and rough timeline. We’ll reply with a written quote, usually within a day. Asking is free.']
+    ]
   }
 ];
 
@@ -676,6 +757,7 @@ ${extra || ''}<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www
 <nav class="nav" aria-label="Main">
 <a href="/services"${current === 'services' ? ' aria-current="page"' : ''}>Services</a>
 <a href="/about"${current === 'about' ? ' aria-current="page"' : ''}>About</a>
+<a href="/blog">Blog</a>
 <a href="/#pricing">Pricing</a>
 <a href="/#area">Service area</a>
 <a href="/#faq">FAQ</a>
@@ -697,7 +779,7 @@ const footer = () => `
 <div style="max-width:340px"><p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p><p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p></div>
 <div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
 <div><h4>Areas</h4>${TOWN_PAGES.map(t => `<a href="/areas/${t.slug}">${t.name}, ${t.state}</a>`).join('')}</div>
-<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/blog">Blog</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
 <div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© 2026 Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
@@ -745,7 +827,7 @@ function servicePage(s) {
 <p class="eyebrow">${esc(s.title)}</p>
 <h1 class="display">${esc(s.h1)}</h1>
 <p class="lede">${esc(s.lede)}</p>
-<p class="price-tag">${s.quote ? '<b>Custom quote</b>' : `<b data-price="${s.id}">$${s.price}</b>`}<span>${esc(s.unit)}</span></p>
+<p class="price-tag">${s.quote ? `<b>${s.priceTag || 'Custom quote'}</b>` : `<b data-price="${s.id}">$${s.price}</b>`}<span>${esc(s.unit)}</span></p>
 <div class="cta-row"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a><a class="btn btn-ghost" href="#included">What’s included</a></div>
 </div>
 <div class="svc-hero-media"><img src="${s.hero}" alt="${esc(s.heroAlt)}" width="600" height="520" fetchpriority="high"></div>
@@ -788,7 +870,7 @@ ${s.brings.items.map(([b, t]) => `<li>${tick('#14233B')}<div><b>${esc(b)}</b><sp
 <dl class="pricebox">
 ${s.pricing.map(([n, d, p, pid, starting], i) => `<div><dt><b>${esc(n)}</b><span>${esc(d)}</span></dt>` + (starting ? `<dd><small style="font-size:14px;font-weight:600">Starting at </small><span data-price="${pid}">${esc(p)}</span></dd></div>` : `<dd${pid ? ` data-price="${pid}"` : (i === 0 && !s.quote ? ` data-price="${s.id}"` : '')}>${esc(p)}</dd></div>`)).join('\n')}
 </dl>
-<div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price. Payment is due when you book. Cancel at least 24 hours ahead for a full refund.</small></div></div>
+${s.payBanner ? `<div class="save-banner"><span class="tag">${esc(s.payBanner[0])}</span><div><b>${esc(s.payBanner[1])}</b><small>${esc(s.payBanner[2])}</small></div></div>` : `<div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price. Payment is due when you book. Cancel at least 24 hours ahead for a full refund.</small></div></div>`}
 <div class="cta-row" style="margin-top:20px"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a></div>
 </div></section>
 
@@ -802,7 +884,7 @@ ${s.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}
 <section class="section"><div class="wrap">
 <div class="section-head"><p class="eyebrow">More from Porchlight</p><h2 class="display">Other services</h2></div>
 <div class="others">
-${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>${o.quote ? 'Quoted ' + esc(o.unit.replace(/^quoted /, '')) : 'From $' + o.price + ' ' + esc(o.unit)}</p></div></a>`).join('\n')}
+${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>${o.fromLine ? esc(o.fromLine) : o.quote ? 'Quoted ' + esc(o.unit.replace(/^quoted /, '')) : 'From $' + o.price + ' ' + esc(o.unit)}</p></div></a>`).join('\n')}
 </div>
 </div></section>
 </main>
@@ -890,7 +972,7 @@ ${t.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}
 
 function hubPage() {
   const url = `${SITE}/services`;
-  const desc = 'Overnight pet sitting, dog walking, drop-in visits, cat sitting, bird, reptile and fish care, home check-ins, pet taxi, flight companions and pet transport in Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo, Clover, York and Lake Wylie, west of the Catawba River.';
+  const desc = 'Overnight pet sitting, dog walking, drop-in visits, cat sitting, bird, reptile and fish care, home check-ins, pet taxi, flight companions, pet transport and wedding and event pet attendants in Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo, Clover, York and Lake Wylie, west of the Catawba River.';
   const schema = ld({ '@context': 'https://schema.org', '@graph': [business, { '@type': 'ItemList', itemListElement: SERVICES.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/services/${s.slug}`, name: s.title })) }] });
   return head('Pet Sitting &amp; Home Care Services in Belmont, NC | Porchlight', desc, url, schema, 'services') + `
 <main>
@@ -901,7 +983,7 @@ function hubPage() {
 <p class="lede" style="max-width:720px">Everything happens in your home, by one person you’ve met first. Pick a service to see exactly what’s included.</p>
 </div></div></section>
 <section class="section"><div class="wrap"><div class="hub">
-${SERVICES.map(s => `<a href="/services/${s.slug}"><img src="${s.hero.replace('w=1200', 'w=800&h=480')}" alt="${esc(s.heroAlt)}" loading="lazy"><div class="b"><p class="eyebrow">${s.quote ? 'Quoted ' + esc(s.unit.replace(/^quoted /, '')) : `From <span data-price="${s.id}">$${s.price}</span> ${esc(s.unit)}`}</p><h2>${s.name}</h2><p>${esc(s.lede)}</p><span class="more">See what’s included →</span></div></a>`).join('\n')}
+${SERVICES.map(s => `<a href="/services/${s.slug}"><img src="${s.hero.replace('w=1200', 'w=800&h=480')}" alt="${esc(s.heroAlt)}" loading="lazy"><div class="b"><p class="eyebrow">${s.fromLine ? esc(s.fromLine) : s.quote ? 'Quoted ' + esc(s.unit.replace(/^quoted /, '')) : `From <span data-price="${s.id}">$${s.price}</span> ${esc(s.unit)}`}</p><h2>${s.name}</h2><p>${esc(s.lede)}</p><span class="more">See what’s included →</span></div></a>`).join('\n')}
 </div></div></section>
 </main>
 ` + footer();
@@ -1017,8 +1099,13 @@ TOWN_PAGES.forEach(t => fs.writeFileSync(path.join(ROOT, 'areas', t.slug + '.htm
 fs.writeFileSync(path.join(ROOT, 'services.html'), hubPage());
 
 const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), TOWN_PAGES.map(t => '/areas/' + t.slug), ['/quote', '/intake']);
+/* Keep sitemap entries for pages this script doesn't build (blog, testimonials). */
+const prevSitemap = fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '';
+const generated = new Set(pages.map(p => `${SITE}${p || '/'}`));
+const kept = (prevSitemap.match(/^\s*<url>.*<\/url>\s*$/gm) || []).map(l => l.replace(/\s+$/, ''))
+  .filter(l => { const m = l.match(/<loc>([^<]+)<\/loc>/); return m && !generated.has(m[1]); });
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
   '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-  pages.map(p => `  <url><loc>${SITE}${p || '/'}</loc></url>`).join('\n') + '\n</urlset>\n');
+  pages.map(p => `  <url><loc>${SITE}${p || '/'}</loc></url>`).concat(kept).join('\n') + '\n</urlset>\n');
 fs.writeFileSync(path.join(ROOT, 'robots.txt'), `User-agent: *\nDisallow: /portal\nSitemap: ${SITE}/sitemap.xml\n`);
 console.log('Built', SERVICES.length, 'service pages, the hub, sitemap.xml and robots.txt');

@@ -520,7 +520,7 @@ details p{margin-top:12px;color:var(--ink)}
 <div><dt><b>Each additional pet</b><span>Per visit or night</span></dt><dd>+$5</dd></div>
 <div><dt><b>Holidays</b><span>Added per visit / per night</span></dt><dd>+$10 / +$20</dd></div>
 </dl>
-<p class="lede" style="margin-top:20px"><strong>How to pay:</strong> in full when you book, by Venmo or Zelle (no fee) or by card (adds a $5 processing fee). The free meet &amp; greet costs nothing. Taxi waiting time past the free minutes is billed afterward.</p>
+<p class="lede" style="margin-top:20px"><strong>How to pay:</strong> in full when you book. Pay by Venmo, Zelle or check and save $5 on your booking; the prices above are the standard (card) price. The free meet &amp; greet costs nothing. Taxi waiting time past the free minutes is billed afterward.</p>
 </div>
 </section>
 
@@ -552,7 +552,7 @@ details p{margin-top:12px;color:var(--ink)}
 <details><summary>How do you get into the house?</summary><p>A lockbox or a door code is easiest. If you'd rather hand over a key, it's tagged with a code, never your name or address.</p></details>
 <details><summary>Are you insured and bonded?</summary><p>Yes. We carry pet-care liability insurance and a bond, and we're glad to show proof at the meet-and-greet.</p></details>
 <details><summary>Will I hear from you during a visit?</summary><p>After every visit you get a short note and a photo. On overnights, one in the evening and one in the morning.</p></details>
-<details><summary>How do I pay?</summary><p>Payment is due when you book, and your visit is confirmed once it arrives. Pay by Venmo or Zelle with no fee, or by card, which adds a $5 processing fee. The free meet-and-greet costs nothing. Cancel at least 24 hours ahead for a full refund. Pet taxi fares are paid up front, and any waiting time beyond the free minutes is billed afterward. Every payment shows in your client portal, and tips are always optional, before or after your stay.</p></details>
+<details><summary>How do I pay?</summary><p>Payment is due when you book, and your visit is confirmed once it arrives. The prices listed are our standard price. Pay by Venmo, Zelle or check and take $5 off your booking, or pay the standard price by card. The free meet-and-greet costs nothing. Cancel at least 24 hours ahead for a full refund. Pet taxi fares are paid up front, and any waiting time beyond the free minutes is billed afterward. Every payment shows in your client portal, and tips are always optional, before or after your stay.</p></details>
 <details><summary>What if I need to cancel?</summary><p>Cancel at least 24 hours ahead and there's no charge. Later than that, the visit is billed.</p></details>
 <details><summary>What happens if my pet gets sick while I'm away?</summary><p>We call you first, then your vet. If we can't reach either, we go to the emergency clinic you named at the meet-and-greet.</p></details>
 <details><summary>What if it's storming?</summary><p>We still come. In heavy rain or extreme heat the walk gets shorter and the indoor play gets longer, and we'll tell you so in the visit note.</p></details>
@@ -1019,7 +1019,7 @@ details p{margin-top:12px;color:var(--ink)}
     if (!group) return;
     api('rpc/porchlight_pay_due', { body: { p_group: group, p_email: email } }).then(function(d){
       if (!d || !d.total_cents) return;
-      var due = d.total_cents + (d.tip_cents || 0), fee = d.card_fee_cents || 0;
+      var due = d.total_cents + (d.tip_cents || 0), disc = Math.min(d.discount_cents || 0, d.total_cents), dueDisc = due - disc;
       function add(tag, cls, text){ var n = document.createElement(tag); if (cls) n.className = cls; n.textContent = text; box.appendChild(n); return n; }
       add('h4', '', 'Pay now to confirm your booking');
       add('div', 'pay-total', money(due));
@@ -1029,26 +1029,26 @@ details p{margin-top:12px;color:var(--ink)}
       box.appendChild(ul);
       var note = 'Porchlight ' + (el('name').value.trim() || 'booking');
       var o1 = document.createElement('div'); o1.className = 'pay-opt';
-      var b1 = document.createElement('b'); b1.textContent = 'Venmo or Zelle (no fee)'; o1.appendChild(b1);
+      var b1 = document.createElement('b'); b1.textContent = disc ? 'Venmo, Zelle or check: save ' + money(disc) + ', pay ' + money(dueDisc) : 'Venmo, Zelle or check'; o1.appendChild(b1);
       var p1 = document.createElement('span');
       if (d.venmo || d.zelle) {
-        p1.textContent = [d.venmo ? 'Venmo: @' + d.venmo.replace(/^@/, '') : '', d.zelle ? 'Zelle: ' + d.zelle : ''].filter(Boolean).join('  ·  ') + '. Put your name in the note.';
+        p1.textContent = [d.venmo ? 'Venmo: @' + d.venmo.replace(/^@/, '') : '', d.zelle ? 'Zelle: ' + d.zelle : ''].filter(Boolean).join('  ·  ') + '. Put your name in the note. To pay by check, we will text you where to send it.';
         o1.appendChild(p1);
         if (d.venmo) { var a = document.createElement('a'); a.className = 'btn btn-navy'; a.textContent = 'Open Venmo'; a.rel = 'noopener';
-          a.href = 'https://venmo.com/' + encodeURIComponent(d.venmo.replace(/^@/, '')) + '?txn=pay&amount=' + (due/100).toFixed(2) + '&note=' + encodeURIComponent(note); o1.appendChild(document.createElement('br')); o1.appendChild(a); }
+          a.href = 'https://venmo.com/' + encodeURIComponent(d.venmo.replace(/^@/, '')) + '?txn=pay&amount=' + (dueDisc/100).toFixed(2) + '&note=' + encodeURIComponent(note); o1.appendChild(document.createElement('br')); o1.appendChild(a); }
       } else {
         p1.textContent = 'We will text you our Venmo and Zelle details right away at the number you gave us. You can also call 470-424-3183.'; o1.appendChild(p1);
       }
       box.appendChild(o1);
       if (d.card_enabled) {
         var o2 = document.createElement('div'); o2.className = 'pay-opt';
-        var b2 = document.createElement('b'); b2.textContent = 'Credit or debit card (adds ' + money(fee) + ' processing fee)'; o2.appendChild(b2);
-        var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn btn-ghost'; btn.textContent = 'Pay ' + money(due + fee) + ' by card';
+        var b2 = document.createElement('b'); b2.textContent = 'Credit or debit card (standard price)'; o2.appendChild(b2);
+        var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn btn-ghost'; btn.textContent = 'Pay ' + money(due) + ' by card';
         btn.addEventListener('click', function(){
           btn.disabled = true; btn.textContent = 'Opening secure checkout…';
           fetch(FUNCS, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'checkout', group_id: group, email: email }) })
             .then(function(r){ return r.json(); }).then(function(j){ if (j && j.url) location.href = j.url; else throw new Error((j && j.error) || 'Card payment is not available right now'); })
-            .catch(function(e){ btn.disabled = false; btn.textContent = 'Pay ' + money(due + fee) + ' by card'; alert(e.message); });
+            .catch(function(e){ btn.disabled = false; btn.textContent = 'Pay ' + money(due) + ' by card'; alert(e.message); });
         });
         o2.appendChild(document.createElement('br')); o2.appendChild(btn); box.appendChild(o2);
       }

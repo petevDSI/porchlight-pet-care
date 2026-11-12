@@ -647,7 +647,7 @@ const SERVICES = [
   }
 ];
 
-const PAY_LINE = 'Payment is due when you book: Venmo or Zelle with no fee, or card with a $5 processing fee. Cancel at least 24 hours ahead for a full refund.';
+const PAY_LINE = 'Payment is due when you book. Pay by Venmo, Zelle or check and save $5 off your booking, or pay the listed price by card. Cancel at least 24 hours ahead for a full refund.';
 
 /* ---------- Shared chrome ---------- */
 const head = (title, desc, canonical, extra, current) => `<!doctype html>

@@ -28,7 +28,7 @@
   var arrivedForReset = /type=recovery/.test(location.hash);
 
   var SERVICE_LABEL = { walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in' };
-  var BOOKING_SELECT = 'id,start_at,end_at,status,service_id,town_id,group_id,series_label,client_id,client_name,client_email,client_phone,street_address,pets,notes,is_new_client,staff_notes,' +
+  var BOOKING_SELECT = 'id,created_at,start_at,end_at,status,service_id,town_id,group_id,series_label,client_id,client_name,client_email,client_phone,street_address,pets,notes,is_new_client,staff_notes,' +
     'porchlight_clients(id,name,address,phone,town_id,porchlight_pets(name,species))';
 
   function q(sel) { return app.querySelector(sel); }
@@ -148,13 +148,28 @@
 
   /* ================= Kraig (staff) ================= */
   var pendingCount = 0;
+  var staleCount = 0, ESCALATE_MIN = 120;
   function refreshPending() {
-    return sb.from('porchlight_bookings').select('id', { count: 'exact', head: true })
-      .eq('status', 'requested').gte('start_at', new Date().toISOString())
-      .then(function (r) { pendingCount = r.count || 0; });
+    return sb.from('porchlight_bookings').select('group_id,id,created_at')
+      .eq('status', 'requested').gte('start_at', new Date().toISOString()).limit(500)
+      .then(guard).then(function (rows) {
+        // Count requests (a multi-visit request counts once), and how many have waited too long.
+        var seen = {}, stale = {}, cutoff = Date.now() - ESCALATE_MIN * 60000;
+        rows.forEach(function (b) {
+          var k = b.group_id || b.id; seen[k] = true;
+          if (new Date(b.created_at).getTime() < cutoff) stale[k] = true;
+        });
+        pendingCount = Object.keys(seen).length; staleCount = Object.keys(stale).length;
+      });
   }
   function staffTabs(current) {
-    return tabs([['#/schedule', 'schedule', 'Schedule'], ['#/requests', 'requests', 'Requests', pendingCount], ['#/clients', 'clients', 'Clients']], current);
+    var t = tabs([['#/schedule', 'schedule', 'Schedule'], ['#/requests', 'requests', 'Requests', pendingCount], ['#/clients', 'clients', 'Clients']], current);
+    if (!staleCount || current === 'requests') return t;
+    return h('div', null,
+      h('a', { class: 'escalate', href: '#/requests' },
+        h('strong', { text: staleCount + (staleCount === 1 ? ' request has' : ' requests have') + ' been waiting over 2 hours.' }),
+        h('span', { text: ' A request nobody answers usually books someone else. Review now →' })),
+      t);
   }
   function staffRoute(r) {
     var p = r.parts;
@@ -174,6 +189,12 @@
     var petNames = c && c.porchlight_pets && c.porchlight_pets.length
       ? c.porchlight_pets.map(function (x) { return x.name; }).join(', ') : (b.pets || '');
     return { name: name, pets: petNames, address: (c && c.address) || b.street_address };
+  }
+
+  function waited(createdAt) {
+    var mins = Math.round((Date.now() - new Date(createdAt).getTime()) / 60000);
+    var txt = mins < 60 ? mins + ' min' : mins < 1440 ? Math.floor(mins / 60) + ' h ' + (mins % 60) + ' min' : Math.floor(mins / 1440) + ' days';
+    return h('div', { class: 'small' + (mins >= ESCALATE_MIN ? ' late' : ' muted'), text: 'Waiting ' + txt });
   }
 
   function setStatus(id, status) {
@@ -207,7 +228,8 @@
         w.pets ? h('div', { class: 'small muted', text: w.pets }) : null,
         b.series_label && !opts.inGroup ? h('div', { class: 'small', text: '↻ ' + b.series_label }) : null,
         opts.contact ? h('div', { class: 'small' }, h('a', { href: 'tel:' + b.client_phone, text: b.client_phone }), ' · ', h('a', { href: 'mailto:' + b.client_email, text: b.client_email })) : null,
-        opts.contact && b.notes ? h('div', { class: 'small muted', text: 'Note: ' + b.notes }) : null),
+        opts.contact && b.notes ? h('div', { class: 'small muted', text: 'Note: ' + b.notes }) : null,
+        b.status === 'requested' && b.created_at && !opts.inGroup ? waited(b.created_at) : null),
       acts);
   }
 
@@ -246,6 +268,7 @@
     root.appendChild(staffTabs('requests'));
     root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Visit requests' }));
     root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Confirm or decline each one, then let the client know. New clients need a meet-and-greet first.' }));
+    if (staleCount) root.appendChild(notice('err', staleCount + (staleCount === 1 ? ' request has' : ' requests have') + ' been waiting over 2 hours. Answer these first.'));
     var listBox = h('div', { class: 'list' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(listBox);
     sb.from('porchlight_bookings').select(BOOKING_SELECT).eq('status', 'requested')
@@ -293,7 +316,8 @@
         labels.length ? h('div', { class: 'small', text: '↻ ' + labels.join(' · ') }) : null,
         w.pets ? h('div', { class: 'small muted', text: w.pets }) : null,
         h('div', { class: 'small' }, h('a', { href: 'tel:' + first.client_phone, text: first.client_phone }), ' · ', h('a', { href: 'mailto:' + first.client_email, text: first.client_email })),
-        first.notes ? h('div', { class: 'small muted', text: 'Note: ' + first.notes }) : null),
+        first.notes ? h('div', { class: 'small muted', text: 'Note: ' + first.notes }) : null,
+        waited(first.created_at)),
       h('div', { class: 'acts' },
         h('button', { class: 'btn sm', type: 'button', text: 'Confirm all ' + ids.length, onclick: function (ev) { setAll('confirmed', ev); } }),
         h('button', { class: 'btn danger sm', type: 'button', text: 'Decline all', onclick: function (ev) {
@@ -549,6 +573,18 @@
     if (!c) col.appendChild(notice('info', 'No new client form on file for this booking yet. Ask ' + b.client_name + ' to fill one out at ' + location.origin + '/intake?email=' + b.client_email));
     if (b.notes) col.appendChild(notice('info', 'Client’s note with this request: ' + b.notes));
 
+    // Before you go in: behaviour and meds, one glance
+    var heads = [];
+    pets.forEach(function (pet) {
+      var bits = [pet.behavior, pet.quirks, pet.medications ? 'Meds: ' + pet.medications : null].filter(Boolean).join(' ');
+      if (bits) heads.push(h('p', null, h('strong', { text: pet.name + ': ' }), bits));
+    });
+    if (heads.length) {
+      var headsBox = h('section', { class: 'heads stack', role: 'note' }, h('h3', { text: 'Before you go in' }));
+      heads.forEach(function (x) { headsBox.appendChild(x); });
+      col.appendChild(headsBox);
+    }
+
     // Need-to-know
     if (c) {
       var must = h('section', { class: 'must stack' }, h('h3', { text: 'Getting in' }), P.renderKV(P.FIELDS.access, c, { secretsBold: true, empty: 'No entry details on file. Call the client.' }));
@@ -570,16 +606,19 @@
 
     // Report
     if (!c) return;
-    var state = { report: report, photos: (report.photo_paths || []).slice() };
+    var state = { report: report, photos: (report.photo_paths || []).slice(),
+      checklist: (report.checklist || []).slice(), moods: (report.moods || []).slice() };
     function saveReport(extra) {
-      var row = Object.assign({ booking_id: b.id, client_id: c.id, note: noteIn.value.trim() || null, photo_paths: state.photos }, extra || {});
+      var row = Object.assign({ booking_id: b.id, client_id: c.id, note: noteIn.value.trim() || null, photo_paths: state.photos,
+        checklist: state.checklist, moods: state.moods }, extra || {});
       return sb.from('porchlight_visit_reports').upsert(row, { onConflict: 'booking_id' }).select().single().then(guard)
         .then(function (r) { state.report = r; return r; });
     }
     var times = h('p', { class: 'small muted' });
     function drawTimes() {
       var r = state.report;
-      times.textContent = [r.arrived_at ? 'Arrived ' + P.fmtTime(r.arrived_at) : null, r.departed_at ? 'Left ' + P.fmtTime(r.departed_at) : null].filter(Boolean).join(' · ') || 'Not started';
+      var gps = r.arrive_lat != null && c.lat != null ? ' (' + P.milesBetween({ lat: r.arrive_lat, lng: r.arrive_lng }, c).toFixed(1) + ' mi from the home)' : '';
+      times.textContent = [r.arrived_at ? 'Arrived ' + P.fmtTime(r.arrived_at) + gps : null, r.departed_at ? 'Left ' + P.fmtTime(r.departed_at) : null].filter(Boolean).join(' · ') || 'Not started';
     }
     var arrive = h('button', { class: 'btn amber', type: 'button', text: 'I’ve arrived' });
     var done = h('button', { class: 'btn', type: 'button', text: 'Visit done — send report' });
@@ -608,13 +647,20 @@
         .then(function () { addPhotos.disabled = false; addPhotos.textContent = 'Add photos'; fileIn.value = ''; });
     });
     arrive.addEventListener('click', function () {
-      arrive.disabled = true;
-      saveReport({ arrived_at: new Date().toISOString() }).then(function () { drawTimes(); P.toast('Arrival logged'); })
+      arrive.disabled = true; arrive.textContent = 'Checking in…';
+      var at = new Date().toISOString();
+      P.whereAmI().then(function (loc) {
+        return saveReport(Object.assign({ arrived_at: at }, loc ? { arrive_lat: loc.lat, arrive_lng: loc.lng, arrive_acc_m: loc.acc } : {}));
+      }).then(function () { arrive.textContent = 'Checked in'; drawTimes(); P.toast('Arrival logged'); })
         .catch(function (e) { P.toast(P.errMsg(e)); arrive.disabled = false; });
     });
     done.addEventListener('click', function () {
       done.disabled = true;
-      saveReport({ departed_at: new Date().toISOString(), arrived_at: state.report.arrived_at || new Date().toISOString() })
+      var at = new Date().toISOString();
+      P.whereAmI().then(function (loc) {
+        return saveReport(Object.assign({ departed_at: at, arrived_at: state.report.arrived_at || at },
+          loc ? { depart_lat: loc.lat, depart_lng: loc.lng, depart_acc_m: loc.acc } : {}));
+      })
         .then(function () { return setStatus(b.id, 'completed'); })
         .then(function () { b.status = 'completed'; drawTimes(); P.toast('Report sent to the client portal'); })
         .catch(function (e) { P.toast(P.errMsg(e)); done.disabled = false; });
@@ -622,11 +668,33 @@
     var saveDraft = h('button', { class: 'btn ghost', type: 'button', text: 'Save note', onclick: function () {
       saveReport().then(function () { P.toast('Saved'); }).catch(function (e) { P.toast(P.errMsg(e)); });
     } });
-    if (report.arrived_at) arrive.disabled = true;
+    if (report.arrived_at) { arrive.disabled = true; arrive.textContent = 'Checked in'; }
     drawTimes(); drawPhotos();
+    // Checklist: tap what you did. Only shows items that fit this home.
+    var hasMeds = pets.some(function (x) { return x.medications; });
+    var hasCat = pets.some(function (x) { return /cat/i.test(x.species || ''); });
+    var dogsOrWalk = b.service_id === 'walk' || pets.some(function (x) { return /dog/i.test(x.species || ''); });
+    var items = ['Fed', 'Fresh water'].concat(dogsOrWalk ? ['Walked', 'Potty break'] : [], hasMeds ? ['Medication given'] : [], hasCat ? ['Litter scooped'] : [],
+      b.service_id === 'walk' ? [] : ['Mail brought in', 'Plants watered', 'Trash out', 'Lights adjusted', 'Doors locked']);
+    function chips(list, key, label) {
+      var row = h('div', { class: 'chips', role: 'group', 'aria-label': label });
+      list.forEach(function (it) {
+        var on = state[key].indexOf(it) >= 0;
+        row.appendChild(h('button', { type: 'button', class: 'tog', 'aria-pressed': on ? 'true' : 'false', text: it, onclick: function (ev) {
+          var i = state[key].indexOf(it);
+          if (i >= 0) state[key].splice(i, 1); else state[key].push(it);
+          ev.target.setAttribute('aria-pressed', i >= 0 ? 'false' : 'true');
+          saveReport().catch(function (e) { P.toast(P.errMsg(e)); });
+        } }));
+      });
+      return row;
+    }
     col.appendChild(h('section', { class: 'panel stack' },
       h('div', { class: 'spread' }, h('h2', { text: 'Visit report' }), times),
       h('div', { class: 'row' }, arrive),
+      h('p', { class: 'small muted', text: 'Checking in records where you are, once, so the client sees you were at their home. It never tracks you in the background.' }),
+      h('h3', { style: 'margin-top:8px', text: 'Checklist' }), chips(items, 'checklist', 'Checklist'),
+      h('h3', { style: 'margin-top:8px', text: 'How were they?' }), chips(['Happy', 'Playful', 'Calm', 'Sleepy', 'Affectionate', 'Energetic', 'Hungry', 'Anxious'], 'moods', 'Mood'),
       h('label', { class: 'f', for: 'visit-note' }, 'Note for the client', noteIn),
       h('div', { class: 'row' }, addPhotos, saveDraft, fileIn),
       photoGrid,
@@ -694,10 +762,24 @@
                 sb.rpc('porchlight_cancel_group', { p_group: b.group_id }).then(guard).then(function (n) { P.toast(n + ' visits cancelled'); clientVisits(); })
                   .catch(function (e) { P.toast(P.errMsg(e)); ev.target.disabled = false; });
               } }));
+              acts.appendChild(h('button', { class: 'btn ghost sm', type: 'button', text: 'Pause some dates', onclick: function (ev) {
+                ev.target.disabled = true;
+                var from = h('input', { type: 'date', 'aria-label': 'Pause from', min: P.todayISO(), value: P.todayISO() });
+                var to = h('input', { type: 'date', 'aria-label': 'Pause until', min: P.todayISO(), value: P.addDays(P.todayISO(), 7) });
+                var go = h('button', { class: 'btn sm', type: 'button', text: 'Skip these dates', onclick: function () {
+                  if (!from.value || !to.value || to.value < from.value) { P.toast('Pick a start and end date'); return; }
+                  go.disabled = true;
+                  sb.rpc('porchlight_skip_dates', { p_group: b.group_id, p_from: from.value, p_to: to.value }).then(guard).then(function (n) {
+                    P.toast(n ? n + ' visit' + (n > 1 ? 's' : '') + ' skipped. The rest stay booked.' : 'No visits fell on those dates.'); clientVisits();
+                  }).catch(function (e) { P.toast(P.errMsg(e)); go.disabled = false; });
+                } });
+                acts.appendChild(h('div', { class: 'pause-box' }, h('span', { class: 'small', text: 'Away for a bit? Skip visits from' }), from, h('span', { class: 'small', text: 'to' }), to, go));
+              } }));
             }
             l.appendChild(h('div', { class: 'item' },
               h('div', { class: 'time', text: P.fmtDay(b.start_at) }),
-              h('div', { class: 'main' }, h('div', { class: 'row' }, h('strong', { text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' + P.fmtTime(b.start_at) }), chip(b.status)),
+              h('div', { class: 'main' }, h('div', { class: 'row' }, h('strong', { text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' +
+                (b.service_id === 'overnight' ? P.fmtTime(b.start_at) + ' to morning' : 'arrive ' + P.fmtWindow(b.start_at)) }), chip(b.status)),
                 b.series_label ? h('div', { class: 'small muted', text: '↻ ' + b.series_label }) : null),
               acts));
           });
@@ -715,8 +797,12 @@
     root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:16px', text: 'Visit reports' }));
     var listBox = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(listBox);
-    sb.from('porchlight_visit_reports').select('id,created_at,arrived_at,departed_at,note,photo_paths,porchlight_bookings(start_at,service_id)')
-      .order('created_at', { ascending: false }).limit(60).then(guard).then(function (rows) {
+    var home = null;
+    sb.from('porchlight_clients').select('lat,lng').eq('id', me.client_id).maybeSingle().then(function (r) { home = r.data; homeCache = home && home.lat != null ? home : null; })
+      .then(function () {
+        return sb.from('porchlight_visit_reports').select('id,created_at,arrived_at,departed_at,note,photo_paths,checklist,moods,arrive_lat,arrive_lng,arrive_acc_m,porchlight_bookings(start_at,service_id)')
+          .order('created_at', { ascending: false }).limit(60).then(guard);
+      }).then(function (rows) {
         var all = [];
         rows.forEach(function (r) { all = all.concat(r.photo_paths || []); });
         return P.signedUrls(all).then(function (urls) {
@@ -731,12 +817,24 @@
               h('div', { class: 'spread' },
                 h('h2', { style: 'font-size:20px', text: (bk ? (SERVICE_LABEL[bk.service_id] || '') + ' · ' : '') + when }),
                 h('span', { class: 'small muted', text: [r.arrived_at ? 'Arrived ' + P.fmtTime(r.arrived_at) : null, r.departed_at ? 'left ' + P.fmtTime(r.departed_at) : null].filter(Boolean).join(', ') })),
+              atHome(r),
+              (r.moods || []).length ? h('p', { class: 'small', text: 'Mood: ' + r.moods.join(', ').toLowerCase() }) : null,
               r.note ? h('p', { style: 'white-space:pre-line', text: r.note }) : null,
+              (r.checklist || []).length ? h('ul', { class: 'done-list' }, r.checklist.map(function (x) { return h('li', { text: x }); })) : null,
               (r.photo_paths || []).length ? photos : null));
           });
         });
       }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
   }
+
+  // "Checked in at your home" when the phone's location at check-in was close to the house.
+  function atHome(r) {
+    if (r.arrive_lat == null || !homeCache) return null;
+    var mi = P.milesBetween({ lat: r.arrive_lat, lng: r.arrive_lng }, homeCache);
+    if (mi <= 0.15 && (r.arrive_acc_m || 0) <= 150) return h('span', { class: 'chip completed', text: '✓ Checked in at your home' });
+    return null;
+  }
+  var homeCache = null;
 
   function clientInfo() {
     var root = page();

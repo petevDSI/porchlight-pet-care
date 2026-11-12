@@ -176,6 +176,23 @@
   /* ---------- Dates (the business runs on Eastern time) ---------- */
   var TZ = 'America/New_York';
   P.fmtTime = function (iso) { return new Date(iso).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' }); };
+  // Clients are promised an arrival window, not an exact minute.
+  P.WINDOW_MIN = 30;
+  P.fmtWindow = function (iso) { return P.fmtTime(iso) + '–' + P.fmtTime(new Date(new Date(iso).getTime() + P.WINDOW_MIN * 60000).toISOString()); };
+  P.milesBetween = function (a, b) {
+    var R = 3958.8, toR = Math.PI / 180, dLat = (b.lat - a.lat) * toR, dLng = (b.lng - a.lng) * toR;
+    var x = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(a.lat * toR) * Math.cos(b.lat * toR) * Math.pow(Math.sin(dLng / 2), 2);
+    return 2 * R * Math.asin(Math.sqrt(x));
+  };
+  // Best-effort location for check-in/out. Resolves null if the sitter says no or it takes too long.
+  P.whereAmI = function () {
+    return new Promise(function (res) {
+      if (!navigator.geolocation) return res(null);
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        res({ lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy || 0) });
+      }, function () { res(null); }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+    });
+  };
   P.fmtDay = function (iso) { return new Date(iso).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }); };
   P.fmtDayLong = function (iso) { return new Date(iso).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'long', month: 'long', day: 'numeric' }); };
   P.todayISO = function () {

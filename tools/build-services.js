@@ -807,6 +807,16 @@ const business = {
 const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj)}</script>\n`;
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+const CAT_POSTS = [
+  ['cat-sitter-cost', 'How much does a cat sitter cost?', 'Local prices, and what changes the total.'],
+  ['leave-cat-alone-weekend', 'Can you leave a cat alone for a weekend?', 'The real risks, and a safer plan.'],
+  ['caring-for-cats-while-away', 'How often should a sitter visit?', 'Visits, checks and setup for cats.'],
+  ['shy-cat-and-sitters', 'My cat hides from strangers', 'How a sitter works with a shy cat.'],
+  ['cat-with-medical-needs-sitter', 'Cat on insulin or daily medication?', 'Planning a trip around treatment.'],
+  ['pet-sitter-vs-boarding', 'Pet sitter or boarding?', 'Which is better for your cat.']
+];
+const catPostsHtml = (cls) => `<div class="others">\n${CAT_POSTS.map(([sl, t, d]) => `<a class="other" href="/blog/${sl}"><div><h3>${esc(t)}</h3><p>${esc(d)}</p></div></a>`).join('\n')}\n</div>`;
+
 function servicePage(s) {
   const url = `${SITE}/services/${s.slug}`;
   const book = s.quote ? `/quote?type=${s.quote}` : `/?service=${s.id}#booking`;
@@ -885,7 +895,12 @@ ${s.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}
 </div>
 </div></section>
 
-<section class="section"><div class="wrap">
+${s.slug === 'cat-sitting' ? `<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Cat care guides</p><h2 class="display">Planning a trip with a cat?</h2></div>
+${catPostsHtml()}
+</div></section>
+
+` : ''}<section class="section"><div class="wrap">
 <div class="section-head"><p class="eyebrow">More from Porchlight</p><h2 class="display">Other services</h2></div>
 <div class="others">
 ${others.map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>${o.fromLine ? esc(o.fromLine) : o.quote ? 'Quoted ' + esc(o.unit.replace(/^quoted /, '')) : 'From $' + o.price + ' ' + esc(o.unit)}</p></div></a>`).join('\n')}
@@ -963,6 +978,12 @@ ${SERVICES.filter(o => !o.quote).map(o => `<a class="other" href="/services/${o.
 <div class="faq-list">
 ${t.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('\n')}
 </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Cat owners in ${esc(t.name)}</p><h2 class="display">Cat sitting in ${esc(t.name)}</h2></div>
+<p class="lede" style="font-size:18px;margin-bottom:20px">Cats do best at home. Our <a href="/services/cat-sitting">cat sitter service</a> comes to you in ${esc(t.name)} for $30 a visit. These guides help you plan:</p>
+${catPostsHtml()}
 </div></section>
 
 <section class="section"><div class="wrap">

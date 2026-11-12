@@ -114,7 +114,7 @@ module.exports = [
   },
   {
     slug: 'ranlo', name: 'Ranlo', state: 'NC', county: 'Gaston County',
-    heroPhoto: 'brick', photos: ['crowders'],
+    heroPhoto: 'woodlanddog', photos: ['crowders'],
     metaTitle: 'Dog Walking & Pet Sitting in Ranlo, NC | Porchlight',
     metaDesc: 'Dog walking, drop-in visits and pet sitting in Ranlo, NC, a former mill town north of Gastonia. Reliable midday care for commuter households. Free meet-and-greet.',
     h1: 'Dog walking and pet sitting in Ranlo, NC.',

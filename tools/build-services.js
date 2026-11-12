@@ -124,8 +124,8 @@ const SERVICES = [
     hero: img('photo-1569992274375-e56b14e234f1', 1200), heroAlt: 'A man walking his dog along a tree-lined path',
     gallery: [
       ['/assets/img/pack/pack-hilltop.jpg', 'Bowie, Oskar, Eden and Maizy resting on leashes on a grassy hilltop after a hike'],
-      ['/assets/img/pack/akita-uptown.jpg', 'An Akita on a leash on a walk in uptown Charlotte'],
-      ['/assets/img/pack/eden-puppy.jpg', 'A red puppy bounding across the grass']
+      ['/assets/img/pack/akita-uptown.jpg', 'Shamus on a walk in uptown Charlotte'],
+      ['/assets/img/pack/eden-puppy.jpg', 'Eden as a puppy, bounding across the grass']
     ],
     cta: 'Book a walk',
     included: [
@@ -187,7 +187,7 @@ const SERVICES = [
     gallery: [
       [img('photo-1607539678863-ba64f95124bc', 1200, 800), 'A cat waiting on a table for its food'],
       ['/assets/img/pack/oskar-window.jpg', 'Oskar on his window perch, watching for someone to come home'],
-      ['/assets/img/pack/akita-cat.jpg', 'An Akita and an orange cat meeting nose to nose on a porch']
+      ['/assets/img/pack/akita-cat.jpg', 'Shamus and Pepper the cat meeting nose to nose on the porch']
     ],
     cta: 'Book a visit',
     included: [
@@ -493,7 +493,7 @@ const ABOUT = {
     ['Home base', 'Belmont, NC'],
     ['Studied at', 'UNC Charlotte'],
     ['Before Porchlight', 'Banking and customer service, where the job was getting every detail right and being someone people could trust with their money'],
-    ['Pets in my life', 'My dog Bowie, plus Oskar, Eden and Maizy, my mom and stepdad’s crew, who I know as well as my own'],
+    ['Pets in my life', 'My dog Bowie, plus Oskar, Eden and Maizy, my mom and stepdad’s crew. Before them, Shamus, my first dog, and Pepper the cat'],
     ['Favorite walk in town', '[e.g. the River Street loop, or Stowe Park]'],
     ['Big dogs?', 'Love them. Strong pullers and all.']
   ]
@@ -503,7 +503,8 @@ const PACK = [
   ['bowie-chair', 'Bowie', 'My dog', 'Black and white, all legs, and the first to claim the comfy chair. Walk buddy and official taste-tester.', 'Bowie mid-yawn, sprawled across an armchair'],
   ['oskar-portrait', 'Oskar', 'Family dog', 'A dapple dachshund who runs the window-perch neighborhood watch.', 'Oskar the dachshund looking at the camera on a deck'],
   ['eden-portrait', 'Eden', 'Family dog', 'Red, sweet and built for long walks, then long naps with Oskar on top of her.', 'Eden, a red hound mix, looking out from a porch railing'],
-  ['maizy-grin', 'Maizy', 'Family dog', 'Small, loud about it, and never under the covers alone if she can help it.', 'Maizy, a small black-and-tan dog, grinning at the camera']
+  ['maizy-grin', 'Maizy', 'Family dog', 'Small, loud about it, and never under the covers alone if she can help it.', 'Maizy, a small black-and-tan dog, grinning at the camera'],
+  ['akita-uptown', 'Shamus', 'In loving memory', 'My first dog, and later the family’s. Hiker, porch guardian, and Pepper the cat’s reluctant roommate.', 'Shamus sitting on a sidewalk in uptown Charlotte']
 ];
 
 function aboutPage() {
@@ -526,7 +527,7 @@ function aboutPage() {
 <div class="cta-row"><a class="btn btn-amber" href="/intake">Set up a free meet-and-greet</a><a class="btn btn-ghost" href="/services">See services</a></div>
 </div>
 <div class="svc-hero-media">
-<figure class="pack-hero"><img src="/assets/img/pack/pack-hilltop.jpg" alt="Bowie, Oskar, Eden and Maizy lying on a grassy hilltop with mountains behind them" width="1024" height="768" fetchpriority="high"><figcaption>Bowie, Oskar, Eden and Maizy, taking a break on a hike.</figcaption></figure>
+<figure class="pack-hero"><img src="/assets/img/pack/kraig-bowie.jpg" alt="Kraig sitting at a table, scratching his dog Bowie under the chin" width="768" height="576" fetchpriority="high"><figcaption>Me and Bowie.</figcaption></figure>
 </div>
 </div>
 </div></section>
@@ -537,7 +538,9 @@ function aboutPage() {
 <p>I grew up in a family that runs its own businesses, so I learned early that you build a reputation one promise at a time. Before Porchlight I worked in banking, where the whole job was getting the details exactly right and being someone people trusted with what mattered to them. Pet care turns out to be the same job.</p>
 <p>The name comes from the porch light you leave on when someone’s coming home. That’s what I want Porchlight to feel like: the house isn’t empty, the dog got walked, the cat got her medicine on time, and you get a photo to prove it.</p>
 <p>I live right here in Belmont, so I’m minutes away, not driving in from across Charlotte. I’m small on purpose. When Porchlight grows, every new sitter will be someone I’d trust with my own pets, and you’ll always meet them first.</p>
-<p>[Kraig: add a sentence or two in your own words about why you love animals, or a favorite pet story.]</p>
+<p>My first dog was Shamus. When I left for college he stayed behind with my mom and Pete, and he became as much theirs as mine. He was part of every family hike, and he even shared the house with Pepper, my grandmother’s cat, without too much drama. Shamus is gone now, but he’s a big part of why I do this.</p>
+<p>[Kraig: add a sentence or two in your own words about why you love animals, or a favorite memory of Shamus.]</p>
+<figure class="story-photo"><img src="/assets/img/pack/family-hike-shamus.jpg" alt="Kraig with his mom Susan, his stepdad Pete and Shamus on a mountain hike" width="1024" height="768" loading="lazy"><figcaption>Mom, me, Pete and Shamus on one of our hikes.</figcaption></figure>
 </div>
 </div></section>
 

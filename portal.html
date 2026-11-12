@@ -29,7 +29,7 @@
 
   var SERVICE_LABEL = { meet: 'Free meet & greet', walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in',
     taxi: 'Pet taxi, one way', taxi_rt: 'Pet taxi, round trip' };
-  var QUOTE_LABEL = { flight: 'Flight companion', transport: 'Pet transport', local: 'Outside-area care' };
+  var QUOTE_LABEL = { flight: 'Flight companion', transport: 'Pet transport', local: 'Outside-area care', event: 'Wedding / event attendant' };
   var DISC = 0;
   var PAY_METHODS = [['cash', 'Cash'], ['check', 'Check'], ['venmo', 'Venmo'], ['zelle', 'Zelle'], ['other', 'Other']];
   var PAY_LABEL = { cash: 'Cash', check: 'Check', venmo: 'Venmo', zelle: 'Zelle', card: 'Card', other: 'Other' };
@@ -344,7 +344,7 @@
     var root = page();
     root.appendChild(staffTabs('quotes'));
     root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Trip quotes' }));
-    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Flight companion and long-distance transport requests. Reply with a written quote, then record it here.' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Wedding and event attendant, flight companion and long-distance transport requests. Reply with a written quote, then record it here.' }));
     var listBox = h('div', { class: 'list' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(listBox);
     sb.from('porchlight_quotes').select('*').order('created_at', { ascending: false }).limit(100).then(guard).then(function (rows) {

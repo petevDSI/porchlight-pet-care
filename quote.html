@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Request a Trip Quote | Porchlight Pet &amp; Home Care</title>
-<meta name="description" content="Request a written quote for a pet flight companion or a long-distance pet transport trip.">
+<meta name="description" content="Request a written quote for a pet wedding or event attendant, a pet flight companion or a long-distance pet transport trip.">
 <link rel="canonical" href="https://porchlightpetcare.com/quote">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M6 16 19 7l13 9z' fill='%2314233B'/%3E%3Crect x='9' y='16' width='20' height='21' rx='3' fill='%23F2B33D' stroke='%2314233B' stroke-width='2.5'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
@@ -23,7 +23,7 @@
 <div class="stack" style="gap:10px;margin-bottom:8px">
 <p class="eyebrow">Quote request</p>
 <h1 class="display" style="font-size:clamp(32px,5vw,44px);line-height:1.05">Tell us what you need.</h1>
-<p class="lede">Flights, long drives and care outside our usual area are priced one request at a time. Send the details and we’ll reply with a written quote, usually within a day. Asking is free and doesn’t commit you to anything.</p>
+<p class="lede">Weddings and events, flights, long drives and care outside our usual area are priced one request at a time. Send the details and we’ll reply with a written quote, usually within a day. Asking is free and doesn’t commit you to anything.</p>
 </div>
 
 <section class="panel stack">
@@ -31,6 +31,7 @@
 <legend class="eyebrow" style="margin-bottom:8px">What kind of trip?</legend>
 <label class="check"><input type="radio" name="kind" value="flight"> <span><strong>Flight companion.</strong> Small dog or cat flying in the cabin with a companion.</span></label>
 <label class="check"><input type="radio" name="kind" value="transport"> <span><strong>Pet transport by car.</strong> Moves, adoptions and long drives, door to door.</span></label>
+<label class="check"><input type="radio" name="kind" value="event"> <span><strong>Wedding or special event.</strong> A sitter takes your dog to photos, the ceremony or a party and brings them home.</span></label>
 <label class="check"><input type="radio" name="kind" value="local"> <span><strong>Care at my home, outside your usual area.</strong> Visits, walks, overnights or a pet taxi. We’ll tell you if we can reach you.</span></label>
 </fieldset>
 </section>
@@ -102,12 +103,14 @@
 
   var qs = params.get('from'); if (qs) $('from_place').value = qs;
   function relabel() {
-    var local = chosen() === 'local';
-    $('to-wrap').hidden = local;
-    $('trip-h').textContent = local ? 'Where and when' : 'The trip';
-    $('from-label').textContent = local ? 'Your address' : 'Starting from';
-    $('date-label').textContent = local ? 'First date you need us' : 'Travel date';
-    $('notes').placeholder = local ? 'What you need (walks, visits, overnights, pet taxi), how often, and any dates' : 'Airline, motion sickness, medications, who’s meeting your pet, anything that helps us quote accurately';
+    var k = chosen(), local = k === 'local', ev = k === 'event';
+    $('to-wrap').hidden = local || ev;
+    $('trip-h').textContent = local ? 'Where and when' : ev ? 'The event' : 'The trip';
+    $('from-label').textContent = local ? 'Your address' : ev ? 'Venue name and address' : 'Starting from';
+    $('date-label').textContent = local ? 'First date you need us' : ev ? 'Event date' : 'Travel date';
+    $('notes').placeholder = local ? 'What you need (walks, visits, overnights, pet taxi), how often, and any dates'
+      : ev ? 'Kind of event, ceremony start time, when you want your dog there, how long you need us, and your planner or photographer’s name'
+      : 'Airline, motion sickness, medications, who’s meeting your pet, anything that helps us quote accurately';
   }
   document.querySelectorAll('input[name=kind]').forEach(function (r) { r.addEventListener('change', relabel); });
   relabel();
@@ -118,19 +121,29 @@
   $('quote').addEventListener('submit', function (ev) {
     ev.preventDefault(); err.hidden = true;
     if (!chosen()) return fail('Please choose the kind of trip.', document.querySelector('input[name=kind]'));
-    var need = [['pet_desc', 'a description of your pet'], ['from_place', chosen() === 'local' ? 'your address' : 'where the trip starts']].concat(
-                chosen() === 'local' ? [] : [['to_place', 'where it ends']], [['name', 'your name'], ['phone', 'your phone number'], ['email', 'your email']]);
+    var solo = chosen() === 'local' || chosen() === 'event';
+    var need = [['pet_desc', 'a description of your pet'], ['from_place', chosen() === 'local' ? 'your address' : chosen() === 'event' ? 'the venue' : 'where the trip starts']].concat(
+                solo ? [] : [['to_place', 'where it ends']], [['name', 'your name'], ['phone', 'your phone number'], ['email', 'your email']]);
     for (var i = 0; i < need.length; i++) {
       var f = $(need[i][0]);
       if (!f.value.trim() || !f.checkValidity()) return fail('Please fill in ' + need[i][1] + '.', f);
     }
     var btn = $('submit'); btn.disabled = true; btn.textContent = 'Sending…';
     var w = parseInt($('pet_weight').value, 10);
-    P.sb.rpc('porchlight_request_quote', {
-      p_kind: chosen(), p_name: $('name').value, p_email: $('email').value, p_phone: $('phone').value,
-      p_pet_desc: $('pet_desc').value, p_pet_count: parseInt($('pet_count').value, 10) || 1, p_pet_weight: isNaN(w) ? null : w,
-      p_from: $('from_place').value, p_to: chosen() === 'local' ? 'Home visits at the address above' : $('to_place').value, p_date: $('travel_date').value || null,
-      p_flexible: $('flexible').checked, p_notes: $('notes').value || null
+    function send(kind) {
+      var notes = $('notes').value || '';
+      if (kind === 'local' && chosen() === 'event') notes = ('WEDDING / EVENT ATTENDANT REQUEST. ' + notes).trim();
+      return P.sb.rpc('porchlight_request_quote', {
+        p_kind: kind, p_name: $('name').value, p_email: $('email').value, p_phone: $('phone').value,
+        p_pet_desc: $('pet_desc').value, p_pet_count: parseInt($('pet_count').value, 10) || 1, p_pet_weight: isNaN(w) ? null : w,
+        p_from: $('from_place').value, p_to: kind === 'local' ? (chosen() === 'event' ? 'Event at the venue above' : 'Home visits at the address above') : chosen() === 'event' ? 'Event at the venue above' : $('to_place').value, p_date: $('travel_date').value || null,
+        p_flexible: $('flexible').checked, p_notes: notes || null
+      });
+    }
+    /* Events use their own quote type. If the database doesn't accept it yet, file the request as 'local' with a clear label. */
+    send(chosen()).then(function (r) {
+      if (r.error && chosen() === 'event' && /unknown trip type|kind_check/i.test((r.error.message || '') + ' ' + (r.error.details || ''))) return send('local');
+      return r;
     }).then(function (r) {
       if (r.error) throw r.error;
       $('quote').hidden = true;

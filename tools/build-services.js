@@ -518,7 +518,7 @@ const SERVICES = [
     h1: 'Your pet flies in the cabin, with someone who cares.',
     lede: 'A flight companion, sometimes called a flight nanny, flies with your small dog or cat in the passenger cabin, from your door to the person waiting at the other end. No cargo hold, and no flying alone.',
     price: null, unit: 'quoted for each trip',
-    hero: img('photo-1774790479490-dbf0f3a7fb60', 1200), heroAlt: 'A small dog peeking out of a carrier bag',
+    hero: '/assets/img/pack/flight-cat-carrier.jpg', heroAlt: 'A cat resting in a mesh airline carrier on an airplane',
     gallery: [
       [img('photo-1779638416594-c56bcb5c8682', 1200, 800), 'A small shaggy dog peeking out of a black carrier'],
       [img('photo-1593182440709-4b7b56482c55', 1200, 800), 'An airplane wing above the clouds'],

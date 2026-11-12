@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/testimonials.css">
 <style>
 :root{--navy:#14233B;--navy-2:#2B4470;--ink:#33405A;--muted:#4A5670;--line:#DDE2EA;--line-2:#C6CEDB;--mist:#F4F6F9;--soft:#D5DCE8;--amber:#F2B33D;--white:#FFFFFF;--error:#B42318}
 *{box-sizing:border-box}
@@ -208,6 +209,7 @@ details p{margin-top:12px;color:var(--ink)}
 <nav class="nav" aria-label="Main">
 <a href="/services">Services</a>
 <a href="/about">About</a>
+<a href="#reviews">Reviews</a>
 <a href="#booking">Booking</a>
 <a href="#pricing">Pricing</a>
 <a href="#area">Service area</a>
@@ -335,6 +337,21 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 </article>
 </div>
+</div>
+</section>
+
+<section class="section tm-section" id="reviews" aria-labelledby="reviews-title" data-tm-section hidden>
+<div class="wrap">
+<div class="tm-head">
+<div class="tm-head-copy">
+<p class="eyebrow">Reviews</p>
+<h2 class="display" id="reviews-title">Kind words from neighbors.</h2>
+<p class="lede">Dog walks, overnights, cats, fish, house check-ins and trips. Here's how it goes for the people we care for.</p>
+</div>
+<div class="tm-score" data-tm-score></div>
+</div>
+<div data-tm-carousel></div>
+<div class="cta-row" style="margin-top:28px"><a class="btn btn-ghost" href="/testimonials">Read all reviews</a><a class="btn btn-amber" href="#booking">Book a visit</a></div>
 </div>
 </section>
 
@@ -586,7 +603,7 @@ details p{margin-top:12px;color:var(--ink)}
 <p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p>
 <p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p>
 </div>
-<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/testimonials">Reviews</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
 <div><h4>Services</h4><a href="/services/overnight-pet-sitting">Overnight stays</a><a href="/services/dog-walking">Dog walking</a><a href="/services/drop-in-visits">Drop-in visits</a><a href="/services/cat-sitting">Cat sitting</a><a href="/services/exotic-pet-sitting">Birds, reptiles and fish</a><a href="/services/home-check-ins">Home check-ins</a><a href="/services/pet-taxi">Pet taxi</a><a href="/services/flight-companion">Flight companion</a><a href="/services/pet-transport">Pet transport</a></div>
 <div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
@@ -1102,5 +1119,7 @@ details p{margin-top:12px;color:var(--ink)}
   if ('IntersectionObserver' in window) { new IntersectionObserver(function(e, o){ if (e[0].isIntersecting) { load(); o.disconnect(); } }, { rootMargin: '300px' }).observe(box); } else load();
 })();
 </script>
+<script src="/assets/testimonials-data.js"></script>
+<script src="/assets/testimonials.js"></script>
 </body>
 </html>

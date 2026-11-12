@@ -532,7 +532,7 @@ ${extra || ''}<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www
 <a href="/#area">Service area</a>
 <a href="/#faq">FAQ</a>
 <a href="/portal">Client login</a>
-<a class="btn btn-navy" href="/#booking">Request a visit</a>
+<a class="btn btn-navy" href="/#booking">Book a visit</a>
 </nav></div></header>
 `;
 
@@ -542,7 +542,7 @@ const footer = () => `
 <h2 class="display">Heading out of town? We’ll leave the light on.</h2>
 <p style="font-size:19px">New here? Start with the <a href="/intake">new client form</a> and a free meet-and-greet.</p>
 </div>
-<div class="cta-row"><a class="btn btn-navy" href="/#booking">Request a visit</a><a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a></div>
+<div class="cta-row"><a class="btn btn-navy" href="/#booking">Book a visit</a><a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a></div>
 </div></section>
 <footer class="site-footer"><div class="wrap">
 <div class="foot-cols">

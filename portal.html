@@ -866,7 +866,7 @@
       h('p', { class: 'lede' }, 'We don’t have a client file for ', h('strong', { text: me.email }), ' yet.'),
       h('p', null, 'Fill out the new client form with this same email and your visits, notes and photos will show up here.'),
       h('div', { class: 'row' }, h('a', { class: 'btn amber', href: '/intake?email=' + encodeURIComponent(me.email), text: 'Fill out the new client form' }),
-        h('a', { class: 'btn ghost', href: '/#booking', text: 'Request a visit' }))));
+        h('a', { class: 'btn ghost', href: '/#booking', text: 'Book a visit' }))));
   }
 
   function clientVisits() {
@@ -874,7 +874,7 @@
     root.appendChild(clientTabs('visits'));
     root.appendChild(h('div', { class: 'spread', style: 'margin-bottom:16px' },
       h('h1', { class: 'display', style: 'font-size:30px', text: 'Your visits' }),
-      h('a', { class: 'btn amber', href: '/#booking', text: 'Request a visit' })));
+      h('a', { class: 'btn amber', href: '/#booking', text: 'Book a visit' })));
     var listBox = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(listBox);
     sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id,group_id,series_label,dropoff_address,porchlight_payments(method,paid_at)').order('start_at', { ascending: false }).limit(100)

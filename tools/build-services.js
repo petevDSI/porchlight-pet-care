@@ -509,7 +509,7 @@ const SERVICES = [
   }
 ];
 
-const PAY_LINE = 'Pay by cash, check or Venmo after each visit or trip. Cancel at least 24 hours ahead at no charge.';
+const PAY_LINE = 'Payment is due when you book: Venmo or Zelle with no fee, or card with a $5 processing fee. Cancel at least 24 hours ahead for a full refund.';
 
 /* ---------- Shared chrome ---------- */
 const head = (title, desc, canonical, extra, current) => `<!doctype html>

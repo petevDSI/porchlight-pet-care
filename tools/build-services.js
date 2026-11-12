@@ -303,10 +303,10 @@ const SERVICES = [
     slug: 'pet-taxi', id: 'taxi', name: 'Pet taxi', short: 'Pet taxi',
     title: 'Pet Taxi in Belmont, NC',
     metaTitle: 'Pet Taxi in Belmont, NC | Rides to the Vet and Groomer | Porchlight',
-    metaDesc: 'Pet taxi in Belmont, Mt. Holly, Cramerton and Lake Wylie. A safe, secured ride to the vet, groomer or boarding, door to door, with a text at pickup and drop-off. $35 one way, $65 round trip.',
+    metaDesc: 'Pet taxi from homes in Belmont, Mt. Holly, Cramerton, Lake Wylie, Clover, York and nearby. A safe, secured ride to the vet, groomer or boarding, door to door, with a text at pickup and drop-off. $35 one way, $65 round trip.',
     h1: 'A safe ride to the vet, the groomer or the kennel.',
     lede: 'Can’t get off work for the appointment? We pick your pet up at your door, ride them there secured and calm, hand them to the clinic, and bring them home, with a text at every step.',
-    price: 35, unit: 'one way, up to about 15 miles',
+    price: 35, unit: 'one way, anywhere you need to go',
     hero: img('photo-1711654783635-c65873cdae66', 1200), heroAlt: 'A cocker spaniel looking out of a car window',
     gallery: [
       [img('photo-1703733565148-0a33aa10184e', 1200, 800), 'Two dogs sitting in a car, looking out the window'],
@@ -352,9 +352,9 @@ const SERVICES = [
       ]
     },
     pricing: [
-      ['Pet taxi, one way', 'Door to the destination, up to about 15 miles', '$35', 'taxi'],
+      ['Pet taxi, one way', 'Pickup at your home, drop-off anywhere you need', '$35', 'taxi'],
       ['Pet taxi, round trip', 'There and back, with a short wait or a scheduled return pickup', '$65', 'taxi_rt'],
-      ['Farther than 15 miles, or a long wait', 'We’ll tell you the price before you book', 'Quoted']
+      ['A very long drive, or a long wait', 'We’ll tell you the price before you book', 'Quoted']
     ],
     faq: [
       ['Which pets can ride?', 'Dogs, cats and small pets in a carrier. Tell us the breed and weight when you book so we can confirm they ride safely in our vehicle.'],

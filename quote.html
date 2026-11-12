@@ -21,9 +21,9 @@
 <main class="page narrow">
 <form id="quote" class="stack" novalidate>
 <div class="stack" style="gap:10px;margin-bottom:8px">
-<p class="eyebrow">Trip quote</p>
-<h1 class="display" style="font-size:clamp(32px,5vw,44px);line-height:1.05">Tell us about the trip.</h1>
-<p class="lede">Flights and long drives are priced one trip at a time. Send the details and we’ll reply with a written quote, usually within a day. Asking is free and doesn’t commit you to anything.</p>
+<p class="eyebrow">Quote request</p>
+<h1 class="display" style="font-size:clamp(32px,5vw,44px);line-height:1.05">Tell us what you need.</h1>
+<p class="lede">Flights, long drives and care outside our usual area are priced one request at a time. Send the details and we’ll reply with a written quote, usually within a day. Asking is free and doesn’t commit you to anything.</p>
 </div>
 
 <section class="panel stack">
@@ -31,6 +31,7 @@
 <legend class="eyebrow" style="margin-bottom:8px">What kind of trip?</legend>
 <label class="check"><input type="radio" name="kind" value="flight"> <span><strong>Flight companion.</strong> Small dog or cat flying in the cabin with a companion.</span></label>
 <label class="check"><input type="radio" name="kind" value="transport"> <span><strong>Pet transport by car.</strong> Moves, adoptions and long drives, door to door.</span></label>
+<label class="check"><input type="radio" name="kind" value="local"> <span><strong>Care at my home, outside your usual area.</strong> Visits, walks, overnights or a pet taxi. We’ll tell you if we can reach you.</span></label>
 </fieldset>
 </section>
 
@@ -45,11 +46,11 @@
 </section>
 
 <section class="panel stack">
-<h2>The trip</h2>
-<label class="f">Starting from<input id="from_place" maxlength="200" placeholder="City and state, or a full address" autocomplete="off"></label>
-<label class="f">Going to<input id="to_place" maxlength="200" placeholder="City and state, or a full address" autocomplete="off"></label>
+<h2 id="trip-h">The trip</h2>
+<label class="f"><span id="from-label">Starting from</span><input id="from_place" maxlength="200" placeholder="City and state, or a full address" autocomplete="off"></label>
+<label class="f" id="to-wrap">Going to<input id="to_place" maxlength="200" placeholder="City and state, or a full address" autocomplete="off"></label>
 <div class="row" style="align-items:flex-end;gap:16px">
-<label class="f" style="flex:1 1 200px">Travel date<input id="travel_date" type="date"></label>
+<label class="f" style="flex:1 1 200px"><span id="date-label">Travel date</span><input id="travel_date" type="date"></label>
 <label class="check" style="flex:1 1 200px"><input type="checkbox" id="flexible"> <span>My dates are flexible</span></label>
 </div>
 <label class="f">Anything else we should know<textarea id="notes" maxlength="2000" rows="4" placeholder="Airline, motion sickness, medications, who’s meeting your pet, anything that helps us quote accurately"></textarea></label>
@@ -99,14 +100,26 @@
   document.querySelectorAll('input[name=kind]').forEach(function (r) { r.addEventListener('change', weightNote); });
   weightNote();
 
+  var qs = params.get('from'); if (qs) $('from_place').value = qs;
+  function relabel() {
+    var local = chosen() === 'local';
+    $('to-wrap').hidden = local;
+    $('trip-h').textContent = local ? 'Where and when' : 'The trip';
+    $('from-label').textContent = local ? 'Your address' : 'Starting from';
+    $('date-label').textContent = local ? 'First date you need us' : 'Travel date';
+    $('notes').placeholder = local ? 'What you need (walks, visits, overnights, pet taxi), how often, and any dates' : 'Airline, motion sickness, medications, who’s meeting your pet, anything that helps us quote accurately';
+  }
+  document.querySelectorAll('input[name=kind]').forEach(function (r) { r.addEventListener('change', relabel); });
+  relabel();
+
   var err = $('err');
   function fail(msg, el) { err.textContent = msg; err.hidden = false; if (el) { el.focus(); el.scrollIntoView({ block: 'center' }); } else err.scrollIntoView({ block: 'center' }); }
 
   $('quote').addEventListener('submit', function (ev) {
     ev.preventDefault(); err.hidden = true;
     if (!chosen()) return fail('Please choose the kind of trip.', document.querySelector('input[name=kind]'));
-    var need = [['pet_desc', 'a description of your pet'], ['from_place', 'where the trip starts'], ['to_place', 'where it ends'],
-                ['name', 'your name'], ['phone', 'your phone number'], ['email', 'your email']];
+    var need = [['pet_desc', 'a description of your pet'], ['from_place', chosen() === 'local' ? 'your address' : 'where the trip starts']].concat(
+                chosen() === 'local' ? [] : [['to_place', 'where it ends']], [['name', 'your name'], ['phone', 'your phone number'], ['email', 'your email']]);
     for (var i = 0; i < need.length; i++) {
       var f = $(need[i][0]);
       if (!f.value.trim() || !f.checkValidity()) return fail('Please fill in ' + need[i][1] + '.', f);
@@ -116,7 +129,7 @@
     P.sb.rpc('porchlight_request_quote', {
       p_kind: chosen(), p_name: $('name').value, p_email: $('email').value, p_phone: $('phone').value,
       p_pet_desc: $('pet_desc').value, p_pet_count: parseInt($('pet_count').value, 10) || 1, p_pet_weight: isNaN(w) ? null : w,
-      p_from: $('from_place').value, p_to: $('to_place').value, p_date: $('travel_date').value || null,
+      p_from: $('from_place').value, p_to: chosen() === 'local' ? 'Home visits at the address above' : $('to_place').value, p_date: $('travel_date').value || null,
       p_flexible: $('flexible').checked, p_notes: $('notes').value || null
     }).then(function (r) {
       if (r.error) throw r.error;

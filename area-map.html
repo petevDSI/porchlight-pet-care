@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service Area Map | Porchlight</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<style>
+  html,body{margin:0;height:100%;font-family:system-ui,sans-serif;color:#14233B}
+  #map{position:absolute;inset:0}
+  .panel{position:absolute;z-index:1000;top:12px;left:56px;right:12px;max-width:420px;background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 2px 12px rgba(0,0,0,.25);font-size:14px;line-height:1.4}
+  .panel b{display:block;font-size:16px;margin-bottom:4px}
+  .k{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="panel"><b>Porchlight service area</b>
+Shaded area is where we work, west of the Catawba River and Lake Wylie, south to Celanese Rd.
+<div style="margin-top:6px"><span class="k" style="background:#1f7a4d"></span>Our towns &nbsp; <span class="k" style="background:#c0392b"></span>Just outside</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+var AREA = [[35.340,-81.000],[35.300,-81.002],[35.260,-81.008],[35.230,-81.012],[35.200,-81.005],[35.170,-81.005],
+  [35.150,-81.020],[35.120,-81.033],[35.100,-81.036],[35.060,-81.040],[35.020,-81.037],[35.005,-81.030],
+  [34.995,-81.000],[34.975,-80.975],[34.975,-81.270],[35.340,-81.270]];
+var IN = [['Belmont',35.2429,-81.0373],['Mt. Holly',35.2982,-81.0159],['Cramerton',35.239,-81.0751],['McAdenville',35.2601,-81.0784],
+  ['East Gastonia',35.2615,-81.136],['Lowell',35.268,-81.0994],['Ranlo',35.2863,-81.1305],['Clover',35.1112,-81.2265],
+  ['York',34.9943,-81.242],['India Hook',35.0097,-81.0368],['Newport',34.9899,-81.1009],['Lake Wylie',35.1076,-81.0423]];
+var OUT = [['Steele Creek',35.138,-80.981],['Fort Mill',35.007,-80.945],['Tega Cay',35.024,-81.028],['Rock Hill (south)',34.9409,-80.9876]];
+var map = L.map('map').setView([35.15,-81.08], 10);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+var poly = L.polygon(AREA, { color: '#14233B', weight: 3, fillColor: '#F2B33D', fillOpacity: .22 }).addTo(map);
+map.fitBounds(poly.getBounds(), { paddingTopLeft: [10, 90] });
+function dot(a, c) { L.circleMarker([a[1], a[2]], { radius: 7, color: '#fff', weight: 2, fillColor: c, fillOpacity: 1 }).addTo(map).bindTooltip(a[0], { permanent: true, direction: 'right', offset: [8, 0] }); }
+IN.forEach(function (a) { dot(a, '#1f7a4d'); });
+OUT.forEach(function (a) { dot(a, '#c0392b'); });
+</script>
+</body>
+</html>

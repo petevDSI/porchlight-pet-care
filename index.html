@@ -348,7 +348,7 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 <div><label class="field-label" for="dropoff">Where is your pet going?</label>
 <input id="dropoff" maxlength="300" placeholder="Vet, groomer or boarding address">
-<p class="hint">Up to about 15 miles from your home. Farther, or a long wait? Call us and we’ll quote it. Flying with your pet, or moving across the country? <a href="/services/flight-companion">Flight companion</a> and <a href="/services/pet-transport">pet transport</a> are quoted by the trip.</p></div>
+<p class="hint">We pick up at your home and take your pet anywhere they need to go. Long wait or a very long drive? We’ll tell you the price before you book. Flying with your pet, or moving across the country? <a href="/services/flight-companion">Flight companion</a> and <a href="/services/pet-transport">pet transport</a> are quoted by the trip.</p></div>
 </div>
 </fieldset>
 
@@ -471,7 +471,7 @@ details p{margin-top:12px;color:var(--ink)}
 <div><dt><b>Drop-in visit</b><span>30 minutes, any pet</span></dt><dd data-price="visit">$25</dd></div>
 <div><dt><b>Overnight stay</b><span>Evening to morning, in your home</span></dt><dd data-price="overnight">$95</dd></div>
 <div><dt><b>Home check-in</b><span>Mail, plants, lights. No pets needed</span></dt><dd data-price="home">$30</dd></div>
-<div><dt><b>Pet taxi, one way</b><span>Door to the vet or groomer, up to about 15 miles</span></dt><dd data-price="taxi">$35</dd></div>
+<div><dt><b>Pet taxi, one way</b><span>Door to the vet or groomer, or anywhere they need to go</span></dt><dd data-price="taxi">$35</dd></div>
 <div><dt><b>Pet taxi, round trip</b><span>There and back, with a short wait or a return pickup</span></dt><dd data-price="taxi_rt">$65</dd></div>
 <div><dt><b>Flight companion</b><span>Flies with your small pet in the cabin</span></dt><dd><a href="/quote?type=flight">Get a quote</a></dd></div>
 <div><dt><b>Pet transport by car</b><span>Moves, adoptions and long drives</span></dt><dd><a href="/quote?type=transport">Get a quote</a></dd></div>
@@ -487,7 +487,8 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="section-head">
 <p class="eyebrow">Service area</p>
 <h2 class="display">Within a short drive of downtown Belmont.</h2>
-<p class="lede">We serve the area west of the Catawba River and Lake Wylie, from Mt. Holly down to the Celanese Rd area of Rock Hill. Just outside that line? Call or email and we'll tell you honestly whether we can reach you reliably.</p>
+<p class="lede">We serve the area west of the Catawba River and Lake Wylie, from Mt. Holly down to the Celanese Rd area of Rock Hill. Just outside that line? Tell us your situation and we'll tell you honestly whether we can reach you reliably.</p>
+<div class="cta-row"><a class="btn btn-navy" href="/quote?type=local">Request a quote</a><a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a></div>
 </div>
 <ul class="towns">
 <li class="home">Belmont <span>Home base</span></li>
@@ -584,7 +585,12 @@ details p{margin-top:12px;color:var(--ink)}
     PorchlightAddress.attach(el('where'), function(place){
       if (place && place.outside) {
         state.place = null;
-        whereMsg.textContent = 'That address looks outside our area (we stay west of the Catawba River and Lake Wylie, north of Celanese Rd in Rock Hill). Call us and we’ll see what we can do.';
+        whereMsg.textContent = 'That address looks outside our area (we stay west of the Catawba River and Lake Wylie, north of Celanese Rd in Rock Hill). ';
+        var q = document.createElement('a'); q.className = 'btn btn-navy'; q.style.marginRight = '8px'; q.textContent = 'Request a quote';
+        q.href = '/quote?type=local&from=' + encodeURIComponent(place.address || '');
+        var c = document.createElement('a'); c.className = 'btn btn-ghost'; c.textContent = 'Call [PHONE]'; c.href = 'tel:[PHONE]';
+        var wrap = document.createElement('span'); wrap.style.cssText = 'display:block;margin-top:8px'; wrap.appendChild(q); wrap.appendChild(c);
+        whereMsg.appendChild(wrap);
       } else if (place) {
         state.place = place;
         if (place.town) townSel.value = place.town;

@@ -114,6 +114,13 @@ textarea{min-height:88px;resize:vertical}
 .slot-status{font-size:15px;color:var(--muted)}
 .summary{background:var(--mist);border-radius:16px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
 .summary strong{font-size:18px}
+.day-row{margin-top:12px}.day-row .choice{min-height:42px;padding:8px 14px;font-size:15px}
+.row-gap{margin-top:16px}
+.cart-list{list-style:none;margin:10px 0 0;padding:0;border:1px solid var(--line);border-radius:16px;max-height:340px;overflow:auto}
+.cart-list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:16px}
+.cart-list li:last-child{border-bottom:none}
+.cart-list small{display:block;color:var(--muted);font-size:13px}
+.linkx{font:inherit;font-size:14px;font-weight:700;background:none;border:none;color:var(--navy);text-decoration:underline;cursor:pointer;padding:6px}
 .check{display:flex;align-items:center;gap:10px;font-weight:600}
 .check input{width:22px;min-height:22px;height:22px}
 .form-error{color:var(--error);font-weight:600}
@@ -279,6 +286,7 @@ details p{margin-top:12px;color:var(--ink)}
 <p class="eyebrow">How booking works</p>
 <h2 class="display">Only times we can actually keep.</h2>
 <p class="lede">The calendar knows where we already are that day and how long the drive to you takes. If a time shows as open, we can be at your door for it.</p>
+<p class="lede">Away for a week, or need a walk every weekday? Pick one or more times, choose how often, and send it all as one request.</p>
 </div>
 <ol class="steps">
 <li><span class="step-num">1</span><div><h3>Tell us where you are</h3><p>Pick your town so we can confirm you're in our service area and plan the drive.</p></div></li>
@@ -317,9 +325,35 @@ details p{margin-top:12px;color:var(--ink)}
 </div>
 
 <div>
-<p class="field-label" id="slots-label">Open times</p>
+<p class="field-label" id="slots-label">Open times <span style="text-transform:none;letter-spacing:0;font-weight:600">(pick one or more)</span></p>
 <div class="slot-grid" id="slots" role="group" aria-labelledby="slots-label"></div>
 <p class="hint" id="slot-hint">Crossed-out times are booked, or too far from our previous stop to reach you on time.</p>
+</div>
+
+<div id="repeat-box">
+<p class="field-label" id="often-label">How often</p>
+<div class="choice-row" role="group" aria-labelledby="often-label" id="often-row">
+<button type="button" class="choice" data-often="once" aria-pressed="true">Just this day</button>
+<button type="button" class="choice" data-often="daily" aria-pressed="false">Every day</button>
+<button type="button" class="choice" data-often="weekly" aria-pressed="false">Certain days each week</button>
+</div>
+<div class="choice-row day-row" id="weekly-days" role="group" aria-label="Days of the week" hidden>
+<button type="button" class="choice" data-dow="1" aria-pressed="false">Mon</button>
+<button type="button" class="choice" data-dow="2" aria-pressed="false">Tue</button>
+<button type="button" class="choice" data-dow="3" aria-pressed="false">Wed</button>
+<button type="button" class="choice" data-dow="4" aria-pressed="false">Thu</button>
+<button type="button" class="choice" data-dow="5" aria-pressed="false">Fri</button>
+<button type="button" class="choice" data-dow="6" aria-pressed="false">Sat</button>
+<button type="button" class="choice" data-dow="0" aria-pressed="false">Sun</button>
+</div>
+<div id="until-wrap" hidden style="margin-top:14px;max-width:260px"><label class="field-label" for="until">Until</label><input id="until" type="date"></div>
+<div class="row-gap"><button type="button" class="btn btn-ghost" id="add-btn" disabled>Add to my visits</button></div>
+<p class="hint" id="add-msg" role="status"></p>
+</div>
+
+<div id="cart" hidden>
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><p class="field-label" style="margin:0">Your visits</p><button type="button" class="linkx" id="cart-clear">Clear all</button></div>
+<ul class="cart-list" id="cart-list"></ul>
 </div>
 
 <div id="details" hidden>
@@ -471,31 +505,39 @@ details p{margin-top:12px;color:var(--ink)}
     });
   }
 
-  var state = { service: 'walk', slot: null, slotLabel: null, prices: {}, labels: {
+  var TZ = 'America/New_York';
+  var state = { service: 'walk', picked: [], cart: [], often: 'once', dows: {}, prices: {}, labels: {
     walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in' } };
 
   var el = function(id){ return document.getElementById(id); };
   var serviceButtons = document.querySelectorAll('#service-row .choice');
-  var townSel = el('town'), dateIn = el('date'), slotsBox = el('slots');
+  var oftenButtons = document.querySelectorAll('#often-row .choice');
+  var dowButtons = document.querySelectorAll('#weekly-days .choice');
+  var townSel = el('town'), dateIn = el('date'), slotsBox = el('slots'), untilIn = el('until');
   var details = el('details'), submitBtn = el('submit'), summary = el('summary'), errBox = el('form-error');
+  var addBtn = el('add-btn'), addMsg = el('add-msg'), cartBox = el('cart'), cartList = el('cart-list');
 
   el('year').textContent = new Date().getFullYear();
 
   function localISO(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+  function addDaysISO(iso, n){ var d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return localISO(d); }
   var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   var today = new Date();
-  dateIn.min = localISO(today);
+  var maxISO = addDaysISO(localISO(today), 91);   // the server books up to 13 weeks ahead
+  dateIn.min = localISO(today); dateIn.max = maxISO;
   dateIn.value = localISO(tomorrow);
+  untilIn.max = maxISO;
 
   function money(cents){ return '$' + (cents/100).toFixed(cents % 100 ? 2 : 0); }
+  function dayText(iso){ return new Date(iso).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }); }
+  function shortDay(isoDate){ return new Date(isoDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
 
-  // Prices come from the database so they only need changing in one place.
   api('porchlight_services?select=id,label,price_cents').then(function(rows){
     (rows || []).forEach(function(s){
       state.prices[s.id] = s.price_cents;
       document.querySelectorAll('[data-price="' + s.id + '"]').forEach(function(n){ n.textContent = money(s.price_cents); });
     });
-    updateSummary();
+    renderCart();
   }).catch(function(){});
 
   function setService(id){
@@ -507,24 +549,142 @@ details p{margin-top:12px;color:var(--ink)}
   document.querySelectorAll('[data-pick]').forEach(function(a){
     a.addEventListener('click', function(){ setService(a.dataset.pick); });
   });
-  townSel.addEventListener('change', loadSlots);
-  dateIn.addEventListener('change', loadSlots);
+  townSel.addEventListener('change', function(){
+    if (state.cart.length) { state.cart = []; renderCart(); addMsg.textContent = 'Your list was cleared because the town changed.'; }
+    loadSlots();
+  });
+  dateIn.addEventListener('change', function(){ syncRepeat(true); loadSlots(); });
 
-  function updateSummary(){
-    if (!state.slot) { summary.textContent = 'Pick a time above'; submitBtn.disabled = true; return; }
-    var d = new Date(dateIn.value + 'T12:00:00');
-    var day = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    var price = state.prices[state.service] ? ' · ' + money(state.prices[state.service]) : '';
-    summary.textContent = state.labels[state.service] + ' · ' + day + ', ' + state.slotLabel + price;
-    submitBtn.disabled = false;
+  // ---- How often ----
+  function setOften(v){
+    state.often = v;
+    oftenButtons.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.often === v ? 'true' : 'false'); });
+    syncRepeat(true);
+  }
+  oftenButtons.forEach(function(b){ b.addEventListener('click', function(){ setOften(b.dataset.often); }); });
+  dowButtons.forEach(function(b){ b.addEventListener('click', function(){
+    var on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (on) state.dows[b.dataset.dow] = true; else delete state.dows[b.dataset.dow];
+    updateButtons();
+  }); });
+  function syncRepeat(resetUntil){
+    var o = state.often;
+    el('weekly-days').hidden = o !== 'weekly';
+    el('until-wrap').hidden = o === 'once';
+    untilIn.min = dateIn.value || localISO(today);
+    if (resetUntil && dateIn.value) {
+      var def = addDaysISO(dateIn.value, o === 'daily' ? 6 : 27);
+      untilIn.value = def > maxISO ? maxISO : def;
+    }
+    if (o === 'weekly' && !Object.keys(state.dows).length && dateIn.value) {
+      var dow = String(new Date(dateIn.value + 'T12:00:00').getDay());
+      state.dows[dow] = true;
+      dowButtons.forEach(function(b){ if (b.dataset.dow === dow) b.setAttribute('aria-pressed', 'true'); });
+    }
+    updateButtons();
+  }
+  untilIn.addEventListener('change', updateButtons);
+
+  function repeatDates(){
+    if (state.often === 'once') return [dateIn.value];
+    var out = [], d = dateIn.value, end = untilIn.value || dateIn.value;
+    if (end > maxISO) end = maxISO;
+    while (d <= end && out.length < 92) {
+      if (state.often === 'daily' || state.dows[String(new Date(d + 'T12:00:00').getDay())]) out.push(d);
+      d = addDaysISO(d, 1);
+    }
+    return out;
+  }
+  function seriesLabel(){
+    if (state.often === 'once') return null;
+    var end = shortDay(untilIn.value || dateIn.value);
+    if (state.often === 'daily') return 'Every day, ' + shortDay(dateIn.value) + ' to ' + end;
+    var names = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var days = ['1','2','3','4','5','6','0'].filter(function(k){ return state.dows[k]; }).map(function(k){ return names[+k]; });
+    return 'Weekly on ' + days.join(', ') + ', until ' + end;
+  }
+
+  // ---- Visit list ----
+  function inCart(startAt){ return state.cart.some(function(c){ return c.start_at === startAt; }); }
+  function renderCart(){
+    state.cart.sort(function(a, b){ return a.start_at < b.start_at ? -1 : 1; });
+    cartList.innerHTML = '';
+    state.cart.forEach(function(c, i){
+      var li = document.createElement('li');
+      var info = document.createElement('div');
+      var top = document.createElement('span');
+      top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (state.prices[c.service] ? ' · ' + money(state.prices[c.service]) : '');
+      info.appendChild(top);
+      if (c.series) { var sm = document.createElement('small'); sm.textContent = c.series; info.appendChild(sm); }
+      var x = document.createElement('button');
+      x.type = 'button'; x.className = 'linkx'; x.textContent = 'Remove';
+      x.setAttribute('aria-label', 'Remove ' + top.textContent);
+      x.addEventListener('click', function(){ state.cart.splice(i, 1); renderCart(); });
+      li.appendChild(info); li.appendChild(x);
+      cartList.appendChild(li);
+    });
+    cartBox.hidden = !state.cart.length;
+    updateButtons();
+  }
+  el('cart-clear').addEventListener('click', function(){ state.cart = []; addMsg.textContent = ''; renderCart(); });
+
+  function updateButtons(){
+    var hasPick = state.picked.length > 0;
+    var weeklyOk = state.often !== 'weekly' || Object.keys(state.dows).length > 0;
+    addBtn.disabled = !hasPick || !weeklyOk;
+    var n = state.cart.length;
+    if (!n && !hasPick) summary.textContent = 'Pick a time above';
+    else if (!n) summary.textContent = state.picked.length + ' time' + (state.picked.length > 1 ? 's' : '') + ' picked';
+    else {
+      var total = state.cart.reduce(function(t, c){ return t + (state.prices[c.service] || 0); }, 0);
+      summary.textContent = n + ' visit' + (n > 1 ? 's' : '') + (total ? ' · ' + money(total) : '');
+    }
+    submitBtn.disabled = !(n || (hasPick && weeklyOk));
     submitBtn.textContent = details.hidden ? 'Continue' : 'Send request';
+  }
+
+  // Adds the picked times (on the picked days) to the list. Returns a promise.
+  function addPicked(){
+    var picked = state.picked.slice(), svc = state.service, dates = repeatDates(), series = seriesLabel();
+    if (!picked.length) return Promise.resolve();
+    if (!dates.length) { addMsg.textContent = 'None of those days fall before your end date.'; return Promise.resolve(); }
+    var job;
+    if (state.often === 'once') {
+      job = Promise.resolve(picked.map(function(p){ return { day: dateIn.value, slot_label: p.label, start_at: p.start_at, available: true }; }));
+    } else {
+      addBtn.disabled = true; addMsg.textContent = 'Checking ' + dates.length + ' day' + (dates.length > 1 ? 's' : '') + '…';
+      job = api('rpc/porchlight_check_slots', { body: { p_service: svc, p_town: townSel.value, p_dates: dates, p_times: picked.map(function(p){ return p.label; }) } });
+    }
+    return job.then(function(rows){
+      var added = 0, skipped = [];
+      (rows || []).forEach(function(r){
+        var when = shortDay(r.day) + ' ' + r.slot_label;
+        if (!r.available) { skipped.push(when); return; }
+        if (inCart(r.start_at)) { skipped.push(when + ' (already listed)'); return; }
+        state.cart.push({ service: svc, start_at: r.start_at, time: r.slot_label, series: series });
+        added++;
+      });
+      var msg = added ? 'Added ' + added + ' visit' + (added > 1 ? 's' : '') + '.' : 'Nothing new was added.';
+      if (skipped.length) msg += ' ' + skipped.length + ' didn’t fit our schedule and ' + (skipped.length > 1 ? 'were' : 'was') + ' skipped: ' +
+        skipped.slice(0, 5).join(', ') + (skipped.length > 5 ? ' and ' + (skipped.length - 5) + ' more' : '') + '. Call us and we’ll try to work them in.';
+      addMsg.textContent = msg;
+      clearPicked();
+      renderCart();
+    }).catch(function(e){ addMsg.textContent = e.message; updateButtons(); });
+  }
+  addBtn.addEventListener('click', function(){ addPicked(); });
+
+  function clearPicked(){
+    state.picked = [];
+    slotsBox.querySelectorAll('.slot[aria-pressed]').forEach(function(x){ x.setAttribute('aria-pressed', 'false'); });
   }
 
   var loadToken = 0;
   function loadSlots(){
     var token = ++loadToken;
-    state.slot = null; state.slotLabel = null;
-    updateSummary();
+    state.picked = [];
+    updateButtons();
     errBox.hidden = true;
     if (!dateIn.value) { slotsBox.innerHTML = ''; return; }
     slotsBox.innerHTML = '<p class="slot-status">Checking the schedule…</p>';
@@ -536,17 +696,18 @@ details p{margin-top:12px;color:var(--ink)}
         (rows || []).forEach(function(s){
           var b = document.createElement('button');
           b.type = 'button'; b.className = 'slot'; b.textContent = s.slot_label;
-          if (!s.available) {
+          if (!s.available || inCart(s.start_at)) {
             b.disabled = true;
-            b.setAttribute('aria-label', s.slot_label + ', unavailable');
+            b.setAttribute('aria-label', s.slot_label + (s.available ? ', already in your list' : ', unavailable'));
           } else {
             open++;
             b.setAttribute('aria-pressed', 'false');
             b.addEventListener('click', function(){
-              slotsBox.querySelectorAll('.slot[aria-pressed]').forEach(function(x){ x.setAttribute('aria-pressed', 'false'); });
-              b.setAttribute('aria-pressed', 'true');
-              state.slot = s.start_at; state.slotLabel = s.slot_label;
-              updateSummary();
+              var on = b.getAttribute('aria-pressed') !== 'true';
+              b.setAttribute('aria-pressed', on ? 'true' : 'false');
+              if (on) state.picked.push({ label: s.slot_label, start_at: s.start_at });
+              else state.picked = state.picked.filter(function(p){ return p.start_at !== s.start_at; });
+              updateButtons();
             });
           }
           slotsBox.appendChild(b);
@@ -554,7 +715,8 @@ details p{margin-top:12px;color:var(--ink)}
         if (!open) {
           var p = document.createElement('p');
           p.className = 'slot-status'; p.style.gridColumn = '1 / -1';
-          p.textContent = 'No open times that day. Try the next day, or call us.';
+          p.textContent = state.often === 'once' ? 'No open times that day. Try the next day, or call us.' :
+            'No open times on your start day. Pick a different start day to set up repeating visits.';
           slotsBox.appendChild(p);
         }
       })
@@ -568,13 +730,20 @@ details p{margin-top:12px;color:var(--ink)}
   el('book-form').addEventListener('submit', function(ev){
     ev.preventDefault();
     errBox.hidden = true;
-    if (!state.slot) return;
-    if (details.hidden) {
-      details.hidden = false;
-      updateSummary();
-      el('name').focus();
-      return;
-    }
+    var pre = state.picked.length ? addPicked() : Promise.resolve();
+    pre.then(function(){
+      if (!state.cart.length) return;
+      if (details.hidden) {
+        details.hidden = false;
+        updateButtons();
+        el('name').focus();
+        return;
+      }
+      sendRequest();
+    });
+  });
+
+  function sendRequest(){
     var fields = ['name','phone','email','address'];
     for (var i = 0; i < fields.length; i++) {
       var f = el(fields[i]);
@@ -583,28 +752,31 @@ details p{margin-top:12px;color:var(--ink)}
         errBox.hidden = false; f.focus(); return;
       }
     }
+    var what = summary.textContent;
     submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
-    api('rpc/porchlight_request_booking', { body: {
-      p_service: state.service, p_town: townSel.value, p_start_at: state.slot,
+    api('rpc/porchlight_request_bookings', { body: {
+      p_town: townSel.value,
+      p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series }; }),
       p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
       p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
       p_new_client: el('new-client').checked
     }}).then(function(){
       var isNew = el('new-client').checked;
-      el('success-text').textContent = 'Request for ' + summary.textContent + ' is in. ' +
-        (isNew ? "Since you're new, we'll reach out first to set up a free meet-and-greet before this visit." :
+      el('success-text').textContent = 'Your request for ' + what + ' is in. ' +
+        (isNew ? "Since you're new, we'll reach out first to set up a free meet-and-greet before your first visit." :
                  "We'll confirm by text or email, usually within a few hours.");
       el('book-form').hidden = true;
       el('success').hidden = false;
       el('success').focus();
     }).catch(function(e){
       errBox.textContent = e.message; errBox.hidden = false;
-      submitBtn.disabled = false; submitBtn.textContent = 'Send request';
-      if (/taken/i.test(e.message)) loadSlots();
+      updateButtons();
+      if (/no longer open/i.test(e.message)) loadSlots();
     });
-  });
+  }
 
   el('book-another').addEventListener('click', function(){
+    state.cart = []; renderCart(); addMsg.textContent = '';
     el('success').hidden = true;
     el('book-form').hidden = false;
     details.hidden = true;
@@ -612,6 +784,7 @@ details p{margin-top:12px;color:var(--ink)}
   });
 
   var preset = new URLSearchParams(location.search).get('service');
+  syncRepeat(true);
   if (preset && state.labels[preset]) setService(preset); else loadSlots();
 })();
 </script>

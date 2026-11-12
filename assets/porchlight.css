@@ -98,3 +98,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy)}
 .section-title{display:flex;align-items:baseline;gap:12px;margin:8px 0 2px}
 .section-title .n{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;background:var(--navy);color:var(--white);border-radius:50%;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:var(--white);padding:12px 20px;border-radius:999px;font-weight:700;z-index:50;box-shadow:0 10px 30px rgba(20,35,59,.25)}
+.item.group{border-color:#F3D69C}
+.group-items{flex:1 1 100%;margin-top:4px}
+.group-items summary{cursor:pointer;font-weight:700;font-size:15px}

@@ -28,7 +28,7 @@
   var arrivedForReset = /type=recovery/.test(location.hash);
 
   var SERVICE_LABEL = { walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in' };
-  var BOOKING_SELECT = 'id,start_at,end_at,status,service_id,town_id,client_id,client_name,client_email,client_phone,street_address,pets,notes,is_new_client,staff_notes,' +
+  var BOOKING_SELECT = 'id,start_at,end_at,status,service_id,town_id,group_id,series_label,client_id,client_name,client_email,client_phone,street_address,pets,notes,is_new_client,staff_notes,' +
     'porchlight_clients(id,name,address,phone,town_id,porchlight_pets(name,species))';
 
   function q(sel) { return app.querySelector(sel); }
@@ -205,6 +205,7 @@
           !b.client_id ? h('span', { class: 'chip new', text: 'no intake yet' }) : null),
         h('div', null, w.name, P.townName(b.town_id) ? ' · ' + P.townName(b.town_id) : ''),
         w.pets ? h('div', { class: 'small muted', text: w.pets }) : null,
+        b.series_label && !opts.inGroup ? h('div', { class: 'small', text: '↻ ' + b.series_label }) : null,
         opts.contact ? h('div', { class: 'small' }, h('a', { href: 'tel:' + b.client_phone, text: b.client_phone }), ' · ', h('a', { href: 'mailto:' + b.client_email, text: b.client_email })) : null,
         opts.contact && b.notes ? h('div', { class: 'small muted', text: 'Note: ' + b.notes }) : null),
       acts);
@@ -251,8 +252,55 @@
       .gte('start_at', new Date().toISOString()).order('start_at').then(guard).then(function (rows) {
         P.clear(listBox);
         if (!rows.length) { listBox.appendChild(h('div', { class: 'empty', text: 'No requests waiting. Nice.' })); return; }
-        rows.forEach(function (b) { listBox.appendChild(bookingItem(b, { showDay: true, contact: true })); });
+        // Visits sent in one request (a trip, or a weekly series) are shown together.
+        var groups = [], byId = {};
+        rows.forEach(function (b) {
+          var k = b.group_id || b.id;
+          if (!byId[k]) { byId[k] = { id: b.group_id, items: [] }; groups.push(byId[k]); }
+          byId[k].items.push(b);
+        });
+        groups.forEach(function (g) {
+          if (g.items.length === 1) { listBox.appendChild(bookingItem(g.items[0], { showDay: true, contact: true })); return; }
+          listBox.appendChild(requestGroup(g));
+        });
       }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function requestGroup(g) {
+    var first = g.items[0], last = g.items[g.items.length - 1];
+    var ids = g.items.map(function (b) { return b.id; });
+    var labels = [];
+    g.items.forEach(function (b) { if (b.series_label && labels.indexOf(b.series_label) < 0) labels.push(b.series_label); });
+    var counts = {};
+    g.items.forEach(function (b) { counts[b.service_id] = (counts[b.service_id] || 0) + 1; });
+    var mix = Object.keys(counts).map(function (k) { return counts[k] + ' × ' + (SERVICE_LABEL[k] || k); }).join(', ');
+    var w = bookingWho(first);
+    function setAll(status, ev) {
+      ev.target.disabled = true;
+      return sb.from('porchlight_bookings').update({ status: status }).in('id', ids).eq('status', 'requested').then(guard)
+        .then(function () { P.toast(status === 'confirmed' ? 'All ' + ids.length + ' confirmed' : 'All declined'); render(); })
+        .catch(function (e) { P.toast(P.errMsg(e)); ev.target.disabled = false; });
+    }
+    var list = h('div', { class: 'list', style: 'margin-top:12px' });
+    g.items.forEach(function (b) { list.appendChild(bookingItem(b, { showDay: true, inGroup: true })); });
+    var more = h('details', { class: 'group-items' }, h('summary', { text: 'See each visit, confirm or decline one at a time' }), list);
+    return h('div', { class: 'item group' },
+      h('div', { class: 'time', text: g.items.length + ' visits' }),
+      h('div', { class: 'main' },
+        h('div', { class: 'row' }, h('strong', { text: mix }), chip('requested'), !first.client_id ? h('span', { class: 'chip new', text: 'no intake yet' }) : null),
+        h('div', null, w.name, P.townName(first.town_id) ? ' · ' + P.townName(first.town_id) : ''),
+        h('div', { class: 'small', text: P.fmtDay(first.start_at) + ' to ' + P.fmtDay(last.start_at) }),
+        labels.length ? h('div', { class: 'small', text: '↻ ' + labels.join(' · ') }) : null,
+        w.pets ? h('div', { class: 'small muted', text: w.pets }) : null,
+        h('div', { class: 'small' }, h('a', { href: 'tel:' + first.client_phone, text: first.client_phone }), ' · ', h('a', { href: 'mailto:' + first.client_email, text: first.client_email })),
+        first.notes ? h('div', { class: 'small muted', text: 'Note: ' + first.notes }) : null),
+      h('div', { class: 'acts' },
+        h('button', { class: 'btn sm', type: 'button', text: 'Confirm all ' + ids.length, onclick: function (ev) { setAll('confirmed', ev); } }),
+        h('button', { class: 'btn danger sm', type: 'button', text: 'Decline all', onclick: function (ev) {
+          if (!confirm('Decline all ' + ids.length + ' visits in this request? Let the client know by phone or email.')) return;
+          setAll('declined', ev);
+        } })),
+      more);
   }
 
   function staffClients() {
@@ -615,12 +663,15 @@
       h('a', { class: 'btn amber', href: '/#booking', text: 'Request a visit' })));
     var listBox = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(listBox);
-    sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id').order('start_at', { ascending: false }).limit(100)
+    sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id,group_id,series_label').order('start_at', { ascending: false }).limit(100)
       .then(guard).then(function (rows) {
         P.clear(listBox);
         var now = Date.now();
         var upcoming = rows.filter(function (b) { return new Date(b.end_at) > now && (b.status === 'requested' || b.status === 'confirmed'); }).reverse();
         var past = rows.filter(function (b) { return upcoming.indexOf(b) < 0; });
+        var groupLeft = {};
+        upcoming.forEach(function (b) { if (b.group_id && new Date(b.start_at) > now) groupLeft[b.group_id] = (groupLeft[b.group_id] || 0) + 1; });
+        var seriesShown = {};
         function list(title, items, canCancel) {
           var l = h('div', { class: 'list' });
           if (!items.length) l.appendChild(h('div', { class: 'empty', text: canCancel ? 'Nothing coming up.' : 'No past visits yet.' }));
@@ -633,9 +684,21 @@
               sb.rpc('porchlight_cancel_booking', { p_id: b.id }).then(guard).then(function () { P.toast('Visit cancelled'); clientVisits(); })
                 .catch(function (e) { P.toast(P.errMsg(e)); ev.target.disabled = false; });
             } }));
+            // Offer "cancel the rest" once per multi-visit request, on its first upcoming visit.
+            if (canCancel && b.group_id && groupLeft[b.group_id] > 1 && !seriesShown[b.group_id]) {
+              seriesShown[b.group_id] = true;
+              acts.appendChild(h('button', { class: 'btn ghost sm', type: 'button', text: 'Cancel all ' + groupLeft[b.group_id] + ' in this request', onclick: function (ev) {
+                var late = new Date(b.start_at) - now < 24 * 3600 * 1000;
+                if (!confirm('Cancel all ' + groupLeft[b.group_id] + ' upcoming visits in this request?' + (late ? ' The next one is less than 24 hours away and will still be billed.' : ''))) return;
+                ev.target.disabled = true;
+                sb.rpc('porchlight_cancel_group', { p_group: b.group_id }).then(guard).then(function (n) { P.toast(n + ' visits cancelled'); clientVisits(); })
+                  .catch(function (e) { P.toast(P.errMsg(e)); ev.target.disabled = false; });
+              } }));
+            }
             l.appendChild(h('div', { class: 'item' },
               h('div', { class: 'time', text: P.fmtDay(b.start_at) }),
-              h('div', { class: 'main' }, h('div', { class: 'row' }, h('strong', { text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' + P.fmtTime(b.start_at) }), chip(b.status))),
+              h('div', { class: 'main' }, h('div', { class: 'row' }, h('strong', { text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' + P.fmtTime(b.start_at) }), chip(b.status)),
+                b.series_label ? h('div', { class: 'small muted', text: '↻ ' + b.series_label }) : null),
               acts));
           });
           return h('section', { class: 'stack' }, h('h2', { class: 'display', style: 'font-size:22px', text: title }), l);

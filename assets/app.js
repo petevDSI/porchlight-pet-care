@@ -31,7 +31,8 @@
       { k: 'vet_clinic', label: 'Your vet (clinic name)' },
       { k: 'vet_phone', label: 'Vet phone', type: 'tel' },
       { k: 'emergency_clinic', label: 'Preferred emergency clinic', wide: true },
-      { k: 'vet_spend_limit', label: 'Care we may approve if we can’t reach you', placeholder: 'e.g. up to $500', wide: true }
+      { k: 'vet_spend_limit', label: 'Care we may approve if we can’t reach you', placeholder: 'e.g. up to $500', wide: true },
+      { k: 'vet_records_ok', label: 'May we confirm vaccination records with your vet?', type: 'yesno', wide: true, hint: 'Handy if you can’t find a certificate.' }
     ],
     access: [
       { k: 'access_method', label: 'How we get in', type: 'select', options: ['', 'Lockbox', 'Door keypad / smart lock', 'Key kept by Porchlight', 'Hidden key', 'Someone will be home', 'Other'] },
@@ -55,6 +56,7 @@
       { k: 'sex', label: 'Sex', type: 'select', options: ['', 'Male', 'Female'] },
       { k: 'spayed_neutered', label: 'Spayed / neutered', type: 'yesno' },
       { k: 'vaccinations_current', label: 'Vaccinations up to date', type: 'yesno' },
+      { k: 'rabies_expires_on', label: 'Rabies vaccine expires', type: 'date', hint: 'The "due" or "expires" date on the certificate' },
       { k: 'food', label: 'Food (brand / type)' },
       { k: 'food_amount', label: 'Amount per meal' },
       { k: 'feeding_times', label: 'Feeding times', placeholder: 'e.g. 7am and 5pm' },
@@ -167,6 +169,7 @@
       if (v === null || v === undefined || v === '') return;
       if (f.type === 'yesno') v = v ? 'Yes' : 'No';
       if (f.type === 'town') v = P.townName(v);
+      if (f.type === 'date') v = P.fmtDate(v);
       any = true;
       dl.appendChild(P.h('dt', { text: f.label }));
       dl.appendChild(P.h('dd', { class: f.secret && opts.secretsBold ? 'secret' : null, text: String(v) }));
@@ -194,6 +197,11 @@
       }, function () { res(null); }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
     });
   };
+  // A plain calendar date (YYYY-MM-DD), such as a vaccine expiration.
+  P.fmtDate = function (ymd) {
+    var d = new Date(String(ymd).slice(0, 10) + 'T12:00:00Z');
+    return isNaN(d) ? String(ymd) : d.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' });
+  };
   P.fmtDay = function (iso) { return new Date(iso).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' }); };
   P.fmtDayLong = function (iso) { return new Date(iso).toLocaleDateString('en-US', { timeZone: TZ, weekday: 'long', month: 'long', day: 'numeric' }); };
   P.todayISO = function () {
@@ -212,14 +220,14 @@
   };
 
   /* ---------- Photos ---------- */
-  P.shrinkImage = function (file) {
+  P.shrinkImage = function (file, maxSide, quality) {
     if (!window.createImageBitmap) return Promise.resolve(file);
     return createImageBitmap(file).then(function (bmp) {
-      var scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+      var scale = Math.min(1, (maxSide || 1600) / Math.max(bmp.width, bmp.height));
       var c = document.createElement('canvas');
       c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
       c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
-      return new Promise(function (res) { c.toBlob(function (b) { res(b || file); }, 'image/jpeg', 0.82); });
+      return new Promise(function (res) { c.toBlob(function (b) { res(b || file); }, 'image/jpeg', quality || 0.82); });
     }).catch(function () { return file; });
   };
   P.uploadPhoto = function (path, file) {
@@ -231,14 +239,97 @@
       });
     });
   };
-  P.signedUrls = function (paths) {
+  P.signedUrls = function (paths, bucket) {
     paths = (paths || []).filter(Boolean);
     if (!paths.length) return Promise.resolve({});
-    return P.sb.storage.from(P.BUCKET).createSignedUrls(paths, 3600).then(function (r) {
+    return P.sb.storage.from(bucket || P.BUCKET).createSignedUrls(paths, 3600).then(function (r) {
       var map = {};
       (r.data || []).forEach(function (x) { if (x.signedUrl) map[x.path] = x.signedUrl; });
       return map;
     });
+  };
+
+  /* ---------- Vaccination records (private bucket; PDFs or photos of a certificate) ---------- */
+  P.RECORDS = 'porchlight-records';
+  P.RECORD_ACCEPT = 'application/pdf,image/*,.pdf,.heic,.heif';
+  P.RECORD_MAX = 10 * 1024 * 1024;
+  // Uploads one file under `folder` and resolves { path, file_name }. Photos are resized but kept sharp enough to read.
+  P.uploadRecord = function (folder, file) {
+    var name = file.name || 'record';
+    var lower = name.toLowerCase();
+    var isPdf = file.type === 'application/pdf' || /\.pdf$/.test(lower);
+    var isImage = /^image\//.test(file.type) || /\.(jpe?g|png|webp|heic|heif)$/.test(lower);
+    if (!isPdf && !isImage) return Promise.reject(new Error('Please choose a PDF or a photo of the record.'));
+    return (isPdf ? Promise.resolve(file) : P.shrinkImage(file, 2400, 0.86)).then(function (blob) {
+      if (blob.size > P.RECORD_MAX) throw new Error('That file is over 10 MB. A phone photo of the certificate works well.');
+      var ext, type;
+      if (isPdf) { ext = 'pdf'; type = 'application/pdf'; }
+      else if (blob !== file || blob.type === 'image/jpeg' || /\.jpe?g$/.test(lower)) { ext = 'jpg'; type = 'image/jpeg'; }
+      else if (blob.type === 'image/png' || /\.png$/.test(lower)) { ext = 'png'; type = 'image/png'; }
+      else if (blob.type === 'image/webp' || /\.webp$/.test(lower)) { ext = 'webp'; type = 'image/webp'; }
+      else { ext = 'heic'; type = 'image/heic'; }
+      var path = folder + '/' + P.uuid() + '.' + ext;
+      return P.sb.storage.from(P.RECORDS).upload(path, blob, { contentType: type, upsert: false }).then(function (r) {
+        if (r.error) throw r.error;
+        return { path: path, file_name: name.slice(0, 200) };
+      });
+    });
+  };
+  // Where a pet stands on rabies paperwork. Returns null when it doesn't apply (birds, fish and so on).
+  P.vaxStatus = function (pet) {
+    var docs = pet.porchlight_pet_docs || [];
+    var hasCert = docs.some(function (d) { return d.kind === 'rabies'; });
+    var exp = pet.rabies_expires_on, today = P.todayISO();
+    if (!/dog|cat|ferret/i.test(pet.species || '') && !hasCert && !exp) return null;
+    if (exp && exp < today) return { level: 'bad', ok: false, text: 'Rabies vaccine expired ' + P.fmtDate(exp) };
+    if (!hasCert) return { level: 'need', ok: false, text: 'Rabies certificate needed' };
+    if (!exp) return { level: 'need', ok: false, text: 'Rabies expiration date needed' };
+    if (exp <= P.addDays(today, 30)) return { level: 'soon', ok: true, text: 'Rabies vaccine expires ' + P.fmtDate(exp) };
+    return { level: 'ok', ok: true, text: 'Rabies current through ' + P.fmtDate(exp) };
+  };
+  // Two buttons that upload a rabies certificate or other records into `opts.folder`.
+  // opts.onAdded({ path, file_name, kind }) runs per file (may return a promise); opts.onDone() runs once at the end.
+  P.recordPicker = function (opts) {
+    var h = P.h, busy = 0, kind = 'rabies';
+    var fileIn = h('input', { type: 'file', accept: P.RECORD_ACCEPT, multiple: true, hidden: true, 'aria-hidden': 'true', tabindex: '-1' });
+    var status = h('p', { class: 'small muted', role: 'status', hidden: true });
+    function say(msg, bad) { status.textContent = msg || ''; status.hidden = !msg; status.className = 'small ' + (bad ? 'late' : 'muted'); }
+    function pick(k) { return function () { kind = k; fileIn.click(); }; }
+    var b1 = h('button', { type: 'button', class: 'btn ghost sm', text: opts.rabiesLabel || 'Add rabies certificate', onclick: pick('rabies') });
+    var b2 = h('button', { type: 'button', class: 'btn ghost sm', text: 'Add other vaccine records', onclick: pick('other') });
+    fileIn.addEventListener('change', function () {
+      var files = Array.prototype.slice.call(fileIn.files || [], 0, 4), k = kind, failed = null;
+      fileIn.value = '';
+      if (!files.length) return;
+      busy++; b1.disabled = b2.disabled = true;
+      say('Uploading ' + (files.length > 1 ? files.length + ' files' : files[0].name) + '…');
+      files.reduce(function (chain, f) {
+        return chain.then(function () {
+          return P.uploadRecord(opts.folder, f).then(function (d) { d.kind = k; return opts.onAdded(d); })
+            .catch(function (e) { failed = e; });
+        });
+      }, Promise.resolve()).then(function () {
+        busy--; b1.disabled = b2.disabled = false;
+        if (failed) say(/row-level security|policy/i.test(P.errMsg(failed)) ? 'We couldn’t take that upload right now. You can add it later from your client portal.' : P.errMsg(failed), true);
+        else say(files.length > 1 ? files.length + ' files added.' : 'Added ' + files[0].name + '.');
+        if (opts.onDone) opts.onDone(!failed);
+      });
+    });
+    return { el: h('div', { class: 'stack', style: 'gap:8px' }, h('div', { class: 'row' }, b1, b2, fileIn), status), busy: function () { return busy > 0; } };
+  };
+  P.listNames = function (names) {
+    return names.length < 3 ? names.join(' and ') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+  };
+  P.vaxChip = function (st) {
+    return P.h('span', { class: 'chip ' + ({ ok: 'completed', soon: 'requested', need: 'requested', bad: 'bad' })[st.level], text: st.text });
+  };
+
+  P.uuid = function () {
+    if (crypto.randomUUID) return crypto.randomUUID();
+    var b = crypto.getRandomValues(new Uint8Array(16)), hex = [];
+    b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
+    for (var i = 0; i < 16; i++) hex.push((b[i] + 256).toString(16).slice(1));
+    return hex.slice(0, 4).join('') + '-' + hex.slice(4, 6).join('') + '-' + hex.slice(6, 8).join('') + '-' + hex.slice(8, 10).join('') + '-' + hex.slice(10).join('');
   };
   P.uid = function () { return (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)); };
 

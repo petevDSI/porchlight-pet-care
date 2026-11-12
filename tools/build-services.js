@@ -11,7 +11,16 @@ const path = require('path');
 const SITE = 'https://porchlightpetcare.com';
 const ROOT = path.join(__dirname, '..');
 const img = (id, w, h) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}${h ? '&h=' + h : ''}&q=75`;
-const TOWN_PAGES = require('./towns.js').map(t => ({ ...t, hero: typeof t.hero === 'function' ? t.hero(img) : t.hero }));
+const PH = require('./town-photos.js');
+const EXTRA_PHOTOS = { 'belmont': ['lake', 'kayak'], 'mt-holly': ['kayak'], 'lake-wylie': ['lake', 'osprey'], 'clover': ['rhbench'], 'york': ['rhroad'] };
+const ORDER = ['belmont', 'mt-holly', 'cramerton', 'mcadenville', 'lake-wylie', 'east-gastonia', 'lowell', 'ranlo', 'clover', 'york', 'india-hook', 'newport'];
+const TOWN_PAGES = require('./towns.js').concat(require('./towns2.js'))
+  .map(t => {
+    const o = { ...t, hero: typeof t.hero === 'function' ? t.hero(img) : t.hero, photos: t.photos || EXTRA_PHOTOS[t.slug] || [] };
+    if (t.heroPhoto) { o.hero = PH.src(t.heroPhoto, 1200); o.heroAlt = PH.LIB[t.heroPhoto].alt; }
+    return o;
+  })
+  .sort((a, b) => ORDER.indexOf(a.slug) - ORDER.indexOf(b.slug));
 const SC_TOWNS = ['Lake Wylie', 'Clover', 'York', 'India Hook', 'Newport'];
 const TOWNS = ['Belmont', 'Mt. Holly', 'Cramerton', 'McAdenville', 'Lake Wylie', 'East Gastonia', 'Lowell', 'Ranlo', 'Clover', 'York', 'India Hook', 'Newport'];
 
@@ -710,6 +719,13 @@ ${t.places.map(([n, d]) => `<article class="inc"><span class="ic">${icon('leash'
 </div>
 </div></section>
 
+${t.photos.length ? `<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Local flavor</p><h2 class="display">Around ${esc(t.name)}</h2></div>
+<div class="local-photos">
+${t.photos.map(k => `<figure><img src="${PH.src(k, 1000, 640)}" alt="${esc(PH.LIB[k].alt)}" loading="lazy" width="1000" height="640"><figcaption>${esc(PH.LIB[k].cap)} Photo by <a href="${PH.LIB[k].page}" rel="noopener">${esc(PH.LIB[k].by)}</a> on Unsplash.</figcaption></figure>`).join('\n')}
+</div>
+</div></section>
+` : ''}
 <section class="section"><div class="wrap">
 <div class="section-head"><p class="eyebrow">What we do in ${esc(t.name)}</p><h2 class="display">Care that comes to your door</h2></div>
 <div class="others">
@@ -728,7 +744,7 @@ ${t.faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}
 <section class="section"><div class="wrap">
 <div class="section-head"><p class="eyebrow">Nearby</p><h2 class="display">Also serving</h2></div>
 <p class="lede" style="font-size:18px">${near.map(n => `<a href="/areas/${n.slug}">${esc(n.name)}, ${n.state}</a>`).join(' · ')} · <a href="/#area">See the full service area</a></p>
-<p class="lede" style="margin-top:22px;font-size:14px;color:var(--muted)">Sources for the local details on this page: ${t.sources.map(([n, u]) => `<a href="${u}" rel="noopener">${esc(n)}</a>`).join('; ')}. Park rules and hours change, so check before you go.</p>
+<p class="lede" style="margin-top:22px;font-size:14px;color:var(--muted)">Sources for the local details on this page: ${t.sources.map(([n, u]) => `<a href="${u}" rel="noopener">${esc(n)}</a>`).join('; ')}. Park rules and hours change, so check before you go.${t.heroPhoto ? ` Header photo by <a href="${PH.LIB[t.heroPhoto].page}" rel="noopener">${esc(PH.LIB[t.heroPhoto].by)}</a> on Unsplash.` : ''}</p>
 </div></section>
 </main>
 ` + footer();

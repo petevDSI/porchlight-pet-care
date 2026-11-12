@@ -30,7 +30,7 @@ module.exports = [
   },
   {
     slug: 'mcadenville', name: 'McAdenville', state: 'NC', county: 'Gaston County',
-    heroPhoto: 'brick', photos: ['kayak'],
+    heroPhoto: 'familypath', photos: ['kayak'],
     metaTitle: 'Pet Sitting & Dog Walking in McAdenville, NC | Porchlight',
     metaDesc: 'Pet sitting and dog walking in McAdenville, NC, home of Christmas Town USA. We plan around holiday traffic so your pets are never left waiting. Free meet-and-greet.',
     h1: 'Pet sitting and dog walking in McAdenville, NC.',
@@ -58,7 +58,7 @@ module.exports = [
   },
   {
     slug: 'east-gastonia', name: 'East Gastonia', state: 'NC', county: 'Gaston County',
-    heroPhoto: 'crowders', photos: ['brick'],
+    heroPhoto: 'crowders', photos: ['hikerdog'],
     metaTitle: 'Dog Walking & Pet Sitting in East Gastonia, NC | Porchlight',
     metaDesc: 'Dog walking, drop-in visits and overnight pet sitting on the east side of Gastonia, NC. Rankin Lake Park, George Poston Park and Crowders Mountain are all nearby.',
     h1: 'Dog walking and pet sitting in East Gastonia, NC.',

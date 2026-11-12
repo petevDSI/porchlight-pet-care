@@ -394,13 +394,14 @@ const SERVICES = [
     hero: img('photo-1605449669747-35d71b9436f8', 1200), heroAlt: 'Houseplants being watered',
     gallery: [
       [img('photo-1789352050543-b1bbc066fefc', 1200, 800), 'View from a covered front porch onto a quiet street'],
-      [img('photo-1759693726718-10912942c0fb', 700, 700), 'A mailbox on a front door'],
+      ['/assets/img/pack/squirrel-window-feeder.jpg', 'A gray squirrel peering through a kitchen window next to a window bird feeder'],
       ['/assets/img/pack/eden-oskar-deck.jpg', 'Eden and Oskar on a back deck with planters of flowers']
     ],
     cta: 'Book a check-in',
     included: [
       ['mail', 'Mail and packages in', 'Nothing piling up on the porch telling people you’re gone.'],
       ['plant', 'Plants watered', 'Indoor and porch plants, on the schedule you set.'],
+      ['bowl', 'Bird feeders refilled', 'Seed, suet or nectar topped up in your feeders, so the backyard birds (and the occasional squirrel) keep visiting.'],
       ['bulb', 'Lights and blinds rotated', 'Different rooms on different days, so the house looks occupied.'],
       ['trash', 'Trash and recycling', 'Bins out on collection day and back in after.'],
       ['thermo', 'A walk-through', 'Every room checked for leaks, temperature problems, power outages and anything out of place.'],
@@ -420,6 +421,7 @@ const SERVICES = [
       items: [
         ['Which plants, and how much water', 'A note or a photo of each one helps.'],
         ['Trash and recycling days', 'And where the bins live.'],
+        ['Feeder seed and where it’s kept', 'Which feeders to refill, how often, and how much.'],
         ['Alarm code and company', 'So a check-in doesn’t become a police visit.'],
         ['Who to call for problems', 'Your plumber, HVAC company, or a neighbor with a key.']
       ]
@@ -441,6 +443,7 @@ const SERVICES = [
       ['How often should someone check on my house?', 'Every two to three days for most trips. Daily if you get lots of packages or have plants that need it.'],
       ['What happens if you find a problem?', 'We call you right away, and with your permission call the contractor you listed. We send photos either way.'],
       ['Do I need pets to book this?', 'No. Plenty of clients book check-ins for an empty house.'],
+      ['Can you refill my bird feeders?', 'Yes. Leave the seed, suet or nectar where we can find it and tell us which feeders to fill and how often. We’ll refill them and sweep up spilled seed. The squirrels will thank you.'],
       ['Can you start my car or run the faucets?', 'Yes. Small upkeep jobs like those are included; just tell us what you’d like done.']
     ]
   },

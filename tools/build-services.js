@@ -250,10 +250,10 @@ const SERVICES = [
   },
   {
     slug: 'cat-sitting', id: 'visit', name: 'Cat sitting', short: 'Cat sitting',
-    title: 'Cat Sitting in Belmont, NC',
-    metaTitle: 'Cat Sitting in Belmont, NC | Porchlight Pet & Home Care',
-    metaDesc: 'In-home cat sitting in Belmont, Mt. Holly, Cramerton and Lake Wylie. Your cat stays home: meals, litter, medication, play and a photo update every visit. $30 per 30-minute visit.',
-    h1: 'Cat sitting that keeps your cat at home.',
+    title: 'Cat Sitter in Belmont, NC',
+    metaTitle: 'Cat Sitter in Belmont, NC | Porchlight Pet & Home Care',
+    metaDesc: 'Cat sitter near Belmont, NC. In-home visits in Mt. Holly, Cramerton, Lake Wylie and nearby: meals, litter, meds, play and a photo update. $30 per visit.',
+    h1: 'A cat sitter who keeps your cat at home.',
     lede: 'Most cats are happiest in their own space. We come to you for 30 minutes of real care: fresh food and water, a clean litter box, medication if needed, play, and a note and photos so you know how they are.',
     price: 30, unit: 'per 30-minute visit',
     includesTitle: 'Every cat visit includes',
@@ -312,7 +312,11 @@ const SERVICES = [
       ['My cat is shy and hides. Is that a problem?', 'No, that’s common. We take our time, confirm that your cat is eating, drinking and using the litter box, and find them to check on them every visit.'],
       ['Do you need my cat’s vaccination records?', 'We ask for a current rabies certificate for every cat before the first visit. You can upload it on the new client form or later from your client portal.'],
       ['What if my cat seems sick while I’m away?', 'We call you right away. With your permission we contact your vet, and our pet taxi can take your cat in if needed.'],
-      ['Can you care for my cat and my dog on the same trip?', 'Yes. Each additional pet is +$5 per visit, and you get one report covering everyone.']
+      ['Can you care for my cat and my dog on the same trip?', 'Yes. Each additional pet is +$5 per visit, and you get one report covering everyone.'],
+      ['How much does a cat sitter cost near Belmont?', 'A 30-minute cat visit is $30 for one or two cats, with +$5 for each additional pet and +$10 on holidays. An overnight stay, where your sitter stays the night, is $99. Pay by Venmo, Zelle or check and save $5 on your booking.'],
+      ['Can a cat sitter stay overnight?', 'Yes. Overnight stays suit cats who do best with company, such as kittens, seniors, and cats on medication. Your sitter stays in your home from evening to morning for $99 a night.'],
+      ['Which towns do you cover for cat sitting?', 'Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo and East Gastonia in North Carolina, and Lake Wylie, Clover, York, India Hook and Newport in South Carolina, west of the Catawba River.'],
+      ['Is a cat sitter better than boarding?', 'For many cats, yes. Staying home means no carrier ride, no strange smells and no change in food or litter. Boarding can make sense for a cat who needs round-the-clock supervision, and we’re happy to talk through which fits your cat.']
     ]
   },
   {
@@ -779,7 +783,7 @@ const footer = () => `
 <div style="max-width:340px"><p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p><p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p></div>
 <div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
 <div><h4>Areas</h4>${TOWN_PAGES.map(t => `<a href="/areas/${t.slug}">${t.name}, ${t.state}</a>`).join('')}</div>
-<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/blog">Blog</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/blog">Blog</a><a href="/become-a-pet-sitter">Become a sitter</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
 <div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© 2026 Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
@@ -1091,14 +1095,125 @@ ${ABOUT.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`)
 ` + footer();
 }
 
+/* ---------- Sitter recruiting page ----------
+ * Targets "pet sitting jobs", "become a pet sitter" and "dog walking jobs" searches near Belmont.
+ * The pay split and the Rover comparison are driven by the numbers below, so changing the deal
+ * means editing two constants and re-running this script. */
+const RECRUIT = {
+  keepPct: 88,                 // share of each booking the sitter keeps (Porchlight keeps the rest). Confirm before publishing.
+  exampleBooking: 30,          // the listed price of a 30-minute walk or visit
+  rover: { sitterFeePct: 20, ownerFeePct: 11, checked: 'November 2026', source: 'https://support.rover.com/hc/en-us/articles/205385304' }
+};
+const money = (n) => '$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, '');
+
+function recruitPage() {
+  const url = `${SITE}/become-a-pet-sitter`;
+  const R = RECRUIT, keep = R.exampleBooking * R.keepPct / 100;
+  const roverOwner = R.exampleBooking * (1 + R.rover.ownerFeePct / 100), roverSitter = R.exampleBooking * (1 - R.rover.sitterFeePct / 100);
+  const title = 'Pet Sitting Jobs in Belmont, NC | Become a Porchlight Sitter';
+  const desc = `Join Porchlight as an independent pet sitter or dog walker near Belmont, NC. Set your schedule, keep ${R.keepPct}% of every booking and get local clients.`;
+  const faq = [
+    ['How much do I earn?', `You keep ${R.keepPct}% of every booking and 100% of tips. Our listed prices start at $${R.exampleBooking} for a 30-minute walk or visit, so a $${R.exampleBooking} booking pays you ${money(keep)}. Overnight stays and other services pay on the same split.`],
+    ['Do I need experience?', 'You need to be comfortable and reliable with animals and with being in other people’s homes. Experience with your own pets counts. Tell us what you’ve done and we’ll talk through the rest.'],
+    ['Am I an employee?', 'No. You work as an independent contractor. You choose which requests to accept, you set your own availability, and you’re responsible for your own taxes. We report your earnings as the IRS requires.'],
+    ['How do I get paid?', 'Clients pay Porchlight when they book. We pay you for the visits you complete, and we’ll explain the schedule when you start.'],
+    ['What do you check before I start?', 'A background check, a conversation, and references. Every client meets their sitter first, so you’ll be introduced at a free meet-and-greet.'],
+    ['Do I need my own insurance?', 'Ask us in your conversation. We’ll explain what is covered and what we expect before your first booking.'],
+    ['Can I keep working with my own clients or on another platform?', 'Yes. You’re independent. If you use another platform, follow its rules about bookings that started there, and keep Porchlight bookings with Porchlight.'],
+    ['Which towns do you serve?', 'Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo and East Gastonia in North Carolina, and Lake Wylie, Clover, York, India Hook and Newport in South Carolina, west of the Catawba River.'],
+    ['How soon will I hear back?', 'We read every application and reply within a few days to set up a conversation.']
+  ];
+  const schema = ld({ '@context': 'https://schema.org', '@graph': [
+    business,
+    { '@type': 'WebPage', url, name: title, description: desc, about: { '@id': SITE + '/#business' } },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Become a sitter', item: url }] },
+    { '@type': 'FAQPage', mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }
+  ] });
+  const hero = '/assets/img/pack/pack-hilltop.jpg';
+  const benefits = [
+    ['paw', 'Clients come to you', 'People book through porchlightpetcare.com. You don’t have to find or advertise to clients.'],
+    ['mail', 'Booking and payment handled', 'Requests, scheduling and payment run through Porchlight, so you spend your time with the animals.'],
+    ['camera', 'Visit reports made easy', 'Notes and photos go straight to the client’s portal after every visit, so clients know how it went.'],
+    ['heart', 'A fair split', `You keep ${R.keepPct}% of every booking and all of your tips.`],
+    ['clock', 'Your schedule', 'Set when you’re available and accept the requests that fit. Nobody assigns you a shift.'],
+    ['shield', 'A local business behind you', 'Real people who answer the phone, introduce you at a meet-and-greet and sort out problems.']
+  ];
+  return head(esc(title), esc(desc), url, `<meta property="og:image" content="${SITE + hero}">\n` + schema, '') + `
+<main>
+<section class="svc-hero"><div class="wrap">
+<div class="svc-hero-copy">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Become a sitter</li></ol></nav>
+<p class="eyebrow">Become a Porchlight sitter</p>
+<h1 class="display">Pet sitting jobs near Belmont, NC. Keep more of what you earn.</h1>
+<p class="lede">Porchlight is a small, local pet-care business. We bring you the clients and handle booking, payment and visit reports. You do the part you love. Independent sitters keep ${R.keepPct}% of every booking and all of their tips.</p>
+<p class="price-tag"><b>${R.keepPct}%</b><span>of every booking is yours</span></p>
+<div class="cta-row"><a class="btn btn-amber" href="/sitter-application">Apply to join</a><a class="btn btn-ghost" href="#pay">How the pay works</a></div>
+</div>
+<div class="svc-hero-media"><img src="${hero}" alt="Bowie, Oskar, Eden and Maizy resting on leashes on a grassy hilltop after a hike" width="600" height="520" fetchpriority="high"></div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">What you get</p><h2 class="display">Work close to home, without the hassle</h2></div>
+<div class="included">
+${benefits.map(([ic, t, d]) => `<article class="inc"><span class="ic">${icon(ic)}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></article>`).join('\n')}
+</div>
+</div></section>
+
+<section class="section tint" id="pay"><div class="wrap">
+<div class="section-head"><p class="eyebrow">How the pay works</p><h2 class="display">A $${R.exampleBooking} walk, side by side</h2><p class="lede">Pet-care apps take a cut from the sitter and often add a fee for the owner. Here is what that looks like on one $${R.exampleBooking} booking.</p></div>
+<dl class="pricebox">
+<div><dt><b>Porchlight</b><span>Client pays $${R.exampleBooking}. No booking fee added for the client.</span></dt><dd>You keep ${money(keep)}</dd></div>
+<div><dt><b>Rover</b><span>Owner pays ${money(roverOwner)} (${R.rover.ownerFeePct}% booking fee). Rover takes ${R.rover.sitterFeePct}% from the sitter.</span></dt><dd>You keep ${money(roverSitter)}</dd></div>
+</dl>
+<p class="lede" style="margin-top:14px;font-size:15px;color:var(--muted)">Rover’s fees are from its <a href="${R.rover.source}" rel="noopener">US help center</a>, checked ${R.rover.checked}. Fees change, so check any platform’s current terms before you decide. Porchlight’s split is for bookings made through Porchlight.</p>
+<div class="cta-row" style="margin-top:20px"><a class="btn btn-amber" href="/sitter-application">Apply to join</a></div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="two-lists">
+<div class="checklist featured"><h3>Who we’re looking for</h3><p class="sub">You don’t need to be a professional. You do need to be dependable.</p><ul>
+<li>${tick('#F2B33D')}<div><b>Reliable and kind with animals</b><span>Dogs, cats, birds, reptiles and small pets all need care. Tell us what you’re comfortable with.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Trustworthy in people’s homes</b><span>Clients give us keys and codes. You’ll treat their home the way you’d want yours treated.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>18 or older, with transportation</b><span>You’ll need a way to get to clients in your towns.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Willing to pass a background check</b><span>Required before anyone works with a Porchlight client.</span></div></li>
+<li>${tick('#F2B33D')}<div><b>Good at communicating</b><span>A quick note and a photo after every visit is part of the job.</span></div></li>
+</ul></div>
+<div class="checklist"><h3>How you get started</h3><p class="sub">From application to your first booking.</p><ul>
+<li>${tick('#14233B')}<div><b>Apply (about ten minutes)</b><span>Tell us about yourself, the animals you’re comfortable with and when you’re free.</span></div></li>
+<li>${tick('#14233B')}<div><b>Talk with us</b><span>A conversation, two references and a background check.</span></div></li>
+<li>${tick('#14233B')}<div><b>Meet your first client</b><span>We introduce you at a free meet-and-greet so the pets and owners know you.</span></div></li>
+<li>${tick('#14233B')}<div><b>Start taking bookings</b><span>Accept the requests that fit your schedule, in the towns you choose.</span></div></li>
+</ul></div>
+</div>
+</div></section>
+
+<section class="section tint"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Where we’re looking</p><h2 class="display">Towns we serve</h2><p class="lede">We’re growing one neighborhood at a time. Sitters who live near their clients get the most work and the shortest drives.</p></div>
+<p class="lede" style="font-size:18px">${TOWN_PAGES.map(t => `<a href="/areas/${t.slug}">${esc(t.name)}, ${t.state}</a>`).join(' · ')}</p>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="section-head"><p class="eyebrow">Questions</p><h2 class="display">About working with Porchlight</h2></div>
+<div class="faq-list">
+${faq.map(([q, a], i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('\n')}
+</div>
+<div class="cta-row" style="margin-top:28px"><a class="btn btn-amber" href="/sitter-application">Apply to join</a></div>
+</div></section>
+</main>
+` + footer();
+}
+
 fs.mkdirSync(path.join(ROOT, 'services'), { recursive: true });
+fs.writeFileSync(path.join(ROOT, 'become-a-pet-sitter.html'), recruitPage());
 fs.writeFileSync(path.join(ROOT, 'about.html'), aboutPage());
 SERVICES.forEach(s => fs.writeFileSync(path.join(ROOT, 'services', s.slug + '.html'), servicePage(s)));
 fs.mkdirSync(path.join(ROOT, 'areas'), { recursive: true });
 TOWN_PAGES.forEach(t => fs.writeFileSync(path.join(ROOT, 'areas', t.slug + '.html'), areaPage(t)));
 fs.writeFileSync(path.join(ROOT, 'services.html'), hubPage());
 
-const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), TOWN_PAGES.map(t => '/areas/' + t.slug), ['/quote', '/intake']);
+const pages = ['', '/services', '/about'].concat(SERVICES.map(s => '/services/' + s.slug), TOWN_PAGES.map(t => '/areas/' + t.slug), ['/become-a-pet-sitter', '/quote', '/intake']);
 /* Keep sitemap entries for pages this script doesn't build (blog, testimonials). */
 const prevSitemap = fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '';
 const generated = new Set(pages.map(p => `${SITE}${p || '/'}`));

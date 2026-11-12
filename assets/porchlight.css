@@ -58,9 +58,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy)}
 
 .chip{display:inline-flex;align-items:center;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:var(--mist);color:var(--ink);border:1px solid var(--line)}
 .chip.requested,.chip.new{background:var(--amber-soft);border-color:#F3D69C;color:#7A5200}
-.chip.confirmed,.chip.active{background:#E6EEFB;border-color:#C5D5F2;color:#1E3A6E}
-.chip.completed{background:var(--ok-soft);border-color:#BFE0CC;color:var(--ok)}
-.chip.declined,.chip.cancelled,.chip.inactive{background:#F3F4F6;color:#5B6475}
+.chip.confirmed,.chip.active,.chip.contacted,.chip.interviewing{background:#E6EEFB;border-color:#C5D5F2;color:#1E3A6E}
+.chip.approved,.chip.completed{background:var(--ok-soft);border-color:#BFE0CC;color:var(--ok)}
+.chip.declined,.chip.withdrawn,.chip.cancelled,.chip.inactive{background:#F3F4F6;color:#5B6475}
 
 .list{display:flex;flex-direction:column;gap:12px}
 .item{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:space-between}

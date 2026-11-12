@@ -8,7 +8,7 @@ Plain static site, no build step. Hosted on Vercel; data and logins in Supabase.
 |---|---|
 | `index.html` | Public homepage with drive-time-aware booking requests |
 | `intake.html` (`/intake`) | New client form: household, pets, vet, home access, agreement |
-| `portal.html` (`/portal`) | Sitter portal (schedule, requests, clients, visit reports) and client portal (visits, reports, pets & home) |
+| `portal.html` (`/portal`) | Sitter portal (schedule, requests, quotes, sitter applications, clients, visit reports) and client portal (visits, reports, pets & home) |
 | `assets/app.js` | Shared Supabase client, form field definitions, helpers |
 | `assets/porchlight.css` | Styles for the intake form and portal |
 

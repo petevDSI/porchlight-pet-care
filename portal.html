@@ -154,7 +154,7 @@
   }
 
   /* ================= Kraig (staff) ================= */
-  var pendingCount = 0, quoteCount = 0;
+  var pendingCount = 0, quoteCount = 0, applicantCount = 0;
   var staleCount = 0, ESCALATE_MIN = 120;
   function refreshPending() {
     return sb.from('porchlight_bookings').select('group_id,id,created_at')
@@ -168,10 +168,13 @@
         });
         pendingCount = Object.keys(seen).length; staleCount = Object.keys(stale).length;
         return sb.from('porchlight_quotes').select('id', { count: 'exact', head: true }).eq('status', 'new');
-      }).then(function (r) { quoteCount = (r && r.count) || 0; });
+      }).then(function (r) {
+        quoteCount = (r && r.count) || 0;
+        return sb.from('porchlight_sitter_applications').select('id', { count: 'exact', head: true }).eq('status', 'new');
+      }).then(function (r) { applicantCount = (r && !r.error && r.count) || 0; });
   }
   function staffTabs(current) {
-    var t = tabs([['#/schedule', 'schedule', 'Schedule'], ['#/requests', 'requests', 'Requests', pendingCount], ['#/quotes', 'quotes', 'Quotes', quoteCount], ['#/payments', 'payments', 'Payments'], ['#/clients', 'clients', 'Clients']], current);
+    var t = tabs([['#/schedule', 'schedule', 'Schedule'], ['#/requests', 'requests', 'Requests', pendingCount], ['#/quotes', 'quotes', 'Quotes', quoteCount], ['#/sitters', 'sitters', 'Sitters', applicantCount], ['#/payments', 'payments', 'Payments'], ['#/clients', 'clients', 'Clients']], current);
     if (!staleCount || current === 'requests') return t;
     return h('div', null,
       h('a', { class: 'escalate', href: '#/requests' },
@@ -185,6 +188,7 @@
     refreshPending().then(function () {
       if (p[0] === 'requests') return staffRequests();
       if (p[0] === 'quotes') return staffQuotes();
+      if (p[0] === 'sitters') return staffSitters(r.query.get('s') || 'open');
       if (p[0] === 'payments') return staffPayments();
       if (p[0] === 'clients') return staffClients();
       if (p[0] === 'client' && p[1]) return staffClient(p[1]);
@@ -380,6 +384,60 @@
         qt.kind === 'flight' && qt.pet_weight_lb > 20 ? h('div', { class: 'small late', text: 'Over 20 lb: most airlines won’t allow this pet in the cabin.' }) : null,
         qt.notes ? h('div', { class: 'small muted', text: 'Note: ' + qt.notes }) : null,
         h('div', { class: 'row', style: 'margin-top:8px' }, amount, status, save),
+        h('div', { style: 'margin-top:8px' }, notes)));
+  }
+
+  /* ================= Sitter applications ================= */
+  var APP_STATUS = ['new', 'contacted', 'interviewing', 'approved', 'declined', 'withdrawn'];
+  var APP_OPEN = ['new', 'contacted', 'interviewing'];
+  function staffSitters(filter) {
+    var root = page();
+    root.appendChild(staffTabs('sitters'));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Sitter applications' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:12px', text: 'People who applied at /become-a-pet-sitter. Reach out, interview, run the background check, then mark them approved or declined. Nothing here is visible to the applicant.' }));
+    var bar = h('div', { class: 'row', style: 'margin-bottom:14px' });
+    [['open', 'Open'], ['approved', 'Approved'], ['all', 'All']].forEach(function (f) {
+      bar.appendChild(h('a', { class: 'btn sm' + (filter === f[0] ? '' : ' ghost'), href: '#/sitters' + (f[0] === 'open' ? '' : '?s=' + f[0]), text: f[1] }));
+    });
+    root.appendChild(bar);
+    var listBox = h('div', { class: 'list' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(listBox);
+    var q = sb.from('porchlight_sitter_applications').select('*').order('created_at', { ascending: false }).limit(200);
+    if (filter === 'open') q = q.in('status', APP_OPEN); else if (filter === 'approved') q = q.eq('status', 'approved');
+    q.then(guard).then(function (rows) {
+      P.clear(listBox);
+      if (!rows.length) { listBox.appendChild(h('div', { class: 'empty', text: filter === 'open' ? 'No open applications.' : 'Nothing here yet.' })); return; }
+      rows.forEach(function (a) { listBox.appendChild(applicantItem(a)); });
+    }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function applicantItem(a) {
+    var status = h('select', { 'aria-label': 'Status', style: 'max-width:170px' });
+    APP_STATUS.forEach(function (v) { var o = h('option', { value: v, text: v }); if (v === a.status) o.selected = true; status.appendChild(o); });
+    var notes = h('textarea', { 'aria-label': 'Your notes', placeholder: 'Your notes (call summary, references, background check result)', rows: 2 });
+    notes.value = a.staff_notes || '';
+    var save = h('button', { class: 'btn sm', type: 'button', text: 'Save', onclick: function () {
+      save.disabled = true;
+      sb.from('porchlight_sitter_applications').update({ status: status.value, staff_notes: notes.value.trim() || null, updated_at: new Date().toISOString() }).eq('id', a.id).then(guard)
+        .then(function () { P.toast('Saved'); render(); }).catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
+    } });
+    var list = function (x) { return x && x.length ? x.join(', ') : 'none given'; };
+    var subject = encodeURIComponent('Your Porchlight sitter application');
+    var flags = [];
+    if (!a.is_adult) flags.push('Not confirmed 18+');
+    if (!a.background_check_ok) flags.push('Did not agree to a background check');
+    if (!a.has_vehicle) flags.push('No vehicle');
+    return h('div', { class: 'item' },
+      h('div', { class: 'main' },
+        h('div', { class: 'row' }, h('strong', { text: a.name }), chip(a.status), h('span', { class: 'small muted', text: 'Applied ' + P.fmtDay(a.created_at) })),
+        h('div', { class: 'small' }, h('a', { href: 'tel:' + a.phone, text: a.phone }), ' · ', h('a', { href: 'mailto:' + a.email + '?subject=' + subject, text: a.email }), ' · ' + a.town),
+        flags.length ? h('div', { class: 'small late', text: flags.join(' · ') }) : null,
+        h('div', { class: 'small', text: 'Services: ' + list(a.services) }),
+        h('div', { class: 'small', text: 'Animals: ' + list(a.animals) + ' · Available: ' + list(a.availability) }),
+        h('div', { class: 'small', text: (a.years_experience ? 'Experience: ' + a.years_experience : 'Experience length not given') + (a.other_platforms ? ' · Other platforms: ' + a.other_platforms : '') + (a.how_heard ? ' · Heard via: ' + a.how_heard : '') }),
+        a.experience ? h('div', { class: 'small', style: 'margin-top:6px', text: a.experience }) : null,
+        a.notes ? h('div', { class: 'small muted', text: 'Note: ' + a.notes }) : null,
+        h('div', { class: 'row', style: 'margin-top:8px' }, status, save),
         h('div', { style: 'margin-top:8px' }, notes)));
   }
 

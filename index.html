@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Porchlight Pet &amp; Home Care | Dog Walking &amp; Pet Sitting in Belmont, NC</title>
+<meta name="description" content="Dog walking, pet sitting, overnight stays and home check-ins in Belmont, Mt. Holly, Cramerton and Lake Wylie, NC. Insured, bonded, and booked online.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M6 16 19 7l13 9z' fill='%2314233B'/%3E%3Crect x='9' y='16' width='20' height='21' rx='3' fill='%23F2B33D' stroke='%2314233B' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{--navy:#14233B;--navy-2:#2B4470;--ink:#33405A;--muted:#4A5670;--line:#DDE2EA;--line-2:#C6CEDB;--mist:#F4F6F9;--soft:#D5DCE8;--amber:#F2B33D;--white:#FFFFFF;--error:#B42318}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Figtree',system-ui,sans-serif;color:var(--navy);background:var(--white);font-size:17px;line-height:1.55}
+img{max-width:100%;display:block}
+a{color:var(--navy)}a:hover{color:var(--navy-2)}
+h1,h2,h3{margin:0}
+p{margin:0}
+.display{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;letter-spacing:-0.015em}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.eyebrow{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.section{padding:88px 0}
+.section-head{display:flex;flex-direction:column;gap:12px;max-width:660px;margin-bottom:36px}
+.section-head h2{font-size:clamp(32px,4vw,46px);line-height:1.08}
+.lede{font-size:18px;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:12px 26px;border-radius:999px;font:inherit;font-weight:700;font-size:17px;text-decoration:none;cursor:pointer;border:none}
+.btn-amber{background:var(--amber);color:var(--navy)}.btn-amber:hover{background:#E9A62A;color:var(--navy)}
+.btn-navy{background:var(--navy);color:var(--white)}.btn-navy:hover{background:var(--navy-2);color:var(--white)}
+.btn-ghost{background:var(--white);color:var(--navy);border:1px solid var(--navy)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* Header */
+.site-header{border-bottom:1px solid var(--line);background:var(--white);position:sticky;top:0;z-index:20}
+.site-header .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 28px;padding-top:14px;padding-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--navy)}
+.brand-name{display:flex;flex-direction:column;line-height:1.1}
+.brand-name b{font-family:'Bricolage Grotesque',sans-serif;font-size:24px}
+.brand-name span{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px;font-weight:600;font-size:16px}
+.nav a{text-decoration:none;padding:10px 0}
+.nav .btn{padding:10px 20px;min-height:44px;font-size:16px}
+@media (max-width:820px){.nav a:not(.btn){display:none}}
+
+/* Hero */
+.hero{background:var(--mist)}
+.hero .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:48px;padding-top:64px;padding-bottom:80px}
+.hero-copy{flex:1 1 440px;min-width:0;display:flex;flex-direction:column;gap:22px}
+.hero h1{font-size:clamp(40px,6vw,68px);line-height:1.02}
+.hero .lede{font-size:20px;max-width:520px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px}
+.ticks{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 24px;font-size:16px;font-weight:600;color:var(--ink)}
+.ticks li{display:flex;align-items:center;gap:8px}
+.hero-media{flex:1 1 400px;min-width:0;position:relative;display:flex;justify-content:center}
+.hero-media img{width:100%;max-width:520px;height:580px;object-fit:cover;object-position:42% 50%;border-radius:260px 260px 24px 24px}
+.report{position:absolute;left:0;bottom:28px;background:var(--white);border-radius:18px;padding:18px 20px;width:250px;box-shadow:0 18px 40px rgba(20,35,59,.18);display:flex;flex-direction:column;gap:8px}
+.report ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--ink)}
+@media (max-width:600px){.hero-media img{height:420px}.report{position:static;width:100%;margin-top:-60px}.hero-media{flex-direction:column;align-items:center}}
+
+/* Services */
+.feature{display:flex;flex-wrap:wrap;background:var(--navy);color:var(--white);border-radius:28px;overflow:hidden;margin-bottom:24px}
+.feature img{flex:1 1 420px;min-width:0;height:420px;object-fit:cover}
+.feature-body{flex:1 1 360px;min-width:0;padding:40px;display:flex;flex-direction:column;gap:16px;justify-content:center}
+.feature-body h3{font-size:36px;line-height:1.1}
+.feature-body p.copy{color:var(--soft);font-size:18px}
+.pill{align-self:flex-start;background:var(--amber);color:var(--navy);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.price{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:28px}
+.price small{font-family:'Figtree',sans-serif;font-weight:500;font-size:16px;opacity:.8}
+.feature .price-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-top:8px}
+.feature .btn{background:var(--white);color:var(--navy)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:var(--white)}
+.card img{width:100%;height:240px;object-fit:cover}
+.card-body{padding:26px;display:flex;flex-direction:column;gap:10px;flex-grow:1}
+.card-body h3{font-family:'Bricolage Grotesque',sans-serif;font-size:26px}
+.card-body p{color:var(--ink)}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:14px}
+.card-foot .price{font-size:24px}
+.card-foot a{font-weight:700;padding:10px 0}
+
+/* Booking */
+.booking{background:var(--navy);color:var(--white)}
+.booking .wrap{display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start}
+.booking-intro{flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:28px}
+.booking-intro .eyebrow{color:var(--amber)}
+.booking-intro .lede{color:var(--soft)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:22px}
+.steps li{display:flex;gap:18px}
+.step-num{flex:0 0 44px;height:44px;border-radius:50%;background:var(--amber);color:var(--navy);font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:20px;display:flex;align-items:center;justify-content:center}
+.steps h3{font-size:20px}
+.steps p{color:var(--soft)}
+.book-card{flex:1 1 480px;min-width:0;background:var(--white);color:var(--navy);border-radius:28px;padding:32px;display:flex;flex-direction:column;gap:24px}
+@media (max-width:600px){.book-card{padding:22px}}
+.book-card h3{font-family:'Bricolage Grotesque',sans-serif;font-size:26px}
+.field-label{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:block}
+.choice-row{display:flex;flex-wrap:wrap;gap:10px}
+.choice{font:inherit;font-weight:600;font-size:16px;min-height:46px;padding:10px 18px;border-radius:999px;border:2px solid var(--line-2);background:var(--white);color:var(--navy);cursor:pointer}
+.choice[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--white);font-weight:700}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+select,input,textarea{font:inherit;font-size:16px;color:var(--navy);width:100%;min-height:48px;padding:10px 14px;border:2px solid var(--line-2);border-radius:14px;background:var(--white)}
+textarea{min-height:88px;resize:vertical}
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.slot{font:inherit;font-weight:600;font-size:16px;min-height:48px;border-radius:14px;border:2px solid var(--line-2);background:var(--white);color:var(--navy);cursor:pointer}
+.slot[aria-pressed="true"]{background:var(--amber);border-color:var(--navy);font-weight:700}
+.slot:disabled{border-style:dashed;border-color:var(--line);background:var(--mist);color:#6B768C;text-decoration:line-through;cursor:not-allowed}
+.hint{font-size:14px;color:var(--muted);margin-top:10px}
+.slot-status{font-size:15px;color:var(--muted)}
+.summary{background:var(--mist);border-radius:16px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
+.summary strong{font-size:18px}
+.check{display:flex;align-items:center;gap:10px;font-weight:600}
+.check input{width:22px;min-height:22px;height:22px}
+.form-error{color:var(--error);font-weight:600}
+.success{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.success h3{font-size:28px}
+[hidden]{display:none!important}
+
+/* Why */
+.why .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:48px}
+.why img{flex:1 1 420px;min-width:0;height:480px;object-fit:cover;border-radius:24px 24px 24px 160px}
+.why-copy{flex:1 1 420px;min-width:0}
+.why ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.why li{display:flex;flex-direction:column;gap:4px;padding:18px 0;border-bottom:1px solid var(--line)}
+.why li:last-child{border-bottom:none}
+.why h3{font-size:20px}
+.why li p{color:var(--ink)}
+
+/* Pricing */
+.pricing{background:var(--mist)}
+.pricing .wrap{display:flex;flex-wrap:wrap;gap:40px}
+.pricing .section-head{flex:1 1 300px;margin-bottom:0}
+.price-list{flex:999 1 520px;min-width:0;background:var(--white);border-radius:24px;padding:8px 28px;margin:0}
+.price-list div{display:flex;align-items:baseline;justify-content:space-between;gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
+.price-list div:last-child{border-bottom:none}
+.price-list dt{display:flex;flex-direction:column}
+.price-list dt b{font-size:19px}
+.price-list dt span{color:var(--muted);font-size:15px}
+.price-list dd{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:24px;white-space:nowrap}
+
+/* Area */
+.towns{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:12px}
+.towns li{border:1px solid var(--line-2);font-weight:600;padding:12px 20px;border-radius:999px}
+.towns li.home{background:var(--navy);color:var(--white);border-color:var(--navy);display:flex;align-items:center;gap:10px}
+.towns li.home span{background:var(--amber);color:var(--navy);font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+
+/* FAQ */
+.faq{background:var(--mist)}
+.faq .wrap{max-width:860px}
+.faq-list{display:flex;flex-direction:column;gap:12px}
+details{background:var(--white);border-radius:18px;padding:20px 24px}
+summary{cursor:pointer;font-weight:700;font-size:19px}
+details p{margin-top:12px;color:var(--ink)}
+
+/* Closing */
+.closing{background:var(--amber)}
+.closing .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;padding-top:64px;padding-bottom:64px}
+.closing h2{font-size:clamp(30px,4vw,44px);line-height:1.08}
+.closing .btn-ghost{border:none}
+
+/* Footer */
+.site-footer{background:var(--navy);color:var(--soft)}
+.site-footer .wrap{padding-top:52px;padding-bottom:36px;display:flex;flex-direction:column;gap:32px}
+.foot-cols{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px}
+.foot-cols h4{margin:0 0 8px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--white)}
+.foot-cols a{color:var(--soft);text-decoration:none;display:block;padding:4px 0}
+.foot-cols a:hover{color:var(--white)}
+.foot-base{padding-top:22px;border-top:1px solid #33405A;font-size:14px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+.foot-base a{color:var(--soft)}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+<div class="wrap">
+<a class="brand" href="#top" aria-label="Porchlight Pet and Home Care, home">
+<svg aria-hidden="true" width="38" height="44" viewBox="0 0 38 44" fill="none"><path d="M19 2v5" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/><path d="M6 16 19 7l13 9z" fill="#14233B"/><rect x="9" y="16" width="20" height="21" rx="3" fill="#F2B33D" stroke="#14233B" stroke-width="2.5"/><path d="M19 22c2.6 2.6 3.6 4.6 3.6 6.4a3.6 3.6 0 0 1-7.2 0c0-1.8 1-3.8 3.6-6.4z" fill="#FFFFFF"/><path d="M13 41h12" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/></svg>
+<span class="brand-name"><b>Porchlight</b><span>Pet &amp; Home Care</span></span>
+</a>
+<nav class="nav" aria-label="Main">
+<a href="#services">Services</a>
+<a href="#booking">Booking</a>
+<a href="#pricing">Pricing</a>
+<a href="#area">Service area</a>
+<a href="#faq">FAQ</a>
+<a href="/portal">Client login</a>
+<a class="btn btn-navy" href="#booking">Request a visit</a>
+</nav>
+</div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+<div class="wrap">
+<div class="hero-copy">
+<p class="eyebrow">Belmont · Mt. Holly · Cramerton · Lake Wylie</p>
+<h1 class="display">Someone's home when you can't be.</h1>
+<p class="lede">Dog walking, pet sitting, overnight stays and home check-ins, done in your home by one person you've met first.</p>
+<div class="cta-row">
+<a class="btn btn-amber" href="#booking">Request a visit</a>
+<a class="btn btn-ghost" href="#pricing">See services &amp; pricing</a>
+</div>
+<ul class="ticks">
+<li><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#14233B"/><path d="m6 10.4 2.6 2.6L14 7.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Insured &amp; bonded</li>
+<li><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#14233B"/><path d="m6 10.4 2.6 2.6L14 7.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Background-checked</li>
+<li><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#14233B"/><path d="m6 10.4 2.6 2.6L14 7.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Photo update every visit</li>
+</ul>
+</div>
+<div class="hero-media">
+<img src="https://images.unsplash.com/photo-1530700131180-d43d9b8cc41f?auto=format&fit=crop&w=1100&q=75" alt="A golden retriever on a leash walking down a neighborhood sidewalk" width="520" height="580" fetchpriority="high">
+<div class="report" aria-label="Sample visit report">
+<p class="eyebrow" style="font-size:12px">Sample visit report</p>
+<p class="display" style="font-size:19px;font-weight:600">Midday walk, done</p>
+<ul><li>30 minutes around the block</li><li>Water bowl refilled</li><li>Photo sent to your phone</li></ul>
+</div>
+</div>
+</div>
+</section>
+
+<section class="section" id="services">
+<div class="wrap">
+<div class="section-head">
+<p class="eyebrow">What we do</p>
+<h2 class="display">Care for the pets, and the house they live in.</h2>
+</div>
+<article class="feature">
+<img src="https://images.unsplash.com/photo-1794067096725-f68ccca0c83f?auto=format&fit=crop&w=1200&q=75" alt="A beagle resting its head on the arm of a sofa at home" loading="lazy">
+<div class="feature-body">
+<p class="pill">Most requested for travel</p>
+<h3 class="display">Overnight stays</h3>
+<p class="copy">We sleep at your house, so your pets keep their own beds, their own yard and their own routine. Evening and morning walks, meals, and the mail brought in.</p>
+<div class="price-row">
+<p class="price"><span data-price="overnight">$95</span> <small>per night</small></p>
+<a class="btn" href="#booking" data-pick="overnight">Check overnight dates</a>
+</div>
+</div>
+</article>
+<div class="cards">
+<article class="card">
+<img src="https://images.unsplash.com/photo-1788876727679-fd88c2e84a2d?auto=format&fit=crop&w=800&h=560&q=75" alt="A husky on a leash out for a walk" loading="lazy">
+<div class="card-body">
+<h3>Dog walking</h3>
+<p>A 30-minute walk at your dog's pace, fresh water after, and a photo so you know it happened. Big dogs welcome.</p>
+<div class="card-foot"><p class="price"><span data-price="walk">$26</span> <small>/ 30 min</small></p><a href="#booking" data-pick="walk">Book a walk</a></div>
+</div>
+</article>
+<article class="card">
+<img src="https://images.unsplash.com/photo-1777660554959-658d19a195fa?auto=format&fit=crop&w=800&h=560&q=75" alt="A fluffy cat looking out of a window" loading="lazy">
+<div class="card-body">
+<h3>Drop-in visits</h3>
+<p>For cats, seniors and dogs who'd rather stay in. Meals, litter, playtime and medication given as you direct.</p>
+<div class="card-foot"><p class="price"><span data-price="visit">$25</span> <small>/ 30 min</small></p><a href="#booking" data-pick="visit">Book a visit</a></div>
+</div>
+</article>
+<article class="card">
+<img src="https://images.unsplash.com/photo-1605449669747-35d71b9436f8?auto=format&fit=crop&w=800&h=560&q=75" alt="Houseplants being watered on a wooden table" loading="lazy">
+<div class="card-body">
+<h3>Home check-ins</h3>
+<p>No pets required. Mail and packages in, plants watered, lights and blinds changed so the house looks lived in.</p>
+<div class="card-foot"><p class="price"><span data-price="home">$30</span> <small>/ visit</small></p><a href="#booking" data-pick="home">Book a check-in</a></div>
+</div>
+</article>
+</div>
+</div>
+</section>
+
+<section class="section booking" id="booking">
+<div class="wrap">
+<div class="booking-intro">
+<div class="section-head" style="margin-bottom:0">
+<p class="eyebrow">How booking works</p>
+<h2 class="display">Only times we can actually keep.</h2>
+<p class="lede">The calendar knows where we already are that day and how long the drive to you takes. If a time shows as open, we can be at your door for it.</p>
+</div>
+<ol class="steps">
+<li><span class="step-num">1</span><div><h3>Tell us where you are</h3><p>Pick your town so we can confirm you're in our service area and plan the drive.</p></div></li>
+<li><span class="step-num">2</span><div><h3>Meet us first, free</h3><p>New clients fill out a <a href="/intake" style="color:#F2B33D">short form about your pets and home</a>, then we do a meet-and-greet at your house and sort out keys.</p></div></li>
+<li><span class="step-num">3</span><div><h3>We confirm by text or email</h3><p>Every request is reviewed and confirmed personally, usually within a few hours. Then you get a photo update after every visit.</p></div></li>
+</ol>
+</div>
+
+<div class="book-card">
+<form id="book-form" novalidate>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div><h3>Request a visit</h3><p class="slot-status">Pick a service, town and day to see open times.</p></div>
+
+<fieldset style="border:0;margin:0;padding:0">
+<legend class="field-label">Service</legend>
+<div class="choice-row" id="service-row">
+<button type="button" class="choice" data-service="walk" aria-pressed="true">Dog walk</button>
+<button type="button" class="choice" data-service="visit" aria-pressed="false">Drop-in visit</button>
+<button type="button" class="choice" data-service="overnight" aria-pressed="false">Overnight</button>
+<button type="button" class="choice" data-service="home" aria-pressed="false">Home check-in</button>
+</div>
+</fieldset>
+
+<div class="two-col">
+<div><label class="field-label" for="town">Your town</label>
+<select id="town" required>
+<option value="belmont">Belmont</option>
+<option value="mt-holly">Mt. Holly</option>
+<option value="cramerton">Cramerton</option>
+<option value="mcadenville">McAdenville</option>
+<option value="lake-wylie">Lake Wylie</option>
+<option value="steele-creek">Steele Creek</option>
+<option value="east-gastonia">East Gastonia</option>
+</select></div>
+<div><label class="field-label" for="date">Day</label><input id="date" type="date" required></div>
+</div>
+
+<div>
+<p class="field-label" id="slots-label">Open times</p>
+<div class="slot-grid" id="slots" role="group" aria-labelledby="slots-label"></div>
+<p class="hint" id="slot-hint">Crossed-out times are booked, or too far from our previous stop to reach you on time.</p>
+</div>
+
+<div id="details" hidden>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div class="two-col">
+<div><label class="field-label" for="name">Your name</label><input id="name" autocomplete="name" required maxlength="120"></div>
+<div><label class="field-label" for="phone">Mobile phone</label><input id="phone" type="tel" autocomplete="tel" required maxlength="40"></div>
+</div>
+<div><label class="field-label" for="email">Email</label><input id="email" type="email" autocomplete="email" required maxlength="200"></div>
+<div><label class="field-label" for="address">Street address</label><input id="address" autocomplete="street-address" required maxlength="300"></div>
+<div><label class="field-label" for="pets">Your pets</label><input id="pets" placeholder="e.g. Bailey, 70 lb lab; Miso, cat" maxlength="1000"></div>
+<div><label class="field-label" for="notes">Anything we should know</label><textarea id="notes" placeholder="Feeding, meds, gate codes, quirks" maxlength="2000"></textarea></div>
+<label class="check"><input id="new-client" type="checkbox" checked> This is my first time booking with Porchlight</label>
+</div>
+</div>
+
+<div class="summary">
+<div><p class="field-label" style="margin:0">Your request</p><strong id="summary">Pick a time above</strong></div>
+<button class="btn btn-navy" type="submit" id="submit" disabled>Continue</button>
+</div>
+<p class="form-error" id="form-error" role="alert" hidden></p>
+</div>
+</form>
+
+<div class="success" id="success" hidden tabindex="-1">
+<p class="pill">Request received</p>
+<h3 class="display">Thanks, we've got it.</h3>
+<p id="success-text">We'll confirm by text or email, usually within a few hours.</p>
+<button class="btn btn-ghost" type="button" id="book-another">Request another visit</button>
+</div>
+</div>
+</div>
+</section>
+
+<section class="section why">
+<div class="wrap">
+<img src="https://images.unsplash.com/photo-1789352050543-b1bbc066fefc?auto=format&fit=crop&w=1200&q=75" alt="View from a covered front porch onto a quiet, tree-lined street" loading="lazy">
+<div class="why-copy">
+<div class="section-head" style="margin-bottom:12px">
+<p class="eyebrow">Why Porchlight</p>
+<h2 class="display">Local, and small on purpose.</h2>
+</div>
+<ul>
+<li><h3>The same face at your door</h3><p>You meet your sitter before the first visit, and that's who shows up. No rotating roster of strangers.</p></li>
+<li><h3>Every size of dog</h3><p>Great Danes, shepherds and strong pullers are welcome. We'll talk through handling at the meet-and-greet.</p></li>
+<li><h3>Overnights in your own home</h3><p>No kennel, no car ride. Your pets sleep where they always sleep and your house isn't left empty.</p></li>
+<li><h3>Based in Belmont</h3><p>We live here, so we're minutes away, not coming in from across Charlotte.</p></li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="section pricing" id="pricing">
+<div class="wrap">
+<div class="section-head">
+<p class="eyebrow">Pricing</p>
+<h2 class="display">Flat prices, listed in full.</h2>
+<p class="lede">No call-for-a-quote. Pay by card after each visit or once a week.</p>
+</div>
+<dl class="price-list">
+<div><dt><b>Dog walk</b><span>30 minutes</span></dt><dd data-price="walk">$26</dd></div>
+<div><dt><b>Drop-in visit</b><span>30 minutes, any pet</span></dt><dd data-price="visit">$25</dd></div>
+<div><dt><b>Overnight stay</b><span>Evening to morning, in your home</span></dt><dd data-price="overnight">$95</dd></div>
+<div><dt><b>Home check-in</b><span>Mail, plants, lights. No pets needed</span></dt><dd data-price="home">$30</dd></div>
+<div><dt><b>Each additional pet</b><span>Per visit or night</span></dt><dd>+$5</dd></div>
+<div><dt><b>Holidays</b><span>Added per visit / per night</span></dt><dd>+$10 / +$20</dd></div>
+</dl>
+</div>
+</section>
+
+<section class="section" id="area">
+<div class="wrap">
+<div class="section-head">
+<p class="eyebrow">Service area</p>
+<h2 class="display">Within a short drive of downtown Belmont.</h2>
+<p class="lede">Outside these towns? Call or email and we'll tell you honestly whether we can reach you reliably.</p>
+</div>
+<ul class="towns">
+<li class="home">Belmont <span>Home base</span></li>
+<li>Mt. Holly</li><li>Cramerton</li><li>McAdenville</li><li>Lake Wylie</li><li>Steele Creek</li><li>East Gastonia</li>
+</ul>
+</div>
+</section>
+
+<section class="section faq" id="faq">
+<div class="wrap">
+<div class="section-head">
+<p class="eyebrow">Questions</p>
+<h2 class="display">What people ask before the first visit.</h2>
+</div>
+<div class="faq-list">
+<details open><summary>Do we meet you before you have a key?</summary><p>Always. The first step is a free meet-and-greet at your home, so your pets know us and we know their routine before any visit is booked.</p></details>
+<details><summary>How do you get into the house?</summary><p>A lockbox or a door code is easiest. If you'd rather hand over a key, it's tagged with a code, never your name or address.</p></details>
+<details><summary>Are you insured and bonded?</summary><p>Yes. We carry pet-care liability insurance and a bond, and we're glad to show proof at the meet-and-greet.</p></details>
+<details><summary>Will I hear from you during a visit?</summary><p>After every visit you get a short note and a photo. On overnights, one in the evening and one in the morning.</p></details>
+<details><summary>What if I need to cancel?</summary><p>Cancel at least 24 hours ahead and there's no charge. Later than that, the visit is billed.</p></details>
+<details><summary>What happens if my pet gets sick while I'm away?</summary><p>We call you first, then your vet. If we can't reach either, we go to the emergency clinic you named at the meet-and-greet.</p></details>
+<details><summary>What if it's storming?</summary><p>We still come. In heavy rain or extreme heat the walk gets shorter and the indoor play gets longer, and we'll tell you so in the visit note.</p></details>
+</div>
+</div>
+</section>
+
+<section class="closing">
+<div class="wrap">
+<div style="max-width:640px;display:flex;flex-direction:column;gap:8px">
+<h2 class="display">Heading out of town? We'll leave the light on.</h2>
+<p style="font-size:19px">Holiday dates fill first. Request yours now.</p>
+</div>
+<div class="cta-row">
+<a class="btn btn-navy" href="#booking">Request a visit</a>
+<a class="btn btn-ghost" href="tel:[PHONE]">Call [PHONE]</a>
+</div>
+</div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+<div class="wrap">
+<div class="foot-cols">
+<div style="max-width:340px">
+<p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p>
+<p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p>
+</div>
+<div><h4>Clients</h4><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Services</h4><a href="#services">Dog walking</a><a href="#services">Drop-in visits</a><a href="#services">Overnight stays</a><a href="#services">Home check-ins</a></div>
+<div><h4>Contact</h4><a href="tel:[PHONE]">[PHONE]</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
+</div>
+<div class="foot-base"><p>© <span id="year">2026</span> Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>
+</div>
+</footer>
+
+<script>
+(function(){
+  var SUPABASE_URL = 'https://ngiwnyoxdcycwotxargm.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naXdueW94ZGN5Y3dvdHhhcmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjQzOTEsImV4cCI6MjA5NzMwMDM5MX0.qcK6CUQkMzxoCZ2Dk8682It2honSch-blEyDXZEt9dc';
+
+  function api(path, opts){
+    opts = opts || {};
+    return fetch(SUPABASE_URL + '/rest/v1/' + path, {
+      method: opts.body ? 'POST' : 'GET',
+      headers: {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json'},
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(function(r){
+      return r.json().catch(function(){ return null; }).then(function(data){
+        if (!r.ok) { throw new Error((data && data.message) || 'Something went wrong. Please try again.'); }
+        return data;
+      });
+    });
+  }
+
+  var state = { service: 'walk', slot: null, slotLabel: null, prices: {}, labels: {
+    walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in' } };
+
+  var el = function(id){ return document.getElementById(id); };
+  var serviceButtons = document.querySelectorAll('#service-row .choice');
+  var townSel = el('town'), dateIn = el('date'), slotsBox = el('slots');
+  var details = el('details'), submitBtn = el('submit'), summary = el('summary'), errBox = el('form-error');
+
+  el('year').textContent = new Date().getFullYear();
+
+  function localISO(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+  var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  var today = new Date();
+  dateIn.min = localISO(today);
+  dateIn.value = localISO(tomorrow);
+
+  function money(cents){ return '$' + (cents/100).toFixed(cents % 100 ? 2 : 0); }
+
+  // Prices come from the database so they only need changing in one place.
+  api('porchlight_services?select=id,label,price_cents').then(function(rows){
+    (rows || []).forEach(function(s){
+      state.prices[s.id] = s.price_cents;
+      document.querySelectorAll('[data-price="' + s.id + '"]').forEach(function(n){ n.textContent = money(s.price_cents); });
+    });
+    updateSummary();
+  }).catch(function(){});
+
+  function setService(id){
+    state.service = id;
+    serviceButtons.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.service === id ? 'true' : 'false'); });
+    loadSlots();
+  }
+  serviceButtons.forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.service); }); });
+  document.querySelectorAll('[data-pick]').forEach(function(a){
+    a.addEventListener('click', function(){ setService(a.dataset.pick); });
+  });
+  townSel.addEventListener('change', loadSlots);
+  dateIn.addEventListener('change', loadSlots);
+
+  function updateSummary(){
+    if (!state.slot) { summary.textContent = 'Pick a time above'; submitBtn.disabled = true; return; }
+    var d = new Date(dateIn.value + 'T12:00:00');
+    var day = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    var price = state.prices[state.service] ? ' · ' + money(state.prices[state.service]) : '';
+    summary.textContent = state.labels[state.service] + ' · ' + day + ', ' + state.slotLabel + price;
+    submitBtn.disabled = false;
+    submitBtn.textContent = details.hidden ? 'Continue' : 'Send request';
+  }
+
+  var loadToken = 0;
+  function loadSlots(){
+    var token = ++loadToken;
+    state.slot = null; state.slotLabel = null;
+    updateSummary();
+    errBox.hidden = true;
+    if (!dateIn.value) { slotsBox.innerHTML = ''; return; }
+    slotsBox.innerHTML = '<p class="slot-status">Checking the schedule…</p>';
+    api('rpc/porchlight_available_slots', { body: { p_date: dateIn.value, p_service: state.service, p_town: townSel.value } })
+      .then(function(rows){
+        if (token !== loadToken) return;
+        slotsBox.innerHTML = '';
+        var open = 0;
+        (rows || []).forEach(function(s){
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'slot'; b.textContent = s.slot_label;
+          if (!s.available) {
+            b.disabled = true;
+            b.setAttribute('aria-label', s.slot_label + ', unavailable');
+          } else {
+            open++;
+            b.setAttribute('aria-pressed', 'false');
+            b.addEventListener('click', function(){
+              slotsBox.querySelectorAll('.slot[aria-pressed]').forEach(function(x){ x.setAttribute('aria-pressed', 'false'); });
+              b.setAttribute('aria-pressed', 'true');
+              state.slot = s.start_at; state.slotLabel = s.slot_label;
+              updateSummary();
+            });
+          }
+          slotsBox.appendChild(b);
+        });
+        if (!open) {
+          var p = document.createElement('p');
+          p.className = 'slot-status'; p.style.gridColumn = '1 / -1';
+          p.textContent = 'No open times that day. Try the next day, or call us.';
+          slotsBox.appendChild(p);
+        }
+      })
+      .catch(function(e){
+        if (token !== loadToken) return;
+        slotsBox.innerHTML = '';
+        errBox.textContent = e.message; errBox.hidden = false;
+      });
+  }
+
+  el('book-form').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    errBox.hidden = true;
+    if (!state.slot) return;
+    if (details.hidden) {
+      details.hidden = false;
+      updateSummary();
+      el('name').focus();
+      return;
+    }
+    var fields = ['name','phone','email','address'];
+    for (var i = 0; i < fields.length; i++) {
+      var f = el(fields[i]);
+      if (!f.value.trim() || !f.checkValidity()) {
+        errBox.textContent = 'Please fill in your ' + (fields[i] === 'address' ? 'street address' : fields[i]) + '.';
+        errBox.hidden = false; f.focus(); return;
+      }
+    }
+    submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
+    api('rpc/porchlight_request_booking', { body: {
+      p_service: state.service, p_town: townSel.value, p_start_at: state.slot,
+      p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
+      p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
+      p_new_client: el('new-client').checked
+    }}).then(function(){
+      var isNew = el('new-client').checked;
+      el('success-text').textContent = 'Request for ' + summary.textContent + ' is in. ' +
+        (isNew ? "Since you're new, we'll reach out first to set up a free meet-and-greet before this visit." :
+                 "We'll confirm by text or email, usually within a few hours.");
+      el('book-form').hidden = true;
+      el('success').hidden = false;
+      el('success').focus();
+    }).catch(function(e){
+      errBox.textContent = e.message; errBox.hidden = false;
+      submitBtn.disabled = false; submitBtn.textContent = 'Send request';
+      if (/taken/i.test(e.message)) loadSlots();
+    });
+  });
+
+  el('book-another').addEventListener('click', function(){
+    el('success').hidden = true;
+    el('book-form').hidden = false;
+    details.hidden = true;
+    loadSlots();
+  });
+
+  loadSlots();
+})();
+</script>
+</body>
+</html>

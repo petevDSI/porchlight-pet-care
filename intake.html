@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New Client Form | Porchlight Pet &amp; Home Care</title>
+<meta name="description" content="Tell Porchlight about your pets and your home before your first visit.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M6 16 19 7l13 9z' fill='%2314233B'/%3E%3Crect x='9' y='16' width='20' height='21' rx='3' fill='%23F2B33D' stroke='%2314233B' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/porchlight.css">
+</head>
+<body>
+<header class="topbar"><div class="in">
+<a class="brand" href="/" aria-label="Porchlight home">
+<svg aria-hidden="true" width="32" height="38" viewBox="0 0 38 44" fill="none"><path d="M19 2v5" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/><path d="M6 16 19 7l13 9z" fill="#14233B"/><rect x="9" y="16" width="20" height="21" rx="3" fill="#F2B33D" stroke="#14233B" stroke-width="2.5"/><path d="M13 41h12" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/></svg>
+<span><b>Porchlight</b><small>Pet &amp; Home Care</small></span></a>
+<a class="btn ghost sm" href="/portal">Client login</a>
+</div></header>
+
+<main class="page narrow">
+<form id="intake" class="stack" novalidate>
+<div class="stack" style="gap:10px;margin-bottom:8px">
+<p class="eyebrow">New client form</p>
+<h1 class="display" style="font-size:clamp(32px,5vw,44px);line-height:1.05">Tell us about your pets and your home.</h1>
+<p class="lede">This is everything we need before the first visit. It takes about 10 minutes, and you can change any of it later from your client portal.</p>
+<p class="small muted">Your codes and home details are visible only to you and your Porchlight sitter.</p>
+</div>
+
+<section class="panel stack"><div class="section-title"><span class="n">1</span><h2>You and your home</h2></div><div id="s-household"></div></section>
+
+<section class="panel stack">
+<div class="section-title"><span class="n">2</span><h2>Your pets</h2></div>
+<div id="pets" class="stack"></div>
+<button type="button" class="btn ghost" id="add-pet">+ Add another pet</button>
+<p class="small muted">Home check-ins only, no pets? Remove the pet and fill in the access section.</p>
+</section>
+
+<section class="panel stack"><div class="section-title"><span class="n">3</span><h2>Vet and emergencies</h2></div><div id="s-vet"></div></section>
+
+<section class="panel stack"><div class="section-title"><span class="n">4</span><h2>Getting in</h2></div><div id="s-access"></div></section>
+
+<section class="panel stack"><div class="section-title"><span class="n">5</span><h2>Home care</h2></div><div id="s-home"></div>
+<label class="f">How did you hear about us?<input id="how_heard" maxlength="200"></label>
+</section>
+
+<section class="panel stack">
+<div class="section-title"><span class="n">6</span><h2>Service agreement</h2></div>
+<ul class="small" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--ink)">
+<li>Visits are confirmed only after a free meet-and-greet at your home.</li>
+<li>Cancel at least 24 hours before a visit at no charge. Later cancellations are billed in full.</li>
+<li>If your pet needs urgent care and we can't reach you or your backup contact, you authorize Porchlight to take your pet to your vet or emergency clinic, up to the amount you listed above, at your expense.</li>
+<li>Keys are labeled with a code only, never your name or address, and returned on request.</li>
+<li>Porchlight is insured and bonded for pet care.</li>
+</ul>
+<label class="check"><input type="checkbox" id="agreed"> <span>I've read and agree to these terms.</span></label>
+</section>
+
+<p class="notice err" id="err" role="alert" hidden></p>
+<div class="spread"><p class="small muted">Fields marked <span class="req">*</span> are required.</p>
+<button class="btn amber" type="submit" id="submit">Send my form</button></div>
+</form>
+
+<section id="done" class="panel stack" hidden tabindex="-1">
+<p class="chip completed" style="align-self:flex-start">Form received</p>
+<h1 class="display" style="font-size:36px">Thank you. We have everything we need.</h1>
+<p class="lede">We'll be in touch to set up your free meet-and-greet.</p>
+<p>Next, create your client portal login with <strong id="done-email"></strong>. That's where you'll see upcoming visits, read visit notes and photos, and update your pets' details.</p>
+<div class="row"><a class="btn" id="portal-link" href="/portal">Create my portal login</a><a class="btn ghost" href="/#booking">Request a visit</a></div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/assets/app.js"></script>
+<script>
+(function () {
+  var P = window.Porchlight, h = P.h;
+  var params = new URLSearchParams(location.search);
+  var sections = {
+    household: P.renderFields(P.FIELDS.household, { email: params.get('email') || '', town_id: params.get('town') || '' }),
+    vet: P.renderFields(P.FIELDS.vet),
+    access: P.renderFields(P.FIELDS.access),
+    home: P.renderFields(P.FIELDS.home)
+  };
+  Object.keys(sections).forEach(function (k) { document.getElementById('s-' + k).appendChild(sections[k].el); });
+
+  var petsBox = document.getElementById('pets');
+  var pets = [];
+  function addPet() {
+    var form = P.renderFields(P.FIELDS.pet);
+    var n = pets.length + 1;
+    var block = h('div', { class: 'petblock' });
+    var title = h('h3', { text: 'Pet ' + n });
+    var remove = h('button', { type: 'button', class: 'linkbtn', text: 'Remove' });
+    var entry = { form: form, block: block };
+    remove.addEventListener('click', function () {
+      pets.splice(pets.indexOf(entry), 1); block.remove();
+      pets.forEach(function (p, i) { p.block.querySelector('h3').textContent = 'Pet ' + (i + 1); });
+    });
+    block.appendChild(h('div', { class: 'spread' }, title, remove));
+    block.appendChild(form.el);
+    petsBox.appendChild(block);
+    pets.push(entry);
+    return entry;
+  }
+  addPet();
+  document.getElementById('add-pet').addEventListener('click', function () {
+    var e = addPet(); e.form.inputs.name.input.focus();
+  });
+
+  var err = document.getElementById('err');
+  function fail(msg, focusEl) {
+    err.textContent = msg; err.hidden = false;
+    if (focusEl) { focusEl.focus(); focusEl.scrollIntoView({ block: 'center' }); } else err.scrollIntoView({ block: 'center' });
+  }
+
+  document.getElementById('intake').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    err.hidden = true;
+    var bad = sections.household.firstInvalid();
+    if (bad) return fail('Please fill in: ' + bad.f.label + '.', bad.input);
+    for (var i = 0; i < pets.length; i++) {
+      var pb = pets[i].form.firstInvalid();
+      if (pb) return fail('Please fill in: ' + pb.f.label + ' (pet ' + (i + 1) + ').', pb.input);
+    }
+    if (!document.getElementById('agreed').checked) return fail('Please agree to the service terms.', document.getElementById('agreed'));
+
+    var payload = Object.assign({},
+      sections.household.read(), sections.vet.read(), sections.access.read(), sections.home.read(),
+      { how_heard: document.getElementById('how_heard').value.trim() || null, agreed: true,
+        pets: pets.map(function (p) { return p.form.read(); }) });
+
+    var btn = document.getElementById('submit');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    P.sb.rpc('porchlight_submit_intake', { p: payload }).then(function (r) {
+      if (r.error) throw r.error;
+      document.getElementById('intake').hidden = true;
+      document.getElementById('done-email').textContent = payload.email;
+      document.getElementById('portal-link').href = '/portal?signup=' + encodeURIComponent(payload.email);
+      var done = document.getElementById('done'); done.hidden = false; done.focus();
+      window.scrollTo(0, 0);
+    }).catch(function (e) {
+      fail(P.errMsg(e));
+      btn.disabled = false; btn.textContent = 'Send my form';
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portal | Porchlight Pet &amp; Home Care</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M6 16 19 7l13 9z' fill='%2314233B'/%3E%3Crect x='9' y='16' width='20' height='21' rx='3' fill='%23F2B33D' stroke='%2314233B' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/porchlight.css">
+</head>
+<body>
+<header class="topbar"><div class="in">
+<a class="brand" href="/" aria-label="Porchlight home">
+<svg aria-hidden="true" width="32" height="38" viewBox="0 0 38 44" fill="none"><path d="M19 2v5" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/><path d="M6 16 19 7l13 9z" fill="#14233B"/><rect x="9" y="16" width="20" height="21" rx="3" fill="#F2B33D" stroke="#14233B" stroke-width="2.5"/><path d="M13 41h12" stroke="#14233B" stroke-width="2.5" stroke-linecap="round"/></svg>
+<span><b>Porchlight</b><small id="portal-kind">Portal</small></span></a>
+<div class="who" id="who" hidden><span id="who-email"></span><button class="btn ghost sm" id="signout" type="button">Sign out</button></div>
+</div></header>
+<main class="page" id="app" aria-live="polite"><p class="muted">Loading…</p></main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/assets/app.js"></script>
+<script>
+(function () {
+  var P = window.Porchlight, sb = P.sb, h = P.h;
+  var app = document.getElementById('app');
+  var me = null; // { email, is_staff, client_id }
+  var arrivedForReset = /type=recovery/.test(location.hash);
+
+  var SERVICE_LABEL = { walk: 'Dog walk', visit: 'Drop-in visit', overnight: 'Overnight stay', home: 'Home check-in' };
+  var BOOKING_SELECT = 'id,start_at,end_at,status,service_id,town_id,client_id,client_name,client_email,client_phone,street_address,pets,notes,is_new_client,staff_notes,' +
+    'porchlight_clients(id,name,address,phone,town_id,porchlight_pets(name,species))';
+
+  function q(sel) { return app.querySelector(sel); }
+  function page() { P.clear(app); return app; }
+  function notice(kind, text) { return h('p', { class: 'notice ' + kind, role: kind === 'err' ? 'alert' : null, text: text }); }
+  function chip(status) { return h('span', { class: 'chip ' + status, text: status }); }
+  function guard(r) { if (r.error) throw r.error; return r.data; }
+  function showError(e) { P.clear(app).appendChild(notice('err', P.errMsg(e))); }
+  function parseHash() {
+    var raw = location.hash.replace(/^#\/?/, '');
+    var qs = raw.indexOf('?') >= 0 ? raw.slice(raw.indexOf('?') + 1) : '';
+    var parts = (qs ? raw.slice(0, raw.indexOf('?')) : raw).split('/').filter(Boolean);
+    return { parts: parts, query: new URLSearchParams(qs) };
+  }
+  function go(hash) { if (location.hash === hash) render(); else location.hash = hash; }
+
+  /* ================= Sign in / sign up ================= */
+  function authView(mode, message) {
+    var urlEmail = new URLSearchParams(location.search).get('signup');
+    mode = mode || (urlEmail ? 'signup' : 'signin');
+    var box = h('section', { class: 'panel stack authbox' });
+    var title = { signin: 'Sign in', signup: 'Create your login', forgot: 'Reset your password', reset: 'Choose a new password' }[mode];
+    box.appendChild(h('h1', { class: 'display', style: 'font-size:30px', text: title }));
+    if (mode === 'signup') box.appendChild(h('p', { class: 'muted', text: 'Use the same email you gave us on your new client form.' }));
+    if (message) box.appendChild(notice(message.kind, message.text));
+
+    var form = h('form', { class: 'stack', novalidate: true });
+    var email = h('input', { id: 'a-email', type: 'email', autocomplete: 'email', required: true });
+    email.value = urlEmail || '';
+    var pass = h('input', { id: 'a-pass', type: 'password', autocomplete: mode === 'signin' ? 'current-password' : 'new-password', minlength: 8, required: true });
+    if (mode !== 'reset') form.appendChild(h('label', { class: 'f', for: 'a-email' }, 'Email', email));
+    if (mode !== 'forgot') form.appendChild(h('label', { class: 'f', for: 'a-pass' }, mode === 'signin' ? 'Password' : 'Password (at least 8 characters)', pass));
+    var err = h('p', { class: 'notice err', role: 'alert', hidden: true });
+    var btn = h('button', { class: 'btn', type: 'submit', text: { signin: 'Sign in', signup: 'Create login', forgot: 'Email me a reset link', reset: 'Save new password' }[mode] });
+    form.appendChild(err); form.appendChild(btn);
+    box.appendChild(form);
+
+    var links = h('div', { class: 'row small' });
+    function link(text, m) { return h('button', { type: 'button', class: 'linkbtn', text: text, onclick: function () { page().appendChild(authView(m)); } }); }
+    if (mode === 'signin') { links.appendChild(link('First time here? Create your login', 'signup')); links.appendChild(link('Forgot password?', 'forgot')); }
+    else if (mode !== 'reset') links.appendChild(link('Back to sign in', 'signin'));
+    box.appendChild(links);
+    if (mode === 'signin' || mode === 'signup') box.appendChild(h('p', { class: 'small muted' }, 'New to Porchlight? Start with the ', h('a', { href: '/intake', text: 'new client form' }), '.'));
+
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault(); err.hidden = true;
+      var e = email.value.trim(), p = pass.value;
+      if (mode !== 'reset' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) { err.textContent = 'Please enter your email.'; err.hidden = false; return; }
+      if (mode !== 'forgot' && p.length < 8) { err.textContent = 'Passwords are at least 8 characters.'; err.hidden = false; return; }
+      btn.disabled = true;
+      var back = location.origin + '/portal';
+      var job = mode === 'signin' ? sb.auth.signInWithPassword({ email: e, password: p })
+        : mode === 'signup' ? sb.auth.signUp({ email: e, password: p, options: { emailRedirectTo: back } })
+        : mode === 'forgot' ? sb.auth.resetPasswordForEmail(e, { redirectTo: back })
+        : sb.auth.updateUser({ password: p });
+      job.then(function (r) {
+        if (r.error) throw r.error;
+        if (mode === 'signup' && !r.data.session) {
+          page().appendChild(authView('signin', { kind: 'info', text: 'Almost done. We emailed a confirmation link to ' + e + '. Click it, then sign in here.' }));
+        } else if (mode === 'forgot') {
+          page().appendChild(authView('signin', { kind: 'info', text: 'If that email has a login, a reset link is on its way.' }));
+        } else if (mode === 'reset') {
+          P.toast('Password updated'); history.replaceState(null, '', '/portal'); start();
+        } else { history.replaceState(null, '', '/portal' + location.hash); start(); }
+      }).catch(function (x) {
+        var m = P.errMsg(x);
+        if (/Invalid login/i.test(m)) m = 'That email and password don’t match. Try again, or reset your password.';
+        if (/not confirmed/i.test(m)) m = 'Please click the confirmation link we emailed you first.';
+        err.textContent = m; err.hidden = false; btn.disabled = false;
+      });
+    });
+    setTimeout(function () { (mode === 'reset' ? pass : email.value ? pass : email).focus(); }, 0);
+    return box;
+  }
+
+  /* ================= Startup ================= */
+  var recovering = arrivedForReset;
+  if (recovering) page().appendChild(authView('reset'));
+  sb.auth.onAuthStateChange(function (event) {
+    if (event === 'PASSWORD_RECOVERY') { recovering = true; page().appendChild(authView('reset')); }
+  });
+  document.getElementById('signout').addEventListener('click', function () {
+    sb.auth.signOut().then(function () { me = null; document.getElementById('who').hidden = true; location.hash = ''; page().appendChild(authView('signin')); });
+  });
+
+  function start() {
+    if (recovering) return;
+    sb.auth.getSession().then(function (r) {
+      var s = r.data && r.data.session;
+      if (!s) { document.getElementById('who').hidden = true; page().appendChild(authView()); return; }
+      return sb.rpc('porchlight_whoami').then(guard).then(function (w) {
+        me = w;
+        document.getElementById('who').hidden = false;
+        document.getElementById('who-email').textContent = w.email;
+        document.getElementById('portal-kind').textContent = w.is_staff ? 'Sitter portal' : 'Client portal';
+        render();
+      });
+    }).catch(showError);
+  }
+  window.addEventListener('hashchange', function () { if (me) render(); });
+
+  function render() {
+    var r = parseHash();
+    try {
+      if (me.is_staff) return staffRoute(r);
+      return clientRoute(r);
+    } catch (e) { showError(e); }
+  }
+
+  function tabs(items, current) {
+    var nav = h('nav', { class: 'tabs', 'aria-label': 'Portal sections' });
+    items.forEach(function (t) {
+      nav.appendChild(h('a', { href: t[0], 'aria-current': t[1] === current ? 'page' : null }, t[2], t[3] ? h('span', { class: 'count', text: String(t[3]) }) : null));
+    });
+    return nav;
+  }
+
+  /* ================= Kraig (staff) ================= */
+  var pendingCount = 0;
+  function refreshPending() {
+    return sb.from('porchlight_bookings').select('id', { count: 'exact', head: true })
+      .eq('status', 'requested').gte('start_at', new Date().toISOString())
+      .then(function (r) { pendingCount = r.count || 0; });
+  }
+  function staffTabs(current) {
+    return tabs([['#/schedule', 'schedule', 'Schedule'], ['#/requests', 'requests', 'Requests', pendingCount], ['#/clients', 'clients', 'Clients']], current);
+  }
+  function staffRoute(r) {
+    var p = r.parts;
+    page().appendChild(h('p', { class: 'muted', text: 'Loading…' }));
+    refreshPending().then(function () {
+      if (p[0] === 'requests') return staffRequests();
+      if (p[0] === 'clients') return staffClients();
+      if (p[0] === 'client' && p[1]) return staffClient(p[1]);
+      if (p[0] === 'visit' && p[1]) return staffVisit(p[1]);
+      return staffSchedule(r.query.get('d') || P.todayISO());
+    }).catch(showError);
+  }
+
+  function bookingWho(b) {
+    var c = b.porchlight_clients;
+    var name = c ? h('a', { href: '#/client/' + c.id, text: c.name }) : h('span', { text: b.client_name });
+    var petNames = c && c.porchlight_pets && c.porchlight_pets.length
+      ? c.porchlight_pets.map(function (x) { return x.name; }).join(', ') : (b.pets || '');
+    return { name: name, pets: petNames, address: (c && c.address) || b.street_address };
+  }
+
+  function setStatus(id, status) {
+    return sb.from('porchlight_bookings').update({ status: status }).eq('id', id).then(guard);
+  }
+
+  function bookingItem(b, opts) {
+    opts = opts || {};
+    var w = bookingWho(b);
+    var label = SERVICE_LABEL[b.service_id] || b.service_id;
+    var timeText = b.service_id === 'overnight' ? P.fmtTime(b.start_at) + '–' + P.fmtTime(b.end_at) : P.fmtTime(b.start_at);
+    var acts = h('div', { class: 'acts' });
+    if (b.status === 'requested') {
+      acts.appendChild(h('button', { class: 'btn sm', type: 'button', text: 'Confirm', onclick: function (ev) {
+        ev.target.disabled = true; setStatus(b.id, 'confirmed').then(function () { P.toast('Confirmed'); render(); }).catch(function (e) { P.toast(P.errMsg(e)); });
+      } }));
+      acts.appendChild(h('button', { class: 'btn danger sm', type: 'button', text: 'Decline', onclick: function (ev) {
+        if (!confirm('Decline this request? Let the client know by phone or email.')) return;
+        ev.target.disabled = true; setStatus(b.id, 'declined').then(function () { P.toast('Declined'); render(); }).catch(function (e) { P.toast(P.errMsg(e)); });
+      } }));
+    } else {
+      acts.appendChild(h('a', { class: 'btn sm', href: '#/visit/' + b.id, text: b.status === 'completed' ? 'View visit' : 'Open visit' }));
+    }
+    if (w.address) acts.appendChild(h('a', { class: 'btn ghost sm', href: P.mapsLink(w.address), target: '_blank', rel: 'noopener', text: 'Map' }));
+    return h('div', { class: 'item' },
+      h('div', { class: 'time', text: opts.showDay ? P.fmtDay(b.start_at) : timeText }),
+      h('div', { class: 'main' },
+        h('div', { class: 'row' }, h('strong', { text: label + (opts.showDay ? ' · ' + timeText : '') }), chip(b.status),
+          !b.client_id ? h('span', { class: 'chip new', text: 'no intake yet' }) : null),
+        h('div', null, w.name, P.townName(b.town_id) ? ' · ' + P.townName(b.town_id) : ''),
+        w.pets ? h('div', { class: 'small muted', text: w.pets }) : null,
+        opts.contact ? h('div', { class: 'small' }, h('a', { href: 'tel:' + b.client_phone, text: b.client_phone }), ' · ', h('a', { href: 'mailto:' + b.client_email, text: b.client_email })) : null,
+        opts.contact && b.notes ? h('div', { class: 'small muted', text: 'Note: ' + b.notes }) : null),
+      acts);
+  }
+
+  function staffSchedule(day) {
+    var start = P.dayStartET(day), end = P.dayStartET(P.addDays(day, 1));
+    var root = page();
+    root.appendChild(staffTabs('schedule'));
+    var dateIn = h('input', { type: 'date', value: day, 'aria-label': 'Choose a day', style: 'max-width:190px' });
+    dateIn.addEventListener('change', function () { if (dateIn.value) go('#/schedule?d=' + dateIn.value); });
+    root.appendChild(h('div', { class: 'spread', style: 'margin-bottom:16px' },
+      h('h1', { class: 'display', style: 'font-size:30px', text: P.fmtDayLong(start) }),
+      h('div', { class: 'row' },
+        h('a', { class: 'btn ghost sm', href: '#/schedule?d=' + P.addDays(day, -1), 'aria-label': 'Previous day', text: '←' }),
+        h('a', { class: 'btn ghost sm', href: '#/schedule?d=' + P.todayISO(), text: 'Today' }),
+        h('a', { class: 'btn ghost sm', href: '#/schedule?d=' + P.addDays(day, 1), 'aria-label': 'Next day', text: '→' }),
+        dateIn)));
+    var listBox = h('div', { class: 'list' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(listBox);
+    sb.from('porchlight_bookings').select(BOOKING_SELECT)
+      .lt('start_at', end).gt('end_at', start)
+      .in('status', ['requested', 'confirmed', 'completed'])
+      .order('start_at').then(guard).then(function (rows) {
+        P.clear(listBox);
+        if (!rows.length) { listBox.appendChild(h('div', { class: 'empty', text: 'Nothing booked this day.' })); return; }
+        var stops = rows.filter(function (b) { return b.status !== 'requested'; }).map(function (b) { return bookingWho(b).address; });
+        var route = P.routeLink(stops);
+        if (route) listBox.appendChild(h('div', { class: 'row' },
+          h('a', { class: 'btn amber', href: route, target: '_blank', rel: 'noopener', text: 'Open today’s route in Google Maps' }),
+          h('span', { class: 'small muted', text: stops.length + ' confirmed stop' + (stops.length === 1 ? '' : 's') + ', in time order' })));
+        rows.forEach(function (b) { listBox.appendChild(bookingItem(b)); });
+      }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function staffRequests() {
+    var root = page();
+    root.appendChild(staffTabs('requests'));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Visit requests' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Confirm or decline each one, then let the client know. New clients need a meet-and-greet first.' }));
+    var listBox = h('div', { class: 'list' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(listBox);
+    sb.from('porchlight_bookings').select(BOOKING_SELECT).eq('status', 'requested')
+      .gte('start_at', new Date().toISOString()).order('start_at').then(guard).then(function (rows) {
+        P.clear(listBox);
+        if (!rows.length) { listBox.appendChild(h('div', { class: 'empty', text: 'No requests waiting. Nice.' })); return; }
+        rows.forEach(function (b) { listBox.appendChild(bookingItem(b, { showDay: true, contact: true })); });
+      }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function staffClients() {
+    var root = page();
+    root.appendChild(staffTabs('clients'));
+    var search = h('input', { type: 'search', placeholder: 'Search by name, pet, town or phone', 'aria-label': 'Search clients' });
+    root.appendChild(h('div', { class: 'spread', style: 'margin-bottom:16px' },
+      h('h1', { class: 'display', style: 'font-size:30px', text: 'Clients' }),
+      h('div', { style: 'flex:1 1 280px;max-width:420px' }, search)));
+    var listBox = h('div', { class: 'list' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(listBox);
+    sb.from('porchlight_clients').select('id,name,phone,email,status,town_id,created_at,porchlight_pets(name,species)')
+      .order('status').order('name').then(guard).then(function (rows) {
+        function draw() {
+          var term = search.value.trim().toLowerCase();
+          P.clear(listBox);
+          var shown = rows.filter(function (c) {
+            if (!term) return true;
+            var hay = [c.name, c.phone, c.email, P.townName(c.town_id)].concat((c.porchlight_pets || []).map(function (x) { return x.name; })).join(' ').toLowerCase();
+            return hay.indexOf(term) >= 0;
+          });
+          if (!shown.length) { listBox.appendChild(h('div', { class: 'empty', text: rows.length ? 'No matches.' : 'No clients yet. New client forms will appear here.' })); return; }
+          shown.forEach(function (c) {
+            listBox.appendChild(h('a', { class: 'item', href: '#/client/' + c.id, style: 'text-decoration:none;color:inherit' },
+              h('div', { class: 'main' },
+                h('div', { class: 'row' }, h('strong', { text: c.name }), chip(c.status)),
+                h('div', { class: 'small muted', text: (c.porchlight_pets || []).map(function (x) { return x.name + ' (' + x.species + ')'; }).join(', ') || 'No pets listed' })),
+              h('div', { class: 'small muted', text: [P.townName(c.town_id), c.phone].filter(Boolean).join(' · ') })));
+          });
+        }
+        search.addEventListener('input', draw); draw();
+      }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  /* ---------- Client file (shared by Kraig and the client) ---------- */
+  function petCard(pet, urls, canEdit, onChange, clientId) {
+    var photoBox = h('div', { class: 'ph' });
+    if (pet.photo_path && urls[pet.photo_path]) photoBox.appendChild(h('img', { src: urls[pet.photo_path], alt: pet.name }));
+    else photoBox.appendChild(h('span', { text: 'No photo yet' }));
+    var body = h('div', { class: 'body' },
+      h('div', { class: 'spread' }, h('h3', { class: 'display', style: 'font-size:24px', text: pet.name }),
+        h('span', { class: 'small muted', text: [pet.species, pet.breed, pet.weight_lbs ? pet.weight_lbs + ' lb' : null].filter(Boolean).join(' · ') })),
+      P.renderKV(P.FIELDS.pet.filter(function (f) { return ['name', 'species', 'breed', 'weight_lbs'].indexOf(f.k) < 0; }), pet));
+    var card = h('article', { class: 'pet' }, photoBox, body);
+    if (canEdit) {
+      var fileIn = h('input', { type: 'file', accept: 'image/*', hidden: true });
+      fileIn.addEventListener('change', function () {
+        if (!fileIn.files[0]) return;
+        P.toast('Uploading photo…');
+        P.uploadPhoto(clientId + '/pets/' + pet.id + '-' + Date.now() + '.jpg', fileIn.files[0])
+          .then(function (path) { return sb.from('porchlight_pets').update({ photo_path: path }).eq('id', pet.id).then(guard); })
+          .then(function () { P.toast('Photo saved'); onChange(); })
+          .catch(function (e) { P.toast(P.errMsg(e)); });
+      });
+      body.appendChild(h('div', { class: 'row' },
+        h('button', { class: 'btn ghost sm', type: 'button', text: 'Edit', onclick: function () { editPet(card, pet, onChange, clientId); } }),
+        h('button', { class: 'btn ghost sm', type: 'button', text: pet.photo_path ? 'Change photo' : 'Add photo', onclick: function () { fileIn.click(); } }),
+        fileIn));
+    }
+    return card;
+  }
+
+  function editPet(card, pet, onChange, clientId) {
+    var form = P.renderFields(P.FIELDS.pet, pet || {});
+    var err = h('p', { class: 'notice err', role: 'alert', hidden: true });
+    var box = h('div', { class: 'petblock' }, h('h3', { text: pet ? 'Edit ' + pet.name : 'Add a pet' }), form.el, err);
+    var save = h('button', { class: 'btn', type: 'button', text: 'Save' });
+    var actions = h('div', { class: 'row' }, save, h('button', { class: 'btn ghost', type: 'button', text: 'Cancel', onclick: onChange }));
+    if (pet) actions.appendChild(h('button', { class: 'btn danger', type: 'button', text: 'Remove pet', onclick: function () {
+      if (!confirm('Remove ' + pet.name + ' from this file?')) return;
+      sb.from('porchlight_pets').delete().eq('id', pet.id).then(guard).then(onChange).catch(function (e) { err.textContent = P.errMsg(e); err.hidden = false; });
+    } }));
+    box.appendChild(actions);
+    save.addEventListener('click', function () {
+      var bad = form.firstInvalid();
+      if (bad) { err.textContent = 'Please fill in: ' + bad.f.label; err.hidden = false; bad.input.focus(); return; }
+      save.disabled = true;
+      var data = form.read();
+      var job = pet ? sb.from('porchlight_pets').update(data).eq('id', pet.id)
+        : sb.from('porchlight_pets').insert(Object.assign({ client_id: clientId }, data));
+      job.then(guard).then(function () { P.toast('Saved'); onChange(); })
+        .catch(function (e) { err.textContent = P.errMsg(e); err.hidden = false; save.disabled = false; });
+    });
+    card.replaceWith(box);
+    form.inputs.name.input.focus();
+  }
+
+  function editSection(panel, title, fields, client, onChange, readonly) {
+    var form = P.renderFields(fields, client, { readonly: readonly });
+    var err = h('p', { class: 'notice err', role: 'alert', hidden: true });
+    var save = h('button', { class: 'btn', type: 'button', text: 'Save' });
+    var box = h('section', { class: 'panel stack' }, h('h2', { text: title }), form.el, err,
+      h('div', { class: 'row' }, save, h('button', { class: 'btn ghost', type: 'button', text: 'Cancel', onclick: onChange })));
+    save.addEventListener('click', function () {
+      var bad = form.firstInvalid();
+      if (bad) { err.textContent = 'Please fill in: ' + bad.f.label; err.hidden = false; bad.input.focus(); return; }
+      save.disabled = true;
+      sb.from('porchlight_clients').update(form.read()).eq('id', client.id).then(guard)
+        .then(function () { P.toast('Saved'); onChange(); })
+        .catch(function (e) { err.textContent = P.errMsg(e); err.hidden = false; save.disabled = false; });
+    });
+    panel.replaceWith(box);
+  }
+
+  function clientFile(root, clientId, isStaff, reload) {
+    var loading = h('p', { class: 'muted', text: 'Loading…' });
+    root.appendChild(loading);
+    var jobs = [
+      sb.from('porchlight_clients').select('*').eq('id', clientId).single().then(guard),
+      sb.from('porchlight_pets').select('*').eq('client_id', clientId).order('sort_order').order('created_at').then(guard),
+      isStaff ? sb.from('porchlight_staff_notes').select('notes,updated_at').eq('client_id', clientId).maybeSingle().then(guard) : Promise.resolve(null),
+      isStaff ? sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id,client_id,client_name,pets').eq('client_id', clientId).order('start_at', { ascending: false }).limit(25).then(guard) : Promise.resolve([])
+    ];
+    return Promise.all(jobs).then(function (res) {
+      var c = res[0], pets = res[1], note = res[2], bookings = res[3];
+      return P.signedUrls(pets.map(function (x) { return x.photo_path; })).then(function (urls) {
+        loading.remove();
+        var head = h('div', { class: 'spread' },
+          h('div', { class: 'stack', style: 'gap:4px' },
+            h('h1', { class: 'display', style: 'font-size:32px', text: isStaff ? c.name : 'Your pets and home' }),
+            h('p', { class: 'muted', text: isStaff ? [P.townName(c.town_id), 'client since ' + P.fmtDay(c.created_at)].filter(Boolean).join(' · ') : 'Keep this up to date and your sitter will always have the latest.' })));
+        if (isStaff) {
+          var statusSel = h('select', { 'aria-label': 'Client status', style: 'max-width:180px' });
+          [['new', 'New (meet-and-greet)'], ['active', 'Active'], ['inactive', 'Inactive']].forEach(function (o) { statusSel.appendChild(h('option', { value: o[0], text: o[1] })); });
+          statusSel.value = c.status;
+          statusSel.addEventListener('change', function () {
+            sb.from('porchlight_clients').update({ status: statusSel.value }).eq('id', c.id).then(guard).then(function () { P.toast('Status updated'); }).catch(function (e) { P.toast(P.errMsg(e)); });
+          });
+          head.appendChild(statusSel);
+        }
+        root.appendChild(head);
+        var col = h('div', { class: 'stack', style: 'margin-top:20px' });
+        root.appendChild(col);
+
+        // Contact
+        var contactFields = P.FIELDS.household;
+        var contact = h('section', { class: 'panel stack' },
+          h('div', { class: 'spread' }, h('h2', { text: 'Contact' }), h('button', { class: 'btn ghost sm', type: 'button', text: 'Edit' })),
+          P.renderKV(contactFields, c),
+          h('div', { class: 'row' },
+            h('a', { class: 'btn ghost sm', href: 'tel:' + c.phone, text: 'Call' }),
+            h('a', { class: 'btn ghost sm', href: 'sms:' + c.phone, text: 'Text' }),
+            h('a', { class: 'btn ghost sm', href: P.mapsLink(c.address), target: '_blank', rel: 'noopener', text: 'Map address' })));
+        contact.querySelector('button').addEventListener('click', function () { editSection(contact, 'Contact', contactFields, c, reload, isStaff ? [] : ['email']); });
+        col.appendChild(contact);
+
+        // Access
+        var access = h('section', { class: 'panel stack' },
+          h('div', { class: 'spread' }, h('h2', { text: 'Getting in' }), h('button', { class: 'btn ghost sm', type: 'button', text: 'Edit' })),
+          P.renderKV(P.FIELDS.access, c, { secretsBold: true, empty: 'No entry details yet.' }));
+        access.querySelector('button').addEventListener('click', function () { editSection(access, 'Getting in', P.FIELDS.access, c, reload); });
+        col.appendChild(access);
+
+        // Pets
+        var petsWrap = h('section', { class: 'stack' },
+          h('div', { class: 'spread' }, h('h2', { class: 'display', style: 'font-size:24px', text: 'Pets' })));
+        var petGrid = h('div', { class: 'pets' });
+        pets.forEach(function (pet) { petGrid.appendChild(petCard(pet, urls, true, reload, c.id)); });
+        var addBtn = h('button', { class: 'btn ghost sm', type: 'button', text: '+ Add pet' });
+        petsWrap.firstChild.appendChild(addBtn);
+        addBtn.addEventListener('click', function () { var ph = h('div'); petGrid.appendChild(ph); editPet(ph, null, reload, c.id); });
+        if (!pets.length) petGrid.appendChild(h('div', { class: 'empty', text: 'No pets on file.' }));
+        petsWrap.appendChild(petGrid);
+        col.appendChild(petsWrap);
+
+        // Vet + home
+        [['Vet and emergencies', P.FIELDS.vet], ['Home care', P.FIELDS.home]].forEach(function (s) {
+          var panel = h('section', { class: 'panel stack' },
+            h('div', { class: 'spread' }, h('h2', { text: s[0] }), h('button', { class: 'btn ghost sm', type: 'button', text: 'Edit' })),
+            P.renderKV(s[1], c));
+          panel.querySelector('button').addEventListener('click', function () { editSection(panel, s[0], s[1], c, reload); });
+          col.appendChild(panel);
+        });
+
+        if (isStaff) {
+          // Private notes
+          var ta = h('textarea', { id: 'staff-note', rows: 5, placeholder: 'Only you can see this. Gate sticks, neighbor’s dog, prefers texts, tips…' });
+          ta.value = (note && note.notes) || '';
+          var saveNote = h('button', { class: 'btn sm', type: 'button', text: 'Save note' });
+          saveNote.addEventListener('click', function () {
+            saveNote.disabled = true;
+            sb.from('porchlight_staff_notes').upsert({ client_id: c.id, notes: ta.value, updated_at: new Date().toISOString() })
+              .then(guard).then(function () { P.toast('Note saved'); saveNote.disabled = false; })
+              .catch(function (e) { P.toast(P.errMsg(e)); saveNote.disabled = false; });
+          });
+          col.appendChild(h('section', { class: 'panel stack' },
+            h('h2', { text: 'Private notes' }),
+            h('label', { class: 'f', for: 'staff-note' }, h('span', { class: 'hint', text: 'Never shown to the client.' }), ta),
+            h('div', null, saveNote)));
+          // History
+          var hist = h('section', { class: 'stack' }, h('h2', { class: 'display', style: 'font-size:24px', text: 'Visits' }));
+          var hl = h('div', { class: 'list' });
+          if (!bookings.length) hl.appendChild(h('div', { class: 'empty', text: 'No visits yet.' }));
+          bookings.forEach(function (b) { b.porchlight_clients = null; hl.appendChild(bookingItem(b, { showDay: true })); });
+          hist.appendChild(hl);
+          col.appendChild(hist);
+        }
+      });
+    });
+  }
+
+  function staffClient(id) {
+    var root = page();
+    root.appendChild(staffTabs('clients'));
+    root.appendChild(h('p', { style: 'margin-bottom:12px' }, h('a', { href: '#/clients', text: '← All clients' })));
+    clientFile(root, id, true, function () { staffClient(id); }).catch(showError);
+  }
+
+  /* ---------- Visit screen ---------- */
+  function staffVisit(bookingId) {
+    var root = page();
+    root.appendChild(staffTabs('schedule'));
+    root.appendChild(h('p', { class: 'muted', text: 'Loading visit…' }));
+    sb.from('porchlight_bookings').select('*').eq('id', bookingId).single().then(guard).then(function (b) {
+      var jobs = [
+        b.client_id ? sb.from('porchlight_clients').select('*').eq('id', b.client_id).single().then(guard) : Promise.resolve(null),
+        b.client_id ? sb.from('porchlight_pets').select('*').eq('client_id', b.client_id).order('sort_order').then(guard) : Promise.resolve([]),
+        sb.from('porchlight_visit_reports').select('*').eq('booking_id', b.id).maybeSingle().then(guard),
+        b.client_id ? sb.from('porchlight_staff_notes').select('notes').eq('client_id', b.client_id).maybeSingle().then(guard) : Promise.resolve(null)
+      ];
+      return Promise.all(jobs).then(function (res) {
+        var c = res[0], pets = res[1], report = res[2] || { photo_paths: [] }, note = res[3];
+        var paths = (report.photo_paths || []).concat(pets.map(function (x) { return x.photo_path; }));
+        return P.signedUrls(paths).then(function (urls) { drawVisit(root, b, c, pets, report, note, urls); });
+      });
+    }).catch(showError);
+  }
+
+  function drawVisit(root, b, c, pets, report, note, urls) {
+    P.clear(root);
+    root.appendChild(staffTabs('schedule'));
+    var day = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(b.start_at));
+    root.appendChild(h('p', { style: 'margin-bottom:12px' }, h('a', { href: '#/schedule?d=' + day, text: '← Back to schedule' })));
+    var address = (c && c.address) || b.street_address;
+    root.appendChild(h('div', { class: 'spread', style: 'margin-bottom:16px' },
+      h('div', { class: 'stack', style: 'gap:4px' },
+        h('p', { class: 'eyebrow', text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' + P.fmtDay(b.start_at) + ' ' + P.fmtTime(b.start_at) }),
+        h('h1', { class: 'display', style: 'font-size:32px', text: c ? c.name : b.client_name }),
+        h('p', { class: 'muted', text: address })),
+      h('div', { class: 'row' }, chip(b.status),
+        h('a', { class: 'btn ghost sm', href: P.mapsLink(address), target: '_blank', rel: 'noopener', text: 'Directions' }),
+        h('a', { class: 'btn ghost sm', href: 'tel:' + ((c && c.phone) || b.client_phone), text: 'Call' }))));
+
+    var col = h('div', { class: 'stack' });
+    root.appendChild(col);
+    if (!c) col.appendChild(notice('info', 'No new client form on file for this booking yet. Ask ' + b.client_name + ' to fill one out at ' + location.origin + '/intake?email=' + b.client_email));
+    if (b.notes) col.appendChild(notice('info', 'Client’s note with this request: ' + b.notes));
+
+    // Need-to-know
+    if (c) {
+      var must = h('section', { class: 'must stack' }, h('h3', { text: 'Getting in' }), P.renderKV(P.FIELDS.access, c, { secretsBold: true, empty: 'No entry details on file. Call the client.' }));
+      if (note && note.notes) must.appendChild(h('p', { class: 'small' }, h('strong', { text: 'Your notes: ' }), note.notes));
+      col.appendChild(must);
+      if (c.home_notes || c.house_rules) col.appendChild(h('section', { class: 'panel stack' }, h('h3', { text: 'Home care' }), P.renderKV(P.FIELDS.home, c)));
+      var grid = h('div', { class: 'pets' });
+      pets.forEach(function (pet) {
+        var ph = h('div', { class: 'ph' });
+        if (pet.photo_path && urls[pet.photo_path]) ph.appendChild(h('img', { src: urls[pet.photo_path], alt: pet.name })); else ph.appendChild(h('span', { text: pet.species }));
+        var keyFields = P.FIELDS.pet.filter(function (f) { return ['food', 'food_amount', 'feeding_times', 'treats', 'medications', 'medical_notes', 'behavior', 'walk_notes', 'quirks'].indexOf(f.k) >= 0; });
+        grid.appendChild(h('article', { class: 'pet' }, ph, h('div', { class: 'body' },
+          h('h3', { class: 'display', style: 'font-size:22px', text: pet.name }), P.renderKV(keyFields, pet))));
+      });
+      if (pets.length) col.appendChild(grid);
+      if (c.vet_clinic || c.emergency_clinic) col.appendChild(h('section', { class: 'panel stack' }, h('h3', { text: 'If something goes wrong' }),
+        P.renderKV(P.FIELDS.vet.concat([{ k: 'alt_contact_name', label: 'Backup contact' }, { k: 'alt_contact_phone', label: 'Backup phone' }]), c)));
+    }
+
+    // Report
+    if (!c) return;
+    var state = { report: report, photos: (report.photo_paths || []).slice() };
+    function saveReport(extra) {
+      var row = Object.assign({ booking_id: b.id, client_id: c.id, note: noteIn.value.trim() || null, photo_paths: state.photos }, extra || {});
+      return sb.from('porchlight_visit_reports').upsert(row, { onConflict: 'booking_id' }).select().single().then(guard)
+        .then(function (r) { state.report = r; return r; });
+    }
+    var times = h('p', { class: 'small muted' });
+    function drawTimes() {
+      var r = state.report;
+      times.textContent = [r.arrived_at ? 'Arrived ' + P.fmtTime(r.arrived_at) : null, r.departed_at ? 'Left ' + P.fmtTime(r.departed_at) : null].filter(Boolean).join(' · ') || 'Not started';
+    }
+    var arrive = h('button', { class: 'btn amber', type: 'button', text: 'I’ve arrived' });
+    var done = h('button', { class: 'btn', type: 'button', text: 'Visit done — send report' });
+    var noteIn = h('textarea', { id: 'visit-note', rows: 5, placeholder: 'How did it go? Ate everything, 25-minute walk, meds given at 5:10…' });
+    noteIn.value = report.note || '';
+    var photoGrid = h('div', { class: 'photos' });
+    function drawPhotos() {
+      P.clear(photoGrid);
+      state.photos.forEach(function (p) {
+        if (urls[p]) photoGrid.appendChild(h('a', { href: urls[p], target: '_blank', rel: 'noopener' }, h('img', { src: urls[p], alt: 'Visit photo' })));
+      });
+    }
+    var fileIn = h('input', { type: 'file', accept: 'image/*', multiple: true, hidden: true });
+    var addPhotos = h('button', { class: 'btn ghost', type: 'button', text: 'Add photos', onclick: function () { fileIn.click(); } });
+    fileIn.addEventListener('change', function () {
+      var files = Array.prototype.slice.call(fileIn.files || []);
+      if (!files.length) return;
+      addPhotos.disabled = true; addPhotos.textContent = 'Uploading ' + files.length + '…';
+      Promise.all(files.map(function (f) { return P.uploadPhoto(c.id + '/visits/' + b.id + '/' + P.uid() + '.jpg', f); }))
+        .then(function (newPaths) {
+          state.photos = state.photos.concat(newPaths);
+          return saveReport().then(function () { return P.signedUrls(newPaths); });
+        })
+        .then(function (m) { Object.assign(urls, m); drawPhotos(); P.toast('Photos added'); })
+        .catch(function (e) { P.toast(P.errMsg(e)); })
+        .then(function () { addPhotos.disabled = false; addPhotos.textContent = 'Add photos'; fileIn.value = ''; });
+    });
+    arrive.addEventListener('click', function () {
+      arrive.disabled = true;
+      saveReport({ arrived_at: new Date().toISOString() }).then(function () { drawTimes(); P.toast('Arrival logged'); })
+        .catch(function (e) { P.toast(P.errMsg(e)); arrive.disabled = false; });
+    });
+    done.addEventListener('click', function () {
+      done.disabled = true;
+      saveReport({ departed_at: new Date().toISOString(), arrived_at: state.report.arrived_at || new Date().toISOString() })
+        .then(function () { return setStatus(b.id, 'completed'); })
+        .then(function () { b.status = 'completed'; drawTimes(); P.toast('Report sent to the client portal'); })
+        .catch(function (e) { P.toast(P.errMsg(e)); done.disabled = false; });
+    });
+    var saveDraft = h('button', { class: 'btn ghost', type: 'button', text: 'Save note', onclick: function () {
+      saveReport().then(function () { P.toast('Saved'); }).catch(function (e) { P.toast(P.errMsg(e)); });
+    } });
+    if (report.arrived_at) arrive.disabled = true;
+    drawTimes(); drawPhotos();
+    col.appendChild(h('section', { class: 'panel stack' },
+      h('div', { class: 'spread' }, h('h2', { text: 'Visit report' }), times),
+      h('div', { class: 'row' }, arrive),
+      h('label', { class: 'f', for: 'visit-note' }, 'Note for the client', noteIn),
+      h('div', { class: 'row' }, addPhotos, saveDraft, fileIn),
+      photoGrid,
+      h('div', null, done),
+      h('p', { class: 'small muted', text: 'The client sees this note and these photos in their portal.' })));
+  }
+
+  /* ================= Clients ================= */
+  function clientTabs(current) {
+    return tabs([['#/visits', 'visits', 'Visits'], ['#/reports', 'reports', 'Visit reports'], ['#/info', 'info', 'Pets & home']], current);
+  }
+  function clientRoute(r) {
+    var p = r.parts[0];
+    if (!me.client_id) return noFile();
+    if (p === 'reports') return clientReports();
+    if (p === 'info') return clientInfo();
+    return clientVisits();
+  }
+  function noFile() {
+    var root = page();
+    root.appendChild(h('section', { class: 'panel stack narrow', style: 'margin:0 auto' },
+      h('h1', { class: 'display', style: 'font-size:30px', text: 'Welcome to Porchlight' }),
+      h('p', { class: 'lede' }, 'We don’t have a client file for ', h('strong', { text: me.email }), ' yet.'),
+      h('p', null, 'Fill out the new client form with this same email and your visits, notes and photos will show up here.'),
+      h('div', { class: 'row' }, h('a', { class: 'btn amber', href: '/intake?email=' + encodeURIComponent(me.email), text: 'Fill out the new client form' }),
+        h('a', { class: 'btn ghost', href: '/#booking', text: 'Request a visit' }))));
+  }
+
+  function clientVisits() {
+    var root = page();
+    root.appendChild(clientTabs('visits'));
+    root.appendChild(h('div', { class: 'spread', style: 'margin-bottom:16px' },
+      h('h1', { class: 'display', style: 'font-size:30px', text: 'Your visits' }),
+      h('a', { class: 'btn amber', href: '/#booking', text: 'Request a visit' })));
+    var listBox = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(listBox);
+    sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id').order('start_at', { ascending: false }).limit(100)
+      .then(guard).then(function (rows) {
+        P.clear(listBox);
+        var now = Date.now();
+        var upcoming = rows.filter(function (b) { return new Date(b.end_at) > now && (b.status === 'requested' || b.status === 'confirmed'); }).reverse();
+        var past = rows.filter(function (b) { return upcoming.indexOf(b) < 0; });
+        function list(title, items, canCancel) {
+          var l = h('div', { class: 'list' });
+          if (!items.length) l.appendChild(h('div', { class: 'empty', text: canCancel ? 'Nothing coming up.' : 'No past visits yet.' }));
+          items.forEach(function (b) {
+            var acts = h('div', { class: 'acts' });
+            if (canCancel && new Date(b.start_at) > now) acts.appendChild(h('button', { class: 'btn danger sm', type: 'button', text: 'Cancel', onclick: function (ev) {
+              var late = new Date(b.start_at) - now < 24 * 3600 * 1000;
+              if (!confirm(late ? 'This visit is less than 24 hours away and will still be billed. Cancel anyway?' : 'Cancel this visit?')) return;
+              ev.target.disabled = true;
+              sb.rpc('porchlight_cancel_booking', { p_id: b.id }).then(guard).then(function () { P.toast('Visit cancelled'); clientVisits(); })
+                .catch(function (e) { P.toast(P.errMsg(e)); ev.target.disabled = false; });
+            } }));
+            l.appendChild(h('div', { class: 'item' },
+              h('div', { class: 'time', text: P.fmtDay(b.start_at) }),
+              h('div', { class: 'main' }, h('div', { class: 'row' }, h('strong', { text: (SERVICE_LABEL[b.service_id] || b.service_id) + ' · ' + P.fmtTime(b.start_at) }), chip(b.status))),
+              acts));
+          });
+          return h('section', { class: 'stack' }, h('h2', { class: 'display', style: 'font-size:22px', text: title }), l);
+        }
+        listBox.appendChild(list('Coming up', upcoming, true));
+        listBox.appendChild(list('Past and cancelled', past, false));
+        listBox.appendChild(h('p', { class: 'small muted', text: 'Requested visits are confirmed personally, usually within a few hours.' }));
+      }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function clientReports() {
+    var root = page();
+    root.appendChild(clientTabs('reports'));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:16px', text: 'Visit reports' }));
+    var listBox = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(listBox);
+    sb.from('porchlight_visit_reports').select('id,created_at,arrived_at,departed_at,note,photo_paths,porchlight_bookings(start_at,service_id)')
+      .order('created_at', { ascending: false }).limit(60).then(guard).then(function (rows) {
+        var all = [];
+        rows.forEach(function (r) { all = all.concat(r.photo_paths || []); });
+        return P.signedUrls(all).then(function (urls) {
+          P.clear(listBox);
+          if (!rows.length) { listBox.appendChild(h('div', { class: 'empty', text: 'After each visit, your sitter’s note and photos will appear here.' })); return; }
+          rows.forEach(function (r) {
+            var bk = r.porchlight_bookings;
+            var when = bk ? P.fmtDayLong(bk.start_at) : P.fmtDayLong(r.created_at);
+            var photos = h('div', { class: 'photos' });
+            (r.photo_paths || []).forEach(function (p) { if (urls[p]) photos.appendChild(h('a', { href: urls[p], target: '_blank', rel: 'noopener' }, h('img', { src: urls[p], alt: 'Photo from the visit', loading: 'lazy' }))); });
+            listBox.appendChild(h('article', { class: 'panel stack' },
+              h('div', { class: 'spread' },
+                h('h2', { style: 'font-size:20px', text: (bk ? (SERVICE_LABEL[bk.service_id] || '') + ' · ' : '') + when }),
+                h('span', { class: 'small muted', text: [r.arrived_at ? 'Arrived ' + P.fmtTime(r.arrived_at) : null, r.departed_at ? 'left ' + P.fmtTime(r.departed_at) : null].filter(Boolean).join(', ') })),
+              r.note ? h('p', { style: 'white-space:pre-line', text: r.note }) : null,
+              (r.photo_paths || []).length ? photos : null));
+          });
+        });
+      }).catch(function (e) { P.clear(listBox).appendChild(notice('err', P.errMsg(e))); });
+  }
+
+  function clientInfo() {
+    var root = page();
+    root.appendChild(clientTabs('info'));
+    clientFile(root, me.client_id, false, clientInfo).catch(showError);
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>

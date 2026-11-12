@@ -33,6 +33,7 @@
 <div class="section-title"><span class="n">2</span><h2>Your pets</h2></div>
 <div id="pets" class="stack"></div>
 <button type="button" class="btn ghost" id="add-pet">+ Add another pet</button>
+<p class="small muted">We ask for a current rabies certificate for every dog and cat before the first visit. If you don't have it handy, send the form anyway and add it later from your client portal.</p>
 <p class="small muted">Home check-ins only, no pets? Remove the pet and fill in the access section.</p>
 </section>
 
@@ -66,6 +67,7 @@
 <h1 class="display" style="font-size:36px">Thank you. We have everything we need.</h1>
 <p class="lede">Next, pick a time for your free meet-and-greet.</p>
 <p>Next, create your client portal login with <strong id="done-email"></strong>. That's where you'll see upcoming visits, read visit notes and photos, and update your pets' details.</p>
+<p class="notice info" id="done-vax" hidden></p>
 <div class="row"><a class="btn" id="portal-link" href="/portal">Create my portal login</a><a class="btn ghost" href="/?service=meet#booking">Book your free meet &amp; greet</a></div>
 </section>
 </main>
@@ -96,6 +98,9 @@
     });
   }
 
+  // Vaccination records upload straight away into a private folder for this form; the form then claims them.
+  var formId = P.uuid();
+  var MAX_DOCS = 8;
   var petsBox = document.getElementById('pets');
   var pets = [];
   function addPet() {
@@ -104,13 +109,31 @@
     var block = h('div', { class: 'petblock' });
     var title = h('h3', { text: 'Pet ' + n });
     var remove = h('button', { type: 'button', class: 'linkbtn', text: 'Remove' });
-    var entry = { form: form, block: block };
+    var docs = [];
+    var entry = { form: form, block: block, docs: docs };
     remove.addEventListener('click', function () {
       pets.splice(pets.indexOf(entry), 1); block.remove();
       pets.forEach(function (p, i) { p.block.querySelector('h3').textContent = 'Pet ' + (i + 1); });
     });
     block.appendChild(h('div', { class: 'spread' }, title, remove));
     block.appendChild(form.el);
+    var docList = h('ul', { class: 'doclist', hidden: true });
+    function drawDocs() {
+      P.clear(docList); docList.hidden = !docs.length;
+      docs.forEach(function (d) {
+        docList.appendChild(h('li', null,
+          h('span', null, h('strong', { text: d.kind === 'rabies' ? 'Rabies certificate: ' : 'Other record: ' }), d.file_name),
+          h('button', { type: 'button', class: 'linkbtn', text: 'Remove', onclick: function () { docs.splice(docs.indexOf(d), 1); drawDocs(); } })));
+      });
+    }
+    entry.picker = P.recordPicker({ folder: 'intake/' + formId, onAdded: function (d) {
+      if (docs.length >= MAX_DOCS) throw new Error('That’s the most we can take on this form. Add the rest from your client portal.');
+      docs.push(d); drawDocs();
+    } });
+    block.appendChild(h('div', { class: 'vax stack' },
+      h('h4', { text: 'Vaccination records' }),
+      h('p', { class: 'small muted', text: 'A photo or PDF of the rabies certificate from your vet. Other vaccine records are welcome too. Only you and your sitter can see them.' }),
+      entry.picker.el, docList));
     petsBox.appendChild(block);
     pets.push(entry);
     return entry;
@@ -135,12 +158,13 @@
       var pb = pets[i].form.firstInvalid();
       if (pb) return fail('Please fill in: ' + pb.f.label + ' (pet ' + (i + 1) + ').', pb.input);
     }
+    if (pets.some(function (p) { return p.picker.busy(); })) return fail('A record is still uploading. Give it a moment, then send the form.');
     if (!document.getElementById('agreed').checked) return fail('Please agree to the service terms.', document.getElementById('agreed'));
 
     var payload = Object.assign({},
       sections.household.read(), sections.vet.read(), sections.access.read(), sections.home.read(),
       { how_heard: document.getElementById('how_heard').value.trim() || null, agreed: true,
-        pets: pets.map(function (p) { return p.form.read(); }) },
+        pets: pets.map(function (p) { return Object.assign(p.form.read(), { docs: p.docs }); }) },
       place ? { lat: place.lat, lng: place.lng } : {});
 
     var btn = document.getElementById('submit');
@@ -150,6 +174,15 @@
       document.getElementById('intake').hidden = true;
       document.getElementById('done-email').textContent = payload.email;
       document.getElementById('portal-link').href = '/portal?signup=' + encodeURIComponent(payload.email);
+      var need = payload.pets.filter(function (x) {
+        var st = P.vaxStatus({ species: x.species, rabies_expires_on: x.rabies_expires_on, porchlight_pet_docs: x.docs });
+        return st && !st.ok;
+      }).map(function (x) { return x.name; });
+      if (need.length) {
+        var dv = document.getElementById('done-vax');
+        dv.textContent = 'One thing left before the first visit: a current rabies certificate and its expiration date for ' + P.listNames(need) + '. You can add them under "Pets & home" in your client portal.';
+        dv.hidden = false;
+      }
       var done = document.getElementById('done'); done.hidden = false; done.focus();
       window.scrollTo(0, 0);
     }).catch(function (e) {

@@ -120,3 +120,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--navy)}
 .done-list li::before{content:"✓ "}
 .pause-box{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
 .pause-box input{max-width:170px}
+.chip.bad{background:#FDECEA;border-color:#F1C4BF;color:var(--error)}
+.vax{border-top:1px solid var(--line);padding-top:14px;gap:10px}
+.vax h4{margin:0;font-size:16px}
+.doclist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.doclist li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--mist);font-size:15px;overflow-wrap:anywhere}
+.doclist .linkbtn{padding:0;font-size:14px}

@@ -1106,7 +1106,7 @@ details p{margin-top:12px;color:var(--ink)}
       var isNew = el('new-client').checked;
       var hadMeet = state.cart.some(function(c){ return c.service === 'meet'; });
       var names = (res && res.sitters) || [];
-      var sitterLine = names.length ? ' Your sitter: ' + names.join(' and ') + '.' : (state.sitters.length ? ' We’ll match you with a free sitter and show who it is in your client portal.' : '');
+      var sitterLine = names.length ? ' Your sitter: ' + names.join(' and ').replace(/\.$/, '') + (names.length > 1 ? ' (depending on the visit).' : '.') : (state.sitters.length ? ' We’ll match you with a free sitter and show who it is in your client portal.' : '');
       el('success-text').textContent = 'Your request for ' + what + ' is in.' + sitterLine + ' Pay below to lock it in, and you will receive a confirmation by text or email once your payment arrives.' +
         (isNew && !hadMeet ? ' Since you are new, we also do a free meet-and-greet before your first visit. Pick a time below, or we will reach out to set one up.' : '');
       el('book-meet').hidden = !(isNew && !hadMeet);

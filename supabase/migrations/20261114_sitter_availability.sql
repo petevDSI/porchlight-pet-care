@@ -434,17 +434,17 @@ end $$;
 
 create or replace function public.porchlight_sitter_claim(p_key uuid)
 returns integer language plpgsql security definer set search_path to 'public' as $$
-declare s public.porchlight_sitters; n integer; c record; why text;
+declare s public.porchlight_sitters; n integer; cand record; why text;
 begin
   select * into s from public.porchlight_sitters where id = public.porchlight_my_sitter_id() for update;
   if s.id is null or s.status <> 'active' then
     raise exception 'Your sitter account is not active. Contact Porchlight.';
   end if;
-  for c in select * from public.porchlight_bookings
+  for cand in select * from public.porchlight_bookings
             where (group_id = p_key or id = p_key) and sitter_id is null
               and status in ('requested', 'confirmed') and start_at > now()
   loop
-    why := public.porchlight_sitter_conflict(s.id, c.service_id, c.town_id, c.start_at, c.end_at, c.lat, c.lng);
+    why := public.porchlight_sitter_conflict(s.id, cand.service_id, cand.town_id, cand.start_at, cand.end_at, cand.lat, cand.lng);
     if why is not null then
       raise exception 'That does not fit your availability (%). Update your hours on the Availability tab or skip this one.', why;
     end if;

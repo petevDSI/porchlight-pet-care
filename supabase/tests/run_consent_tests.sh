@@ -10,6 +10,8 @@ trap 'psql $P -qc "drop database $DB" postgres >/dev/null 2>&1 || true' EXIT
 node tools/build-legal.js >/dev/null
 node supabase/tests/make_vars.js > /tmp/consent_vars.sql
 psql $P -q -v ON_ERROR_STOP=1 -d $DB -f supabase/tests/stub_schema.sql
+psql $P -q -v ON_ERROR_STOP=1 -d $DB -f supabase/migrations/20261116_sitter_rates.sql
+psql $P -q -v ON_ERROR_STOP=1 -d $DB -f supabase/migrations/20261120_privacy_retention.sql
 psql $P -q -v ON_ERROR_STOP=1 -d $DB -f supabase/migrations/20261117_consent_logging.sql
 psql $P -q -v ON_ERROR_STOP=1 -d $DB -f supabase/migrations/20261118_legal_doc_versions.sql
 psql $P -q -v ON_ERROR_STOP=1 -d $DB -f /tmp/consent_vars.sql -f supabase/tests/consent_logging_test.sql
@@ -17,7 +19,15 @@ psql $P -q -v ON_ERROR_STOP=1 -d $DB -f /tmp/consent_vars.sql -f supabase/tests/
 DB2=${DB}_enforce
 psql $P -qc "create database $DB2" postgres
 trap 'psql $P -qc "drop database $DB" postgres >/dev/null 2>&1 || true; psql $P -qc "drop database $DB2" postgres >/dev/null 2>&1 || true' EXIT
-for f in supabase/tests/stub_schema.sql supabase/migrations/20261117_consent_logging.sql supabase/migrations/20261118_legal_doc_versions.sql supabase/migrations/20261119_require_consent.sql; do
+for f in supabase/tests/stub_schema.sql supabase/migrations/20261116_sitter_rates.sql supabase/migrations/20261120_privacy_retention.sql supabase/migrations/20261117_consent_logging.sql supabase/migrations/20261118_legal_doc_versions.sql supabase/migrations/20261121_require_consent.sql; do
   psql $P -q -v ON_ERROR_STOP=1 -d $DB2 -f $f 2>&1 | grep -v "does not exist, skipping" || true
 done
 psql $P -q -v ON_ERROR_STOP=1 -d $DB2 -f /tmp/consent_vars.sql -f supabase/tests/enforce_test.sql
+# Rates, fees, payouts and privacy run on their own fresh database (the main tests publish a fake newer document version).
+DB3=${DB}_rates
+psql $P -qc "create database $DB3" postgres
+trap 'psql $P -qc "drop database $DB" postgres >/dev/null 2>&1 || true; psql $P -qc "drop database $DB2" postgres >/dev/null 2>&1 || true; psql $P -qc "drop database $DB3" postgres >/dev/null 2>&1 || true' EXIT
+for f in supabase/tests/stub_schema.sql supabase/migrations/20261116_sitter_rates.sql supabase/migrations/20261120_privacy_retention.sql supabase/migrations/20261117_consent_logging.sql supabase/migrations/20261118_legal_doc_versions.sql; do
+  psql $P -q -v ON_ERROR_STOP=1 -d $DB3 -f $f 2>&1 | grep -v "does not exist, skipping" || true
+done
+psql $P -q -v ON_ERROR_STOP=1 -d $DB3 -f /tmp/consent_vars.sql -f supabase/tests/rates_privacy_test.sql

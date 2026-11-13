@@ -5,8 +5,8 @@ insert into public.porchlight_legal_docs (doc_key, version, title, sha256, url) 
   ('bgcheck', '2026-11-13.3', 'Background Check Disclosure and Authorization', 'f63ed92b17a75d7e3984c81e9a4441a3cfda474abf6549d8db449852e2fd6b3b', '/legal/background-check-disclosure'),
   ('home-safety', '2026-11-13.3', 'Home Standards, Cameras and Safety Policy', '238ac00f9dd3db614bababd14d05f3fa560ac9c62035689ea040dad01158de85', '/legal/home-standards-and-safety'),
   ('overnight', '2026-11-13.3', 'Overnight Stay Addendum', 'bfbe47e9cda258e1527fa2984019a8a9230a2e0d58676cbf914b96a092baf068', '/legal/overnight-addendum'),
-  ('owner', '2026-11-13.3', 'Owner Service Agreement and Release', '17de8b53af36d58019c6cb6da36a7ab7472c1653d02965d41483896d7063ec63', '/legal/owner-agreement'),
-  ('privacy', '2026-11-13.3', 'Privacy Policy', 'a485b4e320d9ce40fb0e991d691898cd1bc83d91ce57b6d5dc0705ed7b67aea8', '/legal/privacy-policy'),
-  ('sitter', '2026-11-13.3', 'Independent Sitter Agreement', '2a8ebc95dda5f96bd370bf22e24d3f3b2e9d38851aed5f28512674a24063f82c', '/legal/sitter-agreement'),
-  ('terms', '2026-11-13.3', 'Terms of Service', '33cef0f94e16d49241228b608a3535132e1721fcd70e04f784e2e21e160d2a38', '/legal/terms-of-service')
+  ('owner', '2026-11-13.4', 'Owner Service Agreement and Release', 'aade417b2f12a7cb4446a69b3ff92fcb0c4b082054ad9248eec4e7928f2f7788', '/legal/owner-agreement'),
+  ('privacy', '2026-11-13.4', 'Privacy Policy', 'e97fe8ee67ff65391b79e9acc009cfb63cf9e10ce0b27611219fe36d05378cee', '/legal/privacy-policy'),
+  ('sitter', '2026-11-13.4', 'Independent Sitter Agreement', 'b39c5b8678a4ab304fdf3dbc67b7194d80d1cfdc3ca9b2499ed7cceb042f7b29', '/legal/sitter-agreement'),
+  ('terms', '2026-11-13.4', 'Terms of Service', '339793e45ff49ee29d25999d5ea148ee8c29d2b76651bd192f3e06f9bed1c312', '/legal/terms-of-service')
 on conflict (doc_key, version) do nothing;

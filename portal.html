@@ -34,8 +34,11 @@
     taxi: 'Pet taxi, one way', taxi_rt: 'Pet taxi, round trip' };
   var QUOTE_LABEL = { flight: 'Flight companion', transport: 'Pet transport', local: 'Outside-area care', event: 'Wedding / event attendant' };
   var DISC = 0;
-  var PAY_METHODS = [['cash', 'Cash'], ['check', 'Check'], ['venmo', 'Venmo'], ['zelle', 'Zelle'], ['other', 'Other']];
-  var PAY_LABEL = { cash: 'Cash', check: 'Check', venmo: 'Venmo', zelle: 'Zelle', card: 'Card', other: 'Other' };
+  // Clients pay by card through the site. Staff can only log a card payment taken by hand or an adjustment.
+  var PAY_METHODS = [['card', 'Card'], ['other', 'Other / adjustment']];
+  var PAYOUT_METHODS = [['bank', 'Bank transfer (ACH)'], ['stripe', 'Stripe payout'], ['other', 'Other']];
+  // Older records may still show a method that is no longer offered.
+  var PAY_LABEL = { cash: 'Cash', check: 'Check', venmo: 'Venmo', zelle: 'Zelle', card: 'Card', bank: 'Bank transfer', stripe: 'Stripe', other: 'Other' };
   function isTaxi(id) { return id === 'taxi' || id === 'taxi_rt'; }
   function usd(cents) { return '$' + (cents / 100).toFixed(cents % 100 ? 2 : 0); }
   var BOOKING_SELECT = 'id,created_at,start_at,end_at,status,service_id,town_id,group_id,series_label,client_id,client_name,client_email,client_phone,street_address,dropoff_address,pets,notes,is_new_client,staff_notes,' +
@@ -450,7 +453,7 @@
 
   /* ================= Sitters (contracted sitters: open requests, schedule, earnings) ================= */
   function sitterTabs(current) {
-    return tabs([['#/open', 'open', 'Open requests'], ['#/schedule', 'schedule', 'My schedule'], ['#/availability', 'availability', 'Availability'], ['#/earnings', 'earnings', 'Earnings'], ['#/profile', 'profile', 'Profile']], current);
+    return tabs([['#/open', 'open', 'Open requests'], ['#/schedule', 'schedule', 'My schedule'], ['#/availability', 'availability', 'Availability'], ['#/rates', 'rates', 'My rates'], ['#/earnings', 'earnings', 'Earnings'], ['#/profile', 'profile', 'Profile']], current);
   }
   function navTabs(current) { return me && me.is_staff ? staffTabs(current) : sitterTabs(current); }
 
@@ -460,6 +463,7 @@
     Promise.resolve().then(function () {
       if (p[0] === 'visit' && p[1]) return staffVisit(p[1]);
       if (p[0] === 'availability') return sitterAvailability();
+      if (p[0] === 'rates') return sitterRates();
       if (p[0] === 'earnings') return sitterEarnings();
       if (p[0] === 'profile') return sitterProfile();
       if (p[0] === 'schedule') return sitterSchedule();
@@ -554,7 +558,7 @@
     var root = page();
     root.appendChild(sitterTabs('earnings'));
     root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Earnings' }));
-    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'You keep ' + (me.sitter ? me.sitter.keep_pct : 88) + '% of what the client pays for each visit, and 100% of tips. A visit counts once you’ve marked it done and the client’s payment is recorded. Porchlight pays you out by the method in your profile.' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'You earn what the client pays you for each visit, minus Porchlight’s fee, plus 100% of tips and any extra-animal charges. A visit counts once you’ve marked it done and the client’s payment is recorded. Porchlight pays you out by the method in your profile.' }));
     var box = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(box);
     sb.rpc('porchlight_sitter_earnings').then(guard).then(function (rows) {
@@ -577,7 +581,7 @@
         list.appendChild(h('div', { class: 'item' },
           h('div', { class: 'time', text: P.fmtDay(e.start_at) }),
           h('div', { class: 'main' }, h('strong', { text: SERVICE_LABEL[e.service_id] || e.service_id }),
-            h('div', { class: 'small muted', text: 'Client paid ' + usd(e.collected_cents) + (e.tip_cents ? ' + ' + usd(e.tip_cents) + ' tip' : '') + ' · you keep ' + e.keep_pct + '%' })),
+            h('div', { class: 'small muted', text: 'Client paid ' + usd(e.collected_cents) + (e.tip_cents ? ' + ' + usd(e.tip_cents) + ' tip' : '') + ' · Porchlight fee ' + usd(e.fee_cents || 0) })),
           h('div', { class: 'acts' }, h('strong', { text: usd(e.share_cents) }), state)));
       });
       box.appendChild(list);
@@ -710,6 +714,40 @@
     }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
   }
 
+  /* ---- sitter: set your own prices ---- */
+  function sitterRates() {
+    var root = page();
+    root.appendChild(sitterTabs('rates'));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'My rates' }));
+    var box = h('div', { class: 'stack narrow' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(box);
+    sb.rpc('porchlight_my_rates').then(guard).then(function (r) {
+      P.clear(box);
+      box.appendChild(h('p', { class: 'muted', text: 'Everyone starts at Porchlight’s suggested price. You can charge more or less, in whole dollars, within the range shown. Porchlight keeps a minimum fee on every visit, based on the suggested price. If you charge less than suggested, the minimum comes out of your pay. If you charge more, Porchlight’s fee grows with your price (' + r.fee_pct + '%). Extra-animal charges and tips are always 100% yours. Owners see your price on the booking page.' }));
+      (r.services || []).forEach(function (sv) {
+        var cur = sv.mine_cents != null ? sv.mine_cents : sv.suggested_cents;
+        var inp = h('input', { type: 'number', min: String(Math.ceil(sv.min_cents / 100)), max: String(Math.floor(sv.max_cents / 100)), step: '1', value: String(cur / 100), 'aria-label': sv.label + ' price in dollars', style: 'max-width:100px' });
+        var take = h('span', { class: 'small' });
+        function fee(c) { return Math.min(c, Math.max(sv.min_fee_cents, Math.round(c * r.fee_pct / 100))); }
+        function show() {
+          var c = Math.round(parseFloat(inp.value) * 100);
+          take.textContent = isNaN(c) ? '' : 'You take home ' + usd(Math.max(c - fee(c), 0)) + ' (Porchlight fee ' + usd(fee(c)) + ')';
+        }
+        inp.addEventListener('input', show); show();
+        var save = h('button', { class: 'btn sm', type: 'button', text: 'Save', onclick: function () {
+          var c = Math.round(parseFloat(inp.value) * 100);
+          if (isNaN(c)) { P.toast('Enter a price in whole dollars'); return; }
+          save.disabled = true;
+          sb.rpc('porchlight_set_sitter_rate', { p_service: sv.service_id, p_cents: c === sv.suggested_cents ? null : c }).then(guard)
+            .then(function () { P.toast('Saved'); save.disabled = false; }).catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
+        } });
+        box.appendChild(h('section', { class: 'panel stack' },
+          h('div', { class: 'spread' }, h('strong', { text: sv.label }), h('span', { class: 'small muted', text: 'Suggested ' + usd(sv.suggested_cents) + ' · allowed ' + usd(sv.min_cents) + ' to ' + usd(sv.max_cents) })),
+          h('div', { class: 'row' }, h('span', { text: '$' }), inp, save), take));
+      });
+    }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
+  }
+
   function sitterProfile() {
     var root = page();
     root.appendChild(sitterTabs('profile'));
@@ -720,20 +758,19 @@
       P.clear(box);
       var phone = h('input', { id: 'sp-phone', type: 'tel', value: s.phone || '' });
       var method = h('select', { id: 'sp-method' }); method.appendChild(h('option', { value: '', text: 'Choose…' }));
-      PAY_METHODS.forEach(function (m) { var o = h('option', { value: m[0], text: m[1] }); if (m[0] === s.payout_method) o.selected = true; method.appendChild(o); });
-      var handle = h('input', { id: 'sp-handle', type: 'text', value: s.payout_handle || '', placeholder: 'Venmo @name, Zelle phone or email, or mailing address for a check' });
+      PAYOUT_METHODS.forEach(function (m) { var o = h('option', { value: m[0], text: m[1] }); if (m[0] === s.payout_method) o.selected = true; method.appendChild(o); });
       var paused = h('input', { id: 'sp-paused', type: 'checkbox' }); paused.checked = s.status === 'paused';
       var save = h('button', { class: 'btn', type: 'button', text: 'Save', onclick: function () {
         save.disabled = true;
-        sb.rpc('porchlight_sitter_update_me', { p_phone: phone.value, p_method: method.value || null, p_handle: handle.value, p_paused: paused.checked }).then(guard)
+        sb.rpc('porchlight_sitter_update_me', { p_phone: phone.value, p_method: method.value || null, p_handle: null, p_paused: paused.checked }).then(guard)
           .then(function () { P.toast('Saved'); me.sitter.status = paused.checked ? 'paused' : 'active'; save.disabled = false; })
           .catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
       } });
       box.appendChild(h('p', null, h('strong', { text: s.name }), ' · ' + s.email));
-      box.appendChild(h('p', { class: 'small muted', text: 'Towns: ' + (s.towns.length ? s.towns.map(P.townName).join(', ') : 'all') + ' · You keep ' + s.keep_pct + '%. To change either, contact Porchlight.' }));
+      box.appendChild(h('p', { class: 'small muted', text: 'Towns: ' + (s.towns.length ? s.towns.map(P.townName).join(', ') : 'all') + '. To change your towns, contact Porchlight.' }));
       box.appendChild(h('label', { class: 'f', for: 'sp-phone' }, 'Phone', phone));
       box.appendChild(h('label', { class: 'f', for: 'sp-method' }, 'How should we pay you?', method));
-      box.appendChild(h('label', { class: 'f', for: 'sp-handle' }, 'Payout details', handle));
+      box.appendChild(h('p', { class: 'small muted', text: 'Porchlight pays you after each completed visit, out of the client’s payment. Bank details are collected securely by our payment provider when you are set up. Never email or text them to us.' }));
       box.appendChild(h('label', { class: 'small', style: 'display:flex;gap:8px;align-items:center' }, paused, 'Pause my account (no new requests while you’re away)'));
       box.appendChild(save);
     }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
@@ -787,13 +824,13 @@
   var SITTER_SERVICES = [['meet', 'Meet & greet'], ['walk', 'Dog walk'], ['visit', 'Drop-in'], ['overnight', 'Overnight'], ['home', 'Home check'], ['taxi', 'Taxi'], ['taxi_rt', 'Taxi round trip']];
 
   function approvePanel(a) {
-    var keep = h('input', { type: 'number', min: '50', max: '100', step: '1', value: '88', 'aria-label': 'Percent the sitter keeps', style: 'max-width:90px' });
+    var keep = { value: '88' }; // legacy field; pay now follows each sitter's own rates and Porchlight's fee
     var towns = checkRow('Towns this sitter covers', P.TOWNS, []);
     var panel = h('div', { class: 'panel stack', style: 'margin-top:10px' });
     var btn = h('button', { class: 'btn sm', type: 'button', text: 'Approve and create sitter account', onclick: function () {
       var k = parseInt(keep.value, 10);
       if (!(k >= 50 && k <= 100)) { P.toast('Enter a percentage from 50 to 100'); return; }
-      if (!confirm('Approve ' + a.name + ' as a sitter keeping ' + k + '%?')) return;
+      if (!confirm('Approve ' + a.name + ' as a sitter?')) return;
       btn.disabled = true;
       sb.rpc('porchlight_approve_applicant', { p_app: a.id, p_towns: towns.picked(), p_keep: k }).then(guard).then(function () {
         P.clear(panel);
@@ -805,7 +842,7 @@
     panel.appendChild(h('strong', { text: 'Approve as a sitter' }));
     panel.appendChild(h('p', { class: 'small muted', text: 'Run your interview and background check first. No towns checked means all towns.' }));
     panel.appendChild(towns);
-    panel.appendChild(h('div', { class: 'row small' }, h('label', null, 'Sitter keeps ', keep, ' % of each booking'), btn));
+    panel.appendChild(h('div', { class: 'row small' }, btn));
     return panel;
   }
 
@@ -837,15 +874,12 @@
   function sitterRow(s) {
     var status = h('select', { 'aria-label': 'Status', style: 'max-width:150px' });
     ['active', 'paused', 'removed'].forEach(function (v) { var o = h('option', { value: v, text: v }); if (v === s.status) o.selected = true; status.appendChild(o); });
-    var keep = h('input', { type: 'number', min: '50', max: '100', step: '1', value: String(s.keep_pct), 'aria-label': 'Percent kept', style: 'max-width:80px' });
     var towns = checkRow('Towns', P.TOWNS, s.towns);
     var svcs = checkRow('Services', SITTER_SERVICES, s.services);
     var notes = h('textarea', { 'aria-label': 'Your notes', rows: 2, placeholder: 'Your notes' }); notes.value = s.staff_notes || '';
     var save = h('button', { class: 'btn sm', type: 'button', text: 'Save', onclick: function () {
-      var k = parseInt(keep.value, 10);
-      if (!(k >= 50 && k <= 100)) { P.toast('Enter a percentage from 50 to 100'); return; }
       save.disabled = true;
-      sb.from('porchlight_sitters').update({ status: status.value, keep_pct: k, towns: towns.picked(), services: svcs.picked(), staff_notes: notes.value.trim() || null, updated_at: new Date().toISOString() })
+      sb.from('porchlight_sitters').update({ status: status.value, towns: towns.picked(), services: svcs.picked(), staff_notes: notes.value.trim() || null, updated_at: new Date().toISOString() })
         .eq('id', s.id).then(guard).then(function () { P.toast('Saved'); save.disabled = false; }).catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
     } });
     return h('div', { class: 'item' },
@@ -855,7 +889,7 @@
         h('div', { class: 'small muted', text: s.payout_method ? 'Pay by ' + s.payout_method + (s.payout_handle ? ': ' + s.payout_handle : '') : 'No payout method yet' }),
         h('div', { class: 'small', style: 'margin-top:8px', text: 'Towns' }), towns,
         h('div', { class: 'small', style: 'margin-top:8px', text: 'Services' }), svcs,
-        h('div', { class: 'row', style: 'margin-top:8px' }, status, h('label', { class: 'small' }, 'Keeps ', keep, ' %'), save,
+        h('div', { class: 'row', style: 'margin-top:8px' }, status, save,
           h('a', { class: 'btn ghost sm', href: '#/sitters?v=hours&id=' + s.id, text: 'Hours, days off & photo' })),
         h('div', { style: 'margin-top:8px' }, notes)));
   }
@@ -865,7 +899,7 @@
     root.appendChild(staffTabs('sitters'));
     root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Sitter payouts' }));
     root.appendChild(sittersNav('payouts'));
-    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:12px', text: 'A sitter is owed their share once the visit is marked done and the client’s payment is recorded in Payments. Send the money first (Venmo, Zelle, check or cash), then record it here so it isn’t paid twice.' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:12px', text: 'A sitter is owed their share once the visit is marked done and the client’s payment is recorded in Payments. Pay the sitter from Porchlight’s account (bank transfer or Stripe), then record it here so it isn’t paid twice. Each visit’s share is the client’s payment minus Porchlight’s fee, plus tips.' }));
     var box = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(box);
     Promise.all([
@@ -877,10 +911,10 @@
       if (!res[0].length) list.appendChild(h('div', { class: 'empty', text: 'No sitters yet.' }));
       res[0].forEach(function (b) {
         var method = h('select', { 'aria-label': 'How you paid', style: 'max-width:130px' });
-        PAY_METHODS.forEach(function (m) { var o = h('option', { value: m[0], text: m[1] }); if (m[0] === b.payout_method) o.selected = true; method.appendChild(o); });
-        var ref = h('input', { type: 'text', placeholder: 'Reference or check number', 'aria-label': 'Reference', style: 'max-width:220px' });
+        PAYOUT_METHODS.forEach(function (m) { var o = h('option', { value: m[0], text: m[1] }); if (m[0] === b.payout_method) o.selected = true; method.appendChild(o); });
+        var ref = h('input', { type: 'text', placeholder: 'Transfer reference', 'aria-label': 'Reference', style: 'max-width:220px' });
         var pay = h('button', { class: 'btn sm', type: 'button', text: 'Record payout of ' + usd(b.owed_cents), onclick: function () {
-          if (!confirm('Record a ' + usd(b.owed_cents) + ' payout to ' + b.name + '? Only do this after you have sent the money.')) return;
+          if (!confirm('Record a ' + usd(b.owed_cents) + ' payout to ' + b.name + '? Only do this after you have sent the money from Porchlight’s account.')) return;
           pay.disabled = true;
           sb.rpc('porchlight_record_payout', { p_sitter: b.sitter_id, p_method: method.value, p_reference: ref.value, p_note: null }).then(guard)
             .then(function () { P.toast('Payout recorded'); render(); }).catch(function (e) { P.toast(P.errMsg(e)); pay.disabled = false; });
@@ -889,7 +923,7 @@
           h('div', { class: 'main' },
             h('div', { class: 'row' }, h('strong', { text: b.name }), b.status !== 'active' ? h('span', { class: 'chip inactive', text: b.status }) : null),
             h('div', { text: 'Owed ' + usd(b.owed_cents) + ' for ' + b.owed_visits + (b.owed_visits === 1 ? ' visit' : ' visits') + ' · paid out so far ' + usd(b.paid_cents) }),
-            h('div', { class: 'small muted', text: b.payout_method ? 'Prefers ' + b.payout_method + (b.payout_handle ? ': ' + b.payout_handle : '') : 'No payout method on file' }),
+            h('div', { class: 'small muted', text: b.payout_method ? 'Paid by ' + (PAY_LABEL[b.payout_method] || b.payout_method) : 'No payout method on file' }),
             b.owed_cents > 0 ? h('div', { class: 'row', style: 'margin-top:8px' }, method, ref, pay) : null)));
       });
       box.appendChild(list);
@@ -905,12 +939,12 @@
     }).catch(function (e) { P.clear(box).appendChild(notice('err', P.errMsg(e))); });
   }
 
-  /* ================= Payments (cash, check, Venmo, Zelle) ================= */
+  /* ================= Payments (card only, through the site) ================= */
   function staffPayments() {
     var root = page();
     root.appendChild(staffTabs('payments'));
     root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Payments' }));
-    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Upcoming and completed visits that haven’t been paid yet, grouped by client. Clients pay up front by Venmo or Zelle; when it arrives, record it here and then confirm their visits. Waiting-time fees show up as a balance after the ride.' }));
+    root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Upcoming and completed visits that haven’t been paid yet, grouped by client. Clients pay by card through the site and each payment is recorded automatically. Use this screen to see balances or log an adjustment. Waiting-time fees show up as a balance after the ride.' }));
     root.appendChild(paySettingsPanel());
     var box = h('div', { class: 'stack' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(box);
@@ -954,7 +988,7 @@
               .then(function () { P.toast('Tip recorded'); render(); }).catch(function (e) { P.toast(P.errMsg(e)); got.disabled = false; });
           } });
           tl.appendChild(h('div', { class: 'item' }, h('div', { class: 'time', text: P.fmtDay(b.start_at) }),
-            h('div', { class: 'main' }, h('strong', { text: who + ' says they sent a ' + usd(b.tip_sent_cents) + ' tip' }), h('div', { class: 'small muted', text: 'via ' + (PAY_LABEL[b.tip_sent_method] || b.tip_sent_method) + '. Check your Venmo/Zelle, then tap Got it.' })), got));
+            h('div', { class: 'main' }, h('strong', { text: who + ' says they sent a ' + usd(b.tip_sent_cents) + ' tip' }), h('div', { class: 'small muted', text: 'via ' + (PAY_LABEL[b.tip_sent_method] || b.tip_sent_method) + '. Confirm it arrived, then tap Got it.' })), got));
         });
         box.appendChild(h('section', { class: 'stack' }, h('h2', { class: 'display', style: 'font-size:22px', text: 'Tips to confirm' }), tl));
       }
@@ -974,23 +1008,22 @@
   }
 
   function paySettingsPanel() {
-    var wrap = h('details', { class: 'panel', style: 'margin-bottom:16px' }, h('summary', { text: 'How clients pay you (Venmo, Zelle, card)' }));
+    var wrap = h('details', { class: 'panel', style: 'margin-bottom:16px' }, h('summary', { text: 'Card payments and fees' }));
     sb.from('porchlight_pay_settings').select('*').eq('id', 'main').then(guard).then(function (rows) {
       var st = rows[0] || {};
-      var venmo = h('input', { value: st.venmo_handle || '', placeholder: 'Venmo username, no @', maxlength: '60', 'aria-label': 'Venmo username' });
-      var zelle = h('input', { value: st.zelle_contact || '', placeholder: 'Phone or email linked to Zelle', maxlength: '80', 'aria-label': 'Zelle phone or email' });
-      var fee = h('input', { type: 'number', min: '0', max: '50', step: '0.5', value: ((st.discount_cents != null ? st.discount_cents : 500) / 100).toFixed(2), 'aria-label': 'Discount in dollars', style: 'max-width:100px' });
       var card = h('input', { type: 'checkbox', id: 'card-on' }); card.checked = !!st.card_enabled;
+      var pct = h('input', { type: 'number', min: '0', max: '50', step: '1', value: String(st.fee_pct != null ? st.fee_pct : 12), 'aria-label': 'Porchlight fee percent', style: 'max-width:80px' });
+      var lo = h('input', { type: 'number', min: '10', max: '100', step: '5', value: String(st.rate_floor_pct != null ? st.rate_floor_pct : 50), 'aria-label': 'Lowest rate percent of suggested', style: 'max-width:80px' });
+      var hi = h('input', { type: 'number', min: '100', max: '500', step: '5', value: String(st.rate_cap_pct != null ? st.rate_cap_pct : 200), 'aria-label': 'Highest rate percent of suggested', style: 'max-width:80px' });
       var save = h('button', { class: 'btn sm', type: 'button', text: 'Save', onclick: function () {
-        var f = Math.round(parseFloat(fee.value) * 100); if (isNaN(f) || f < 0) { P.toast('Enter the discount in dollars'); return; }
         save.disabled = true;
-        sb.from('porchlight_pay_settings').update({ venmo_handle: venmo.value.trim().replace(/^@/, '') || null, zelle_contact: zelle.value.trim() || null, discount_cents: f, card_fee_cents: 0, card_enabled: card.checked, updated_at: new Date().toISOString() }).eq('id', 'main').then(guard)
-          .then(function () { P.toast('Saved'); save.disabled = false; }).catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
+        sb.from('porchlight_pay_settings').update({ card_enabled: card.checked, fee_pct: parseInt(pct.value, 10), rate_floor_pct: parseInt(lo.value, 10), rate_cap_pct: parseInt(hi.value, 10), updated_at: new Date().toISOString() }).eq('id', 'main').then(guard)
+          .then(function () { P.toast('Saved. New fees apply to visits assigned from now on.'); save.disabled = false; }).catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
       } });
       wrap.appendChild(h('div', { class: 'stack', style: 'margin-top:10px' },
-        h('p', { class: 'small muted', text: 'Shown to clients right after they book and in their portal. Leave a box empty and we tell clients you will text them details.' }),
-        h('div', { class: 'row' }, venmo, zelle),
-        h('div', { class: 'row' }, h('label', { for: 'card-on', text: 'Accept cards (turn on only after Stripe is connected)' }), card, h('span', { class: 'small', text: 'Discount for Venmo/Zelle/check, per booking $' }), fee),
+        h('p', { class: 'small muted', text: 'Everything is paid by card on this site. Porchlight keeps the greater of (a) this percent of the suggested price and (b) this percent of the sitter’s price, so a sitter who charges less than suggested still pays the minimum. Extra-animal charges go entirely to the sitter.' }),
+        h('div', { class: 'row' }, h('label', { for: 'card-on', text: 'Accept cards (turn on only after Stripe is connected)' }), card),
+        h('div', { class: 'row' }, h('span', { class: 'small', text: 'Porchlight fee %' }), pct, h('span', { class: 'small', text: 'Sitter price range: from' }), lo, h('span', { class: 'small', text: '% to' }), hi, h('span', { class: 'small', text: '% of suggested' })),
         h('div', null, save)));
     }).catch(function () {});
     return wrap;
@@ -1007,20 +1040,19 @@
 
   function unpaidClient(g, rates) {
     var sum = g.items.reduce(function (a, i) { return a + i.cents; }, 0);
-    function discFor(m) { return m === 'card' ? 0 : Math.min(DISC, sum); }
+    function discFor() { return 0; }
     var amount = h('input', { type: 'number', min: '0', step: '0.01', value: ((sum - discFor('cash')) / 100).toFixed(2), 'aria-label': 'Amount received in dollars', style: 'max-width:130px' });
     var planned = g.items.reduce(function (a, i) { return a + (i.tipDone ? 0 : (i.b.tip_cents || 0)); }, 0);
     var tip = h('input', { type: 'number', min: '0', step: '0.01', placeholder: 'Tip $', value: planned ? (planned / 100).toFixed(2) : '', 'aria-label': 'Tip in dollars', style: 'max-width:100px' });
     var method = h('select', { 'aria-label': 'Payment method', style: 'max-width:140px' });
     PAY_METHODS.forEach(function (m) { method.appendChild(h('option', { value: m[0], text: m[1] })); });
     method.addEventListener('change', function () { amount.value = ((sum - discFor(method.value)) / 100).toFixed(2); });
-    var ref = h('input', { maxlength: '80', placeholder: 'Check # or note', 'aria-label': 'Check number or note', style: 'max-width:180px' });
+    var ref = h('input', { maxlength: '80', placeholder: 'Reference or note', 'aria-label': 'Reference or note', style: 'max-width:180px' });
     var btn = h('button', { class: 'btn sm', type: 'button', text: 'Mark paid', onclick: function () {
       var total = Math.round(parseFloat(amount.value) * 100), tipC = tip.value.trim() ? Math.round(parseFloat(tip.value) * 100) : 0;
       if (isNaN(total) || total < 0 || isNaN(tipC) || tipC < 0) { P.toast('Enter the amounts in dollars'); return; }
       // One row per visit. Anything above or below the listed prices (extra pets, holiday fees) goes on the first visit.
-      // The Venmo/Zelle/check discount is applied once per payment and recorded beside the amount so balances still add up.
-      var D = discFor(method.value), amounts = g.items.map(function (i) { return i.cents; });
+            var D = discFor(method.value), amounts = g.items.map(function (i) { return i.cents; });
       amounts[0] += total - (sum - D);
       var left = D, rows = g.items.map(function (i, n) { var d = Math.min(left, amounts[n]); left -= d; return { booking_id: i.b.id, amount_cents: Math.max(0, amounts[n] - d), discount_cents: d, tip_cents: n === 0 ? tipC : 0, method: method.value, reference: ref.value.trim() || null }; });
       if (amounts.some(function (a) { return a < 0; })) { P.toast('That amount is lower than the visits listed. Add up what was paid again.'); return; }
@@ -1329,7 +1361,7 @@
     root.appendChild(h('p', { class: 'muted', text: 'Loading visit…' }));
     sb.from('porchlight_bookings').select('*').eq('id', bookingId).single().then(guard).then(function (b) {
       var jobs = [
-        b.client_id ? sb.from('porchlight_clients').select('*').eq('id', b.client_id).single().then(guard) : Promise.resolve(null),
+        b.client_id ? sb.rpc('porchlight_visit_client', { p_booking: b.id }).then(guard) : Promise.resolve(null),
         b.client_id ? sb.from('porchlight_pets').select('*,porchlight_pet_docs(kind)').eq('client_id', b.client_id).order('sort_order').then(guard) : Promise.resolve([]),
         sb.from('porchlight_visit_reports').select('*').eq('booking_id', b.id).maybeSingle().then(guard),
         b.client_id ? sb.from('porchlight_staff_notes').select('notes').eq('client_id', b.client_id).maybeSingle().then(guard) : Promise.resolve(null)
@@ -1397,6 +1429,7 @@
     // Need-to-know
     if (c) {
       var must = h('section', { class: 'must stack' }, h('h3', { text: 'Getting in' }), P.renderKV(P.FIELDS.access, c, { secretsBold: true, empty: 'No entry details on file. Call the client.' }));
+      if (c.codes_locked) must.appendChild(h('p', { class: 'small' }, 'Door, lockbox and alarm codes and the Wi-Fi password appear here from ' + P.fmtTime(c.codes_from) + ' on ' + P.fmtDay(c.codes_from) + ' until two hours after the visit, for your safety and the client’s. Do not copy them into texts, email or notes.'));
       if (note && note.notes) must.appendChild(h('p', { class: 'small' }, h('strong', { text: 'Your notes: ' }), note.notes));
       col.appendChild(must);
       if (c.home_notes || c.house_rules) col.appendChild(h('section', { class: 'panel stack' }, h('h3', { text: 'Home care' }), P.renderKV(P.FIELDS.home, c)));
@@ -1633,12 +1666,6 @@
   }
 
   var PAY_FN = 'https://ngiwnyoxdcycwotxargm.supabase.co/functions/v1/porchlight-pay';
-  function venmoLine(info) {
-    var bits = [];
-    if (info.venmo) bits.push('Venmo: @' + String(info.venmo).replace(/^@/, ''));
-    if (info.zelle) bits.push('Zelle: ' + info.zelle);
-    return bits.length ? bits.join('  ·  ') + '. Put your name in the note.' : 'We will text you our Venmo and Zelle details, or call 470-424-3183.';
-  }
   function cardCheckout(body, btn, label) {
     btn.disabled = true; btn.textContent = 'Opening secure checkout…';
     sb.auth.getSession().then(function (r) {
@@ -1648,14 +1675,12 @@
       .catch(function (e) { btn.disabled = false; btn.textContent = label; P.toast(e.message); });
   }
   function payPanel(info, cents, ids, visitCents) {
-    var disc = Math.min(info.discount_cents || 0, visitCents || 0), cheaper = cents - disc;
-    var box = h('section', { class: 'panel stack' },
-      h('div', { class: 'spread' }, h('h2', { class: 'display', style: 'font-size:22px', text: 'Payment due to confirm your visits' }), h('strong', { style: 'font-size:24px', text: usd(disc ? cheaper : cents) })),
-      h('p', { text: venmoLine(info) }),
-      h('p', { class: 'small muted', text: (disc ? 'This is your price with the ' + usd(disc) + ' discount for paying by Venmo, Zelle or check (card pays the standard ' + usd(cents) + '). ' : '') + 'To pay by check, text or call 470-424-3183 for where to send it. Cancel at least 24 hours ahead for a full refund. Once your payment arrives we mark your visits paid here.' }));
+        var box = h('section', { class: 'panel stack' },
+      h('div', { class: 'spread' }, h('h2', { class: 'display', style: 'font-size:22px', text: 'Payment due to confirm your visits' }), h('strong', { style: 'font-size:24px', text: usd(cents) })),
+      h('p', { class: 'small muted', text: (info.card_enabled ? 'Pay securely by card below. ' : 'We will email you a secure card payment link. ') + 'Cancel at least 24 hours ahead for a full refund. Once your payment arrives we mark your visits paid here.' }));
     if (info.card_enabled) {
       var label = 'Pay ' + usd(cents) + ' by card';
-      var btn = h('button', { class: 'btn ghost sm', type: 'button', text: label, onclick: function () { cardCheckout({ action: 'checkout', booking_ids: ids }, btn, label); } });
+      var btn = h('button', { class: 'btn sm', type: 'button', text: label, onclick: function () { cardCheckout({ action: 'checkout', booking_ids: ids }, btn, label); } });
       box.appendChild(btn);
     }
     return box;
@@ -1668,23 +1693,16 @@
       row.appendChild(h('button', { class: 'btn ghost sm', type: 'button', text: pct + '% · ' + usd(c), onclick: function () { amt.value = String(c / 100); } }));
     });
     row.appendChild(amt);
-    var method = h('select', { 'aria-label': 'How you will send it', style: 'max-width:160px' });
-    [['venmo', 'Venmo'], ['zelle', 'Zelle'], ['cash', 'Cash']].concat(info.card_enabled ? [['card', 'Card']] : []).forEach(function (m) { method.appendChild(h('option', { value: m[0], text: m[1] })); });
-    var how = h('p', { class: 'small muted', text: venmoLine(info) });
-    method.addEventListener('change', function () { how.textContent = method.value === 'card' ? 'Card tips have no extra fee.' : method.value === 'cash' ? 'Hand it to Kraig or leave it at the door.' : venmoLine(info); });
-    var go = h('button', { class: 'btn sm', type: 'button', text: 'Send tip', onclick: function () {
+    var go = h('button', { class: 'btn sm', type: 'button', text: 'Send tip by card', onclick: function () {
       var cents = Math.round(parseFloat(amt.value) * 100);
       if (isNaN(cents) || cents < 100) { P.toast('Pick an amount of at least $1'); return; }
-      if (method.value === 'card') { cardCheckout({ action: 'tip', booking_id: b.id, cents: cents }, go, 'Send tip'); return; }
-      go.disabled = true;
-      sb.rpc('porchlight_tip_sent', { p_booking: b.id, p_cents: cents, p_method: method.value }).then(guard)
-        .then(function () { P.toast('Thank you! Your sitter will see it.'); P.clear(slot).appendChild(h('p', { class: 'small muted', text: 'Thank you! You told us about a ' + usd(cents) + ' tip.' })); })
-        .catch(function (e) { P.toast(P.errMsg(e)); go.disabled = false; });
+      cardCheckout({ action: 'tip', booking_id: b.id, cents: cents }, go, 'Send tip by card');
     } });
+    if (!info.card_enabled) { go.disabled = true; go.title = 'Card tips open soon'; }
     var cancel = h('button', { class: 'linkbtn', type: 'button', text: 'Not now', onclick: function () { box.remove(); openBtn.hidden = false; } });
     var box = h('div', { class: 'stack', style: 'margin-top:8px' },
       h('p', { class: 'small', text: 'Tips go entirely to your sitter and are always optional. Pet-sitting guides suggest 10 to 20%.' }), row,
-      h('div', { class: 'row' }, method, go, cancel), how);
+      h('div', { class: 'row' }, go, cancel), h('p', { class: 'small muted', text: info.card_enabled ? 'Card tips have no extra fee.' : 'Card tips open when online payments go live.' }));
     return box;
   }
   function paidOf(b) { var p = b.porchlight_payments; return Array.isArray(p) ? p[0] : p; }
@@ -1738,6 +1756,14 @@
     var root = page();
     root.appendChild(clientTabs('info'));
     clientFile(root, me.client_id, false, clientInfo).catch(showError);
+    var rm = h('button', { class: 'btn ghost sm', type: 'button', text: 'Remove my saved door, lockbox, alarm and Wi-Fi codes', onclick: function () {
+      if (!confirm('Remove your saved access codes? Your sitter will need you to share them another way for your next visit.')) return;
+      rm.disabled = true;
+      sb.rpc('porchlight_clear_my_codes').then(guard).then(function () { P.toast('Access codes removed'); clientInfo(); })
+        .catch(function (e) { P.toast(P.errMsg(e)); rm.disabled = false; });
+    } });
+    root.appendChild(h('section', { class: 'panel stack', style: 'margin-top:16px' }, h('h3', { text: 'Privacy' }),
+      h('p', { class: 'small muted', text: 'Your sitter sees your codes only from two hours before a visit until two hours after. We also remove them 30 days after your last booking.' }), rm));
   }
 
   start();

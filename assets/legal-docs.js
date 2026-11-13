@@ -27,26 +27,26 @@ window.PorchlightLegal = {
     },
     "owner": {
       "title": "Owner Service Agreement and Release",
-      "version": "2026-11-13.3",
-      "hash": "17de8b53af36d58019c6cb6da36a7ab7472c1653d02965d41483896d7063ec63",
+      "version": "2026-11-13.4",
+      "hash": "aade417b2f12a7cb4446a69b3ff92fcb0c4b082054ad9248eec4e7928f2f7788",
       "url": "/legal/owner-agreement"
     },
     "privacy": {
       "title": "Privacy Policy",
-      "version": "2026-11-13.3",
-      "hash": "a485b4e320d9ce40fb0e991d691898cd1bc83d91ce57b6d5dc0705ed7b67aea8",
+      "version": "2026-11-13.4",
+      "hash": "e97fe8ee67ff65391b79e9acc009cfb63cf9e10ce0b27611219fe36d05378cee",
       "url": "/legal/privacy-policy"
     },
     "sitter": {
       "title": "Independent Sitter Agreement",
-      "version": "2026-11-13.3",
-      "hash": "2a8ebc95dda5f96bd370bf22e24d3f3b2e9d38851aed5f28512674a24063f82c",
+      "version": "2026-11-13.4",
+      "hash": "b39c5b8678a4ab304fdf3dbc67b7194d80d1cfdc3ca9b2499ed7cceb042f7b29",
       "url": "/legal/sitter-agreement"
     },
     "terms": {
       "title": "Terms of Service",
-      "version": "2026-11-13.3",
-      "hash": "33cef0f94e16d49241228b608a3535132e1721fcd70e04f784e2e21e160d2a38",
+      "version": "2026-11-13.4",
+      "hash": "339793e45ff49ee29d25999d5ea148ee8c29d2b76651bd192f3e06f9bed1c312",
       "url": "/legal/terms-of-service"
     }
   }

@@ -1,7 +1,7 @@
 ---
 key: owner
 title: Owner Service Agreement and Release
-version: 2026-11-13.3
+version: 2026-11-13.4
 audience: owners
 summary: What owners promise about their animals and home, what Porchlight and sitters provide, and the release.
 ---
@@ -51,7 +51,7 @@ If an animal dies or is lost while in the sitter's care, the sitter will tell yo
 
 ## 7. Payment, cancellation and charges
 
-- You pay up front when you book at the published prices, plus any additional-animal charge and any holiday charge, all shown before you pay. A tip is optional.
+- You pay up front, by card through the Service, at the price shown for your Sitter when you book (a Sitter may set a price different from Porchlight's suggested price; the suggested price applies if you pick "anyone available"), plus any additional-animal charge and any holiday charge, all shown before you pay. A tip is optional.
 - Cancel at least 24 hours before a visit or stay for a full refund. Later cancellations are billed in full.
 - If the animals or the home turn out to be different from what you told us (for example, an animal you did not list), we may invoice the additional-animal rate shown when you booked for each visit or night we can substantiate. The invoice shows the dates, the rate, the basis and how to dispute it.
 - Taxi waiting time and other published charges that are billed afterward are due when billed.

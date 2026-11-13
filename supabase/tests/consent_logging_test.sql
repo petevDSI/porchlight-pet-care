@@ -39,7 +39,10 @@ select pg_temp.check((select count(*) from public.porchlight_consents where cont
 select pg_temp.check((select bool_and(booking_group_id = (select (j->>'group_id')::uuid from res)) from public.porchlight_consents), 'consents point at the booking group');
 select pg_temp.check((select bool_and(email = 'pat@example.com' and ip = '203.0.113.9' and user_agent = 'TestBrowser/1.0') from public.porchlight_consents), 'email lowercased, IP and browser captured');
 select pg_temp.check((select (details->>'extra_animals')::int = 2 and details->>'cameras' = 'disclosed' from public.porchlight_consents limit 1), 'animal and camera facts stored with the consent');
-select pg_temp.check((select est from public.porchlight_open_requests()) = 3000+1000+9900+1000, 'sitter estimate uses amount due including extra animals');
+insert into public.porchlight_sitters (id, email, name, status) values ('00000000-0000-0000-0000-0000000000a1', 'sit@example.com', 'Sam Sitter', 'active');
+select set_config('test.sitter', '00000000-0000-0000-0000-0000000000a1', false);
+select pg_temp.check((select sum(est_cents) from public.porchlight_open_requests()) = (4000-360) + (10900-1188), 'sitter estimate = amount due minus Porchlight fee, extra animals untouched');
+select set_config('test.sitter', '', false);
 
 -- ---- things that must fail
 set role anon;

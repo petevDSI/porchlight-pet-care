@@ -1,4 +1,4 @@
--- After 20261119_require_consent.sql, the web can only book through the consent wrapper.
+-- After 20261121_require_consent.sql, the web can only book through the consent wrapper.
 \set ON_ERROR_STOP on
 set role anon;
 do $$ begin

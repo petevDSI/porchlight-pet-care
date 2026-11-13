@@ -189,13 +189,34 @@
     var x = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(a.lat * toR) * Math.cos(b.lat * toR) * Math.pow(Math.sin(dLng / 2), 2);
     return 2 * R * Math.asin(Math.sqrt(x));
   };
-  // Best-effort location for check-in/out. Resolves null if the sitter says no or it takes too long.
+  // Best-effort location for check-in/out. A plain-language notice comes first, and the browser's own permission
+  // prompt only appears after the sitter taps "Use my location". Resolves null if they skip it, say no, or it takes too long.
   P.whereAmI = function () {
     return new Promise(function (res) {
       if (!navigator.geolocation) return res(null);
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        res({ lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy || 0) });
-      }, function () { res(null); }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+      var ov = document.createElement('div');
+      ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'loc-ttl');
+      ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999';
+      var card = document.createElement('div');
+      card.style.cssText = 'background:#fff;color:#1b2a3a;max-width:420px;width:100%;border-radius:14px;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.3)';
+      function el(tag, text, css) { var n = document.createElement(tag); n.textContent = text; if (css) n.style.cssText = css; return n; }
+      card.appendChild(el('h2', 'Confirm you are at the home?', 'font-size:20px;margin:0 0 8px')).id = 'loc-ttl';
+      card.appendChild(el('p', 'Porchlight will read your phone’s location one time, right now, to confirm this visit. The client sees only “checked in at your home.” Exact coordinates are seen only by Porchlight staff, are used only to resolve a visit or safety question, and are deleted after 90 days. We never track you between visits.', 'margin:0 0 14px;line-height:1.45'));
+      card.appendChild(el('p', 'After you tap “Use my location,” your phone will ask for permission. You can skip this and contact Porchlight to verify the visit instead.', 'margin:0 0 16px;font-size:14px;opacity:.85'));
+      var row = document.createElement('div'); row.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap';
+      var skip = el('button', 'Skip'); skip.type = 'button'; skip.className = 'btn ghost';
+      var ok = el('button', 'Use my location'); ok.type = 'button'; ok.className = 'btn';
+      row.appendChild(skip); row.appendChild(ok); card.appendChild(row); ov.appendChild(card); document.body.appendChild(ov);
+      ok.focus();
+      function done(v) { if (ov.parentNode) ov.parentNode.removeChild(ov); res(v); }
+      skip.addEventListener('click', function () { done(null); });
+      ov.addEventListener('keydown', function (e) { if (e.key === 'Escape') done(null); });
+      ok.addEventListener('click', function () {
+        ok.disabled = true; ok.textContent = 'Checking…';
+        navigator.geolocation.getCurrentPosition(function (pos) {
+          done({ lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy || 0) });
+        }, function () { done(null); }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+      });
     });
   };
   // A plain calendar date (YYYY-MM-DD), such as a vaccine expiration.

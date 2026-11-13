@@ -25,7 +25,7 @@ Cat sitter rates are set by each sitter or company, so there is no single nation
 - **Holidays:** +$10 per visit
 - **Overnight stay:** $99, with the sitter staying the night
 
-Paying by Venmo, Zelle or check takes $5 off your booking. Current prices are always on the [cat sitting page](/services/cat-sitting).
+You pay securely by card on the site. Current prices are always on the [cat sitting page](/services/cat-sitting).
 
 ## Three example trips
 

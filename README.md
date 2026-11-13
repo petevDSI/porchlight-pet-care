@@ -26,10 +26,10 @@ To give someone sitter access, add their email to `porchlight_staff` after they 
 
 Migration `20261113_sitters.sql` adds `porchlight_sitters`, `porchlight_payouts` and `sitter_id` / `sitter_keep_pct` / `payout_id` on bookings.
 
-- **Onboarding:** an applicant is approved in Portal > Sitters (towns + keep %). That creates the sitter row; they then sign up at /portal with the same email.
+- **Onboarding:** an applicant is approved in Portal > Sitters (towns). That creates the sitter row; they then sign up at /portal with the same email.
 - **Claiming:** sitters see open requests (no client names or addresses) and accept first-come. Claims are race-safe and reject overlapping visits. A sitter can give a visit back up to 24 hours before it starts.
 - **Privacy:** a sitter sees client details only for assigned, confirmed visits, until 3 days after the visit.
-- **Pay:** the sitter keeps `keep_pct` (default 88) of cash actually collected, plus 100% of tips. The percentage is snapshotted when the visit is assigned. Staff record payouts in Portal > Sitters > Payouts after sending the money; each visit is paid once.
+- **Pay:** see "Sitter rates, fee and payouts" below (replaces the old flat `keep_pct`, which now applies only to visits assigned before that change). Staff record payouts in Portal > Sitters > Payouts after sending the money; each visit is paid once.
 
 ### Availability and choosing a sitter
 
@@ -54,8 +54,8 @@ Migration `20261114_sitter_availability.sql` (apply after `20261113_sitters.sql`
 - `porchlight_consents` is append only (updates and deletes are blocked). Each row is one checked box: email, document, version, fingerprint, the exact words next to the box, time, IP address, browser, and the booking, client or sitter it belongs to. Staff see them under Clients > Agreements accepted.
 - Every booking carries its own checked boxes (Terms, Privacy, Owner Agreement, Home Standards, Animals in the Home; overnights add the Overnight Addendum plus a cameras and people-in-the-home statement). New client forms and sitter applications record theirs too. Signed-in people are asked to accept the current versions before using the portal.
 - The site calls `porchlight_book_with_consent`, `porchlight_submit_intake_consent` and `porchlight_apply_sitter_consent`. These run the original function and save the consent in the same transaction, and the database rejects a version or fingerprint that is not the current published one.
-- **Apply in this order:** `20261117_consent_logging.sql`, `20261118_legal_doc_versions.sql` (generated), deploy the site, then `20261119_require_consent.sql`, which closes the original functions to the web so a booking cannot be made without a consent record. Re-run `node tools/build-legal.js` and apply the new `20261118` file after every document change.
-- Tests: `supabase/tests/run_consent_tests.sh` runs the migrations against a throwaway local Postgres (stand-in tables in `stub_schema.sql`) and checks pricing, consent capture, rejection cases, and that the log cannot be edited.
+- **Apply in this order:** `20261116_sitter_rates.sql`, `20261120_privacy_retention.sql`, `20261117_consent_logging.sql`, `20261118_legal_doc_versions.sql` (generated), deploy the site, then `20261121_require_consent.sql`, which closes the original functions to the web so a booking cannot be made without a consent record. Re-run `node tools/build-legal.js` and apply the new `20261118` file after every document change.
+- Tests: `supabase/tests/run_consent_tests.sh` runs the migrations against a throwaway local Postgres (stand-in tables in `stub_schema.sql`) and checks pricing, consent capture, rejection cases, and that the log cannot be edited. It also runs `rates_privacy_test.sql` (fees, sitter rates, payouts, the access-code window and retention) on its own database.
 
 **Additional animals.** Every animal in the home beyond the first is charged `porchlight_pay_settings.extra_animal_cents` (default 500), whether or not the animal is being booked for care, with two exemptions:
 - **Overnights** always charge each additional animal per night (automatic feeders do not change that).
@@ -83,12 +83,25 @@ Prices come from the `porchlight_services` table (`price_cents`). Change them th
 - Clients can skip a stretch of dates in a repeating request (`porchlight_skip_dates`).
 - Requests waiting more than 2 hours get a banner in the portal. Email alerts come once the domain is set up in Resend.
 
+## Sitter rates, fee and payouts (`20261116_sitter_rates.sql`)
+
+- Porchlight publishes a suggested price per service (`porchlight_services.price_cents`). Each sitter starts there and may set their own price for walk, visit, overnight and home in whole dollars, within `rate_floor_pct` to `rate_cap_pct` (default 50% to 200%) of the suggested price. Taxi and the meet and greet are not sitter-priced. Portal > My rates; owners see each sitter's price on the booking page. "Anyone available" pays the suggested price.
+- **Fee** = the greater of the minimum fee (`fee_pct`, default 12%, of the suggested price, so $3.60 on a $30 visit; override per service with `porchlight_services.min_fee_cents`) and `fee_pct` of the sitter's price, never more than the price. A sitter who charges less than suggested still pays the minimum (the shortfall hits the sitter); a sitter who charges more pays a larger fee (Porchlight earns more). Extra-animal charges and tips are 100% the sitter's.
+- The price (`fare_cents`) is set when the booking is made and the fee (`porchlight_fee_cents`) is snapshotted when a sitter is assigned, so later rate or percentage changes never touch past visits. Visits assigned before this change keep the old `keep_pct` rule.
+- Sitters are independent contractors, never W-2 employees. Payouts are recorded by staff as bank transfer, Stripe or other (Stripe Connect automation is future work). Venmo, Zelle, check and cash are not accepted as payout or payment methods.
+
+## Privacy features (`20261120_privacy_retention.sql`)
+
+- Location notice: `P.whereAmI` in `assets/app.js` shows a plain-language notice first; the browser's permission prompt appears only after the sitter taps "Use my location".
+- Access codes: the sitter portal reads the client through `porchlight_visit_client(booking)`. The assigned sitter gets the codes only from 2 hours before to 2 hours after the visit (each reveal logged in `porchlight_access_log`), never the client's email or coordinates, and nothing at all 3 days after the visit. Codes are not in any message, email or export. Clients can remove their codes from Account.
+- Retention: `porchlight_purge_retention()` runs nightly (pg_cron if installed, otherwise schedule it): access codes 30 days after the client's last booking, check-in/out coordinates 90 days after the visit, code-view log 90 days.
+
 ## Rides, trips and payments
 
 - **Pet taxi** (`taxi` one way, `taxi_rt` round trip) books on the normal calendar. The client gives a pickup address and a drop-off address; the drop-off is stored on the booking (`dropoff_address`) and shown to Kraig on the schedule and the visit screen. Prices live in `porchlight_services` and are editable there.
 - **Flight companion** and **pet transport** are quoted per trip. `/quote` sends a request to `porchlight_quotes` through the `porchlight_request_quote` function; Kraig sees them in the portal's **Quotes** tab, records the price he quoted, and moves each through new, quoted, booked, declined or closed.
-- **Payments are due up front.** After booking, clients see the amount and how to pay (Venmo, Zelle, check or card all pay the posted price; the old payment discount is set to $0 and can still be changed in Portal > Payments settings, but sitter shares are calculated on cash collected, so keep it at $0). Kraig sets his Venmo username, Zelle contact, discount and the card on/off switch in the Payments tab ("How clients pay you"). When money arrives he records it in the Payments tab, then confirms the visits. Unpaid requested, confirmed and completed visits all show there. Taxi waiting time is billed after the ride as a balance. The free meet and greet is never charged.
-- **Tips.** A tip can be added at booking (paid with the booking) or after a completed visit: the portal shows a "Leave a tip" button with 10/15/20% suggestions. Venmo, Zelle or cash tips are reported by the client and confirmed by Kraig ("Tips to confirm"). Card tips have no extra fee.
+- **Payments are due up front and are card only, through the site.** Venmo, Zelle, check and cash are gone (the old discount is $0 and the settings were cleared). Until Stripe is switched on, the booking page tells clients we will email a secure payment link. Porchlight pays sitters out of the client payment (see Sitter rates below). Portal > Payments has the card on/off switch, the Porchlight fee percent and the allowed sitter price band.
+- **Tips.** A tip can be added at booking (paid with the booking) or after a completed visit by card (10/15/20% suggestions). Tips go 100% to the sitter and have no extra fee.
 - **Cards (Stripe) are built but switched off.** The `porchlight-pay` edge function creates Stripe Checkout sessions and records payments from Stripe's signed webhook. To turn it on: create a Stripe account, add the secrets `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` in Supabase, point a Stripe webhook for `checkout.session.completed` at `https://ngiwnyoxdcycwotxargm.supabase.co/functions/v1/porchlight-pay`, test with Stripe test keys, then tick "Accept cards". Cards pay the posted (standard) price. Venmo, Zelle, check and cash get a discount (default $5 per booking, set in the Payments tab), which avoids card-network surcharge limits. The discount is stored on each payment (`discount_cents`) so balances add up.
 - Page content for all seven services is in `tools/build-services.js`. Edit there and run `node tools/build-services.js`.
 

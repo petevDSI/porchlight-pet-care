@@ -1,7 +1,7 @@
 ---
 key: terms
 title: Terms of Service
-version: 2026-11-13.3
+version: 2026-11-13.4
 audience: everyone
 summary: The rules for using the Porchlight website, portals and booking system.
 ---
@@ -33,8 +33,8 @@ You must be at least 18 years old and able to form a contract to create an accou
 
 ## 4. Prices, charges and payments
 
-- Prices are the prices posted on our site at the time you book, plus any additional-animal charge (every animal beyond the first on overnights; on walks, drop-ins and check-ins only animals that need care; never fish or reptiles that need no care) and any holiday charge, all shown before you pay. A tip is optional and goes entirely to the Sitter.
-- Payment is due in full when you book. We accept the payment methods shown at checkout. Card payments are processed by Stripe when card payments are turned on. We do not store full card numbers.
+- Porchlight posts a suggested price for each service. A Sitter you choose may set a different price for walks, drop-ins, overnights and home check-ins within the range Porchlight allows, and the Sitter's price is shown on the booking page. The price you see when you book, for the Sitter you choose (or the suggested price if you pick "anyone available"), is the price you pay, plus any additional-animal charge (every animal beyond the first on overnights; on walks, drop-ins and check-ins only animals that need care; never fish or reptiles that need no care) and any holiday charge, all shown before you pay. A tip is optional and goes entirely to the Sitter.
+- Payment is due in full when you book, and all payment is made by card through the Service. Card payments are processed by Stripe. We do not store full card numbers. Porchlight does not accept cash, checks or payment apps, and you should not pay a Sitter directly for a booking. Porchlight pays the Sitter from the amount you pay; our fee comes out of the Sitter's share, never on top of the price you saw.
 - Pet taxi waiting time and other charges that are billed afterward are due when billed.
 - If an additional animal was present and not included in a booking, we may invoice the additional-animal rate shown when you booked for each affected visit or night we can substantiate. The invoice shows the dates, the rate, the basis for the correction and how to dispute it, as the Animals in the Home Policy explains.
 - You authorize us to charge the payment method you choose for the amounts you agreed to at checkout.

@@ -1,7 +1,7 @@
 ---
 key: sitter
 title: Independent Sitter Agreement
-version: 2026-11-13.3
+version: 2026-11-13.4
 audience: sitters
 summary: The independent-contractor terms for sitters working through Porchlight, including conduct, insurance, pay and removal.
 ---
@@ -56,11 +56,13 @@ You agree to:
 
 ## 5. Pay
 
-- The owner pays Porchlight when they book. You keep the percentage of the cash actually collected for a completed visit that is shown in your portal (the "Keep %"), and **100% of tips**.
-- Your Keep % is fixed when a visit is assigned to you. If we change it later, it does not change visits already assigned.
+- **Your price.** Porchlight publishes a suggested price for each service. You start at the suggested price and may set your own price for walks, drop-ins, overnights and home check-ins, in whole dollars, within the range shown in your portal. Owners see your price before they book. Pet taxi prices are set by Porchlight.
+- **Porchlight's fee.** The owner pays Porchlight by card through the Service. Porchlight keeps a fee from your price on each completed visit. The fee is the greater of (a) a minimum fee, calculated as a percentage of the suggested price, and (b) the same percentage of your price. If you charge less than the suggested price, you still pay the minimum fee, so the difference comes out of your share. If you charge more, the fee grows with your price. Your portal shows the fee and your take-home amount before you save a price and on each visit.
+- You receive your price minus the fee, **100% of tips** and **100% of any additional-animal charge**. Your price and the fee are fixed when a visit is assigned to you. If you or we change them later, it does not change visits already assigned.
+- **No payment outside Porchlight.** You will not accept cash, checks or payment apps from an owner for a booking made through Porchlight.
 - The meet-and-greet is unpaid.
-- Staff record a payout after the visit is marked complete and the owner's payment is recorded. Each visit is paid once.
-- Payouts are made on the schedule shown in your portal. Each payout shows the visit, the amount collected, your Keep %, any adjustment and your tips.
+- Porchlight pays you out of the owner's payment (by bank transfer or Stripe) after the visit is marked complete and the owner's payment is recorded. Each visit is paid once.
+- Payouts are made on the schedule shown in your portal. Each payout shows the visit, the amount collected, Porchlight's fee, any adjustment and your tips.
 - Porchlight may adjust a payout only for a specific, documented reason: the owner is refunded because the visit was not completed, the owner's payment is reversed or charged back, or you broke a safety rule or this agreement. We will send you the amount and the reason in writing. You can dispute an adjustment within 14 days, and a person at Porchlight will review it and answer you.
 
 ## 6. Insurance and your responsibility

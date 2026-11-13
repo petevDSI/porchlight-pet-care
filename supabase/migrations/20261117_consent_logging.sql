@@ -13,7 +13,8 @@
 --                               no care are never charged (porchlight_pay_settings.extra_animal_cents, default $5),
 --                               see policy "Animals in the Home".
 --
--- ORDER: apply this, then 20261118_legal_doc_versions.sql (generated), then deploy the site, then 20261119_require_consent.sql.
+-- ORDER: apply 20261116_sitter_rates.sql and 20261120_privacy_retention.sql first, then this, then 20261118_legal_doc_versions.sql
+-- (generated), then deploy the site, then 20261121_require_consent.sql.
 
 -- ---------------------------------------------------------------- legal documents
 
@@ -311,19 +312,26 @@ begin
     p_trip_minutes := nullif(p->>'trip_minutes', '')::int, p_tip_cents := coalesce(nullif(p->>'tip_cents', '')::int, 0));
   gid := (res->>'group_id')::uuid;
 
-  -- Record the animal count and, for in-home services, the additional-animal charge. fare_cents is the amount due
-  -- for the visit (the same field the card checkout and the client portal already use), so the extra animals are
-  -- billed everywhere the visit is billed.
+  -- Record the animal count and price each visit. fare_cents is the amount due for the visit (the same field the
+  -- card checkout and the client portal already use):
+  --   base  = the chosen sitter's own price (or the suggested price when "anyone available"; taxi keeps its trip fare)
+  --   fare  = base + additional-animal charge (the extra-animal charge goes entirely to the sitter)
+  -- Porchlight's fee is snapshotted by the bookings trigger from base alone.
   update public.porchlight_bookings b
      set animals_in_home = v_total,
          animals_note = v_others,
          animals_no_care_fr = v_fr,
          animals_extra_care = v_care,
          cameras_status = v_cam, cameras_note = v_cam_note, people_in_home = v_people,
-         extra_animal_cents = case b.service_id when 'overnight' then v_extra * v_rate when 'walk' then v_extra_visit * v_rate when 'visit' then v_extra_visit * v_rate when 'home' then v_extra_visit * v_rate else 0 end,
-         fare_cents = case when b.service_id = any (svcs) and (case when b.service_id = 'overnight' then v_extra else v_extra_visit end) > 0
-                           then sv.price_cents + (case when b.service_id = 'overnight' then v_extra else v_extra_visit end) * v_rate
-                           else b.fare_cents end
+         extra_animal_cents = case when b.service_id = 'overnight' then v_extra * v_rate
+                                   when b.service_id in ('walk', 'visit', 'home') then v_extra_visit * v_rate else 0 end,
+         fare_cents = case when b.service_id = 'meet' then b.fare_cents
+                           else coalesce(
+                                  case when b.service_id = any (public.porchlight_rateable_services())
+                                       then public.porchlight_sitter_rate(b.sitter_id, b.service_id) end,
+                                  b.fare_cents, sv.price_cents)
+                                + case when b.service_id = 'overnight' then v_extra * v_rate
+                                       when b.service_id in ('walk', 'visit', 'home') then v_extra_visit * v_rate else 0 end end
     from public.porchlight_services sv
    where b.group_id = gid and sv.id = b.service_id;
 
@@ -340,15 +348,3 @@ begin
 end $$;
 revoke all on function public.porchlight_book_with_consent(jsonb) from public;
 grant execute on function public.porchlight_book_with_consent(jsonb) to anon, authenticated;
-
--- ---------------------------------------------------------------- sitters see the real price for the work (extra animals included)
-
--- Estimated take-home on open requests now uses the amount due for the visit (fare_cents when set).
-do $do$
-declare def text;
-begin
-  select pg_get_functiondef('public.porchlight_open_requests()'::regprocedure) into def;
-  if def like '%else sv.price_cents end as price%' then
-    execute replace(def, 'else sv.price_cents end as price', 'else coalesce(b.fare_cents, sv.price_cents) end as price');
-  end if;
-end $do$;

@@ -313,7 +313,7 @@ const SERVICES = [
       ['Do you need my cat’s vaccination records?', 'We ask for a current rabies certificate for every cat before the first visit. You can upload it on the new client form or later from your client portal.'],
       ['What if my cat seems sick while I’m away?', 'We call you right away. With your permission we contact your vet, and our pet taxi can take your cat in if needed.'],
       ['Can you care for my cat and my dog on the same trip?', 'Yes. Each additional pet is +$5 per visit, and you get one report covering everyone.'],
-      ['How much does a cat sitter cost near Belmont?', 'A 30-minute cat visit is $30 for one or two cats, with +$5 for each additional pet and +$10 on holidays. An overnight stay, where your sitter stays the night, is $99. Pay by Venmo, Zelle or check and save $5 on your booking.'],
+      ['How much does a cat sitter cost near Belmont?', 'A 30-minute cat visit is $30 for one or two cats, with +$5 for each additional pet and +$10 on holidays. An overnight stay, where your sitter stays the night, is $99.'],
       ['Can a cat sitter stay overnight?', 'Yes. Overnight stays suit cats who do best with company, such as kittens, seniors, and cats on medication. Your sitter stays in your home from evening to morning for $99 a night.'],
       ['Which towns do you cover for cat sitting?', 'Belmont, Mt. Holly, Cramerton, McAdenville, Lowell, Ranlo and East Gastonia in North Carolina, and Lake Wylie, Clover, York, India Hook and Newport in South Carolina, west of the Catawba River.'],
       ['Is a cat sitter better than boarding?', 'For many cats, yes. Staying home means no carrier ride, no strange smells and no change in food or litter. Boarding can make sense for a cat who needs round-the-clock supervision, and we’re happy to talk through which fits your cat.']
@@ -732,7 +732,7 @@ const SERVICES = [
   }
 ];
 
-const PAY_LINE = 'Payment is due when you book. Pay by Venmo, Zelle or check and save $5 off your booking, or pay the listed price by card. Cancel at least 24 hours ahead for a full refund.';
+const PAY_LINE = 'Payment is due when you book. Venmo, Zelle, check and card all pay the listed price. Cancel at least 24 hours ahead for a full refund.';
 
 /* ---------- Shared chrome ---------- */
 const head = (title, desc, canonical, extra, current) => `<!doctype html>
@@ -884,7 +884,7 @@ ${s.brings.items.map(([b, t]) => `<li>${tick('#14233B')}<div><b>${esc(b)}</b><sp
 <dl class="pricebox">
 ${s.pricing.map(([n, d, p, pid, starting], i) => `<div><dt><b>${esc(n)}</b><span>${esc(d)}</span></dt>` + (starting ? `<dd><small style="font-size:14px;font-weight:600">Starting at </small><span data-price="${pid}">${esc(p)}</span></dd></div>` : `<dd${pid ? ` data-price="${pid}"` : (i === 0 && !s.quote ? ` data-price="${s.id}"` : '')}>${esc(p)}</dd></div>`)).join('\n')}
 </dl>
-${s.payBanner ? `<div class="save-banner"><span class="tag">${esc(s.payBanner[0])}</span><div><b>${esc(s.payBanner[1])}</b><small>${esc(s.payBanner[2])}</small></div></div>` : `<div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price. Payment is due when you book. Cancel at least 24 hours ahead for a full refund.</small></div></div>`}
+${s.payBanner ? `<div class="save-banner"><span class="tag">${esc(s.payBanner[0])}</span><div><b>${esc(s.payBanner[1])}</b><small>${esc(s.payBanner[2])}</small></div></div>` : ''}
 <div class="cta-row" style="margin-top:20px"><a class="btn btn-amber" href="${book}">${esc(s.cta)}</a></div>
 </div></section>
 
@@ -970,7 +970,6 @@ ${t.photos.map(k => `<figure><img src="${PH.src(k, 1000, 640)}" alt="${esc(PH.LI
 <div class="others">
 ${SERVICES.filter(o => !o.quote).map(o => `<a class="other" href="/services/${o.slug}"><img src="${o.gallery[0][0].replace('w=1200&h=800', 'w=600&h=320')}" alt="" loading="lazy"><div><h3>${o.name}</h3><p>From $${o.price} ${esc(o.unit)}</p></div></a>`).join('\n')}
 </div>
-<div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price. Payment is due when you book. Cancel at least 24 hours ahead for a full refund.</small></div></div>
 </div></section>
 
 <section class="section tint"><div class="wrap">

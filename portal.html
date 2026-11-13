@@ -1514,9 +1514,11 @@
     Promise.all([
       sb.from('porchlight_bookings').select('id,start_at,end_at,status,service_id,town_id,group_id,series_label,dropoff_address,fare_cents,tip_cents,tip_sent_cents,porchlight_payments(method,paid_at,amount_cents,tip_cents)').order('start_at', { ascending: false }).limit(100).then(guard),
       sb.from('porchlight_services').select('id,price_cents').then(guard),
-      sb.rpc('porchlight_pay_info').then(guard)
+      sb.rpc('porchlight_pay_info').then(guard),
+      sb.rpc('porchlight_my_visit_sitters').then(function (r) { return r.error ? [] : (r.data || []); }, function () { return []; })
     ]).then(function (res) {
-        var rows = res[0], price = {}, payInfo = res[2] || {};
+        var rows = res[0], price = {}, payInfo = res[2] || {}, sitterOf = {};
+        (res[3] || []).forEach(function (x) { sitterOf[x.booking_id] = x; });
         res[1].forEach(function (s) { price[s.id] = s.price_cents; });
         function dueFor(b) { return b.service_id === 'meet' || paidOf(b) || (b.status !== 'requested' && b.status !== 'confirmed') ? 0 : (b.fare_cents != null ? b.fare_cents : (price[b.service_id] || 0)) + (b.tip_cents || 0); }
         function visitFor(b) { return dueFor(b) ? dueFor(b) - (b.tip_cents || 0) : 0; }
@@ -1582,6 +1584,11 @@
                 (b.service_id === 'overnight' ? P.fmtTime(b.start_at) + ' to morning' : 'arrive ' + P.fmtWindow(b.start_at)) }), chip(b.status),
                 dueNow ? h('span', { class: 'chip requested', text: 'Payment due · ' + usd(dueNow) }) : null,
                 paidOf(b) ? h('span', { class: 'chip completed', text: 'Paid · ' + (PAY_LABEL[paidOf(b).method] || paidOf(b).method) }) : null),
+                sitterOf[b.id] ? h('div', { class: 'row small', style: 'gap:8px;align-items:center;margin-top:4px' },
+                  sitterOf[b.id].photo_path ? h('img', { src: sitterPhotoUrl(sitterOf[b.id].photo_path), alt: '', width: '28', height: '28', style: 'width:28px;height:28px;border-radius:50%;object-fit:cover' }) : null,
+                  h('span', null, 'Your sitter: ', h('strong', { text: sitterOf[b.id].sitter_name })),
+                  sitterOf[b.id].bio ? h('span', { class: 'muted', text: '· ' + sitterOf[b.id].bio }) : null)
+                  : (b.status === 'requested' || b.status === 'confirmed') && b.service_id !== 'meet' ? h('div', { class: 'small muted', text: 'Sitter: we’re matching you with someone nearby and will show their name here.' }) : null,
                 tipBox,
                 isTaxi(b.service_id) && b.dropoff_address ? h('div', { class: 'small muted', text: 'To: ' + b.dropoff_address }) : null,
                 b.series_label ? h('div', { class: 'small muted', text: '↻ ' + b.series_label }) : null),

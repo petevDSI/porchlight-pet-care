@@ -392,7 +392,12 @@ begin
       tip_left := tip_left - share;
     end loop;
   end if;
-  return jsonb_build_object('group_id', gid, 'count', n);
+  return jsonb_build_object('group_id', gid, 'count', n,
+    'sitters', coalesce((select jsonb_agg(distinct coalesce(nullif(trim(x.display_name), ''),
+                           split_part(trim(x.name), ' ', 1) ||
+                           case when position(' ' in trim(x.name)) > 0 then ' ' || left(split_part(trim(x.name), ' ', 2), 1) || '.' else '' end))
+                           from public.porchlight_bookings b2 join public.porchlight_sitters x on x.id = b2.sitter_id
+                          where b2.group_id = gid), '[]'::jsonb));
 end $function$;
 
 -- ---------------------------------------------------------------- sitters only see and accept work they can do

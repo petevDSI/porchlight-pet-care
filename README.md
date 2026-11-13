@@ -41,6 +41,24 @@ Migration `20261114_sitter_availability.sql` (apply after `20261113_sitters.sql`
 - Visits nobody has accepted yet use up capacity, so the site can't sell more simultaneous "anyone" visits than there are free sitters.
 - Until at least one sitter is active, the old single-provider logic runs, so booking keeps working during the switch.
 
+## Legal documents, consent log and additional animals
+
+**The documents** are plain text in `tools/legal/*.md` (Terms of Service, Privacy Policy, Owner Service Agreement and Release, Independent Sitter Agreement, Overnight Stay Addendum, Home Standards, Cameras and Safety Policy, Animals in the Home Policy, Background Check Disclosure). `ATTORNEY-NOTES.md` there lists the questions for a lawyer and is never published.
+
+- Edit a document, change its `version:` line, then run `node tools/build-legal.js`. It writes the public pages in `/legal`, `assets/legal-docs.js` (versions and SHA-256 fingerprints used by the checkboxes) and a migration that registers the new version. If you change the text and forget the version, the script stops.
+- `tools/legal/config.json` has `"draft": true`, which puts a "draft pending legal review" banner on every legal page. Set it to `false` after a lawyer signs off.
+- Changing a version makes the portal ask every affected client and sitter to accept it again at next sign-in.
+
+**The consent log** (`supabase/migrations/20261117_consent_logging.sql`):
+
+- `porchlight_consents` is append only (updates and deletes are blocked). Each row is one checked box: email, document, version, fingerprint, the exact words next to the box, time, IP address, browser, and the booking, client or sitter it belongs to. Staff see them under Clients > Agreements accepted.
+- Every booking carries its own checked boxes (Terms, Privacy, Owner Agreement, Home Standards, Animals in the Home; overnights add the Overnight Addendum plus a cameras and people-in-the-home statement). New client forms and sitter applications record theirs too. Signed-in people are asked to accept the current versions before using the portal.
+- The site calls `porchlight_book_with_consent`, `porchlight_submit_intake_consent` and `porchlight_apply_sitter_consent`. These run the original function and save the consent in the same transaction, and the database rejects a version or fingerprint that is not the current published one.
+- **Apply in this order:** `20261117_consent_logging.sql`, `20261118_legal_doc_versions.sql` (generated), deploy the site, then `20261119_require_consent.sql`, which closes the original functions to the web so a booking cannot be made without a consent record. Re-run `node tools/build-legal.js` and apply the new `20261118` file after every document change.
+- Tests: `supabase/tests/run_consent_tests.sh` runs the migrations against a throwaway local Postgres (stand-in tables in `stub_schema.sql`) and checks pricing, consent capture, rejection cases, and that the log cannot be edited.
+
+**Additional animals.** Every animal in the home beyond the first is charged `porchlight_pay_settings.extra_animal_cents` (default 500) per visit or night on walks, drop-ins, overnights and home check-ins, whether or not the animal is being booked for care. The booking form asks for the number of animals in the home; the database stores it on each booking (`animals_in_home`, `animals_note`, `extra_animal_cents`) and raises `fare_cents` to price plus the extra, which is the amount the card checkout, the client portal and the Payments tab bill. Sitters see the count on the visit screen. To change the rate, update `extra_animal_cents`.
+
 ## Changing prices
 
 Prices come from the `porchlight_services` table (`price_cents`). Change them there; the site reads them on load.

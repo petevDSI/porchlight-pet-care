@@ -34,6 +34,7 @@
 <div id="pets" class="stack"></div>
 <button type="button" class="btn ghost" id="add-pet">+ Add another pet</button>
 <p class="small muted">We ask for a current rabies certificate for every dog and cat before the first visit. If you don't have it handy, send the form anyway and add it later from your client portal.</p>
+<p class="small muted"><strong>List every animal that lives in the home</strong>, including cats, birds, reptiles, fish tanks and any pets that won't need care from us. A sitter in your home looks in on every animal there, so each additional animal is charged for each visit or night. <a href="/legal/animals-in-the-home-policy" target="_blank" rel="noopener">How this works</a></p>
 <p class="small muted">Home check-ins only, no pets? Remove the pet and fill in the access section.</p>
 </section>
 
@@ -52,9 +53,11 @@
 <li>Cancel at least 24 hours before a visit at no charge. Later cancellations are billed in full.</li>
 <li>If your pet needs urgent care and we can't reach you or your backup contact, you authorize Porchlight to take your pet to your vet or emergency clinic, up to the amount you listed above, at your expense.</li>
 <li>Keys are labeled with a code only, never your name or address, and returned on request.</li>
-<li>Porchlight is insured and bonded for pet care.</li>
+<li>Every animal in the home is listed and counted. Each additional animal is charged per visit or night, and sitters look in on every animal.</li>
+<li>No hidden cameras or recording devices, ever. You tell us about every camera, and we keep our hands off your private spaces too.</li>
+<li>The home is clean and safe when we arrive, and your sitter leaves it as found.</li>
 </ul>
-<label class="check"><input type="checkbox" id="agreed"> <span>I've read and agree to these terms.</span></label>
+<div id="consent-mount"></div>
 </section>
 
 <p class="notice err" id="err" role="alert" hidden></p>
@@ -75,6 +78,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="/assets/app.js"></script>
 <script src="/assets/address.js"></script>
+<script src="/assets/legal-docs.js"></script>
+<script src="/assets/consent.js"></script>
 <script>
 (function () {
   var P = window.Porchlight, h = P.h;
@@ -143,6 +148,9 @@
     var e = addPet(); e.form.inputs.name.input.focus();
   });
 
+  var consent = PorchlightConsent.box([PorchlightConsent.groups.owner(), PorchlightConsent.groups.animals()]);
+  document.getElementById('consent-mount').appendChild(consent.el);
+
   var err = document.getElementById('err');
   function fail(msg, focusEl) {
     err.textContent = msg; err.hidden = false;
@@ -159,7 +167,8 @@
       if (pb) return fail('Please fill in: ' + pb.f.label + ' (pet ' + (i + 1) + ').', pb.input);
     }
     if (pets.some(function (p) { return p.picker.busy(); })) return fail('A record is still uploading. Give it a moment, then send the form.');
-    if (!document.getElementById('agreed').checked) return fail('Please agree to the service terms.', document.getElementById('agreed'));
+    var missingBox = consent.missing();
+    if (missingBox) return fail('Please check each agreement box to send the form.', missingBox);
 
     var payload = Object.assign({},
       sections.household.read(), sections.vet.read(), sections.access.read(), sections.home.read(),
@@ -169,7 +178,7 @@
 
     var btn = document.getElementById('submit');
     btn.disabled = true; btn.textContent = 'Sending…';
-    P.sb.rpc('porchlight_submit_intake', { p: payload }).then(function (r) {
+    P.sb.rpc('porchlight_submit_intake_consent', { p: payload, p_consents: consent.items() }).then(function (r) {
       if (r.error) throw r.error;
       document.getElementById('intake').hidden = true;
       document.getElementById('done-email').textContent = payload.email;

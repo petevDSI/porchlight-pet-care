@@ -783,7 +783,7 @@ const footer = () => `
 <div style="max-width:340px"><p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p><p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p></div>
 <div><h4>Services</h4>${SERVICES.map(s => `<a href="/services/${s.slug}">${s.short}</a>`).join('')}</div>
 <div><h4>Areas</h4>${TOWN_PAGES.map(t => `<a href="/areas/${t.slug}">${t.name}, ${t.state}</a>`).join('')}</div>
-<div><h4>Porchlight</h4><a href="/about">Our story</a><a href="/blog">Blog</a><a href="/become-a-pet-sitter">Become a sitter</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">Our story</a><a href="/blog">Blog</a><a href="/become-a-pet-sitter">Become a sitter</a><a href="/intake">New client form</a><a href="/portal">Client login</a><a href="/legal">Terms &amp; policies</a></div>
 <div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
 <div class="foot-base"><p>© 2026 Porchlight Pet &amp; Home Care. Insured and bonded.</p><p>Photos from <a href="https://unsplash.com/?utm_source=porchlight&amp;utm_medium=referral">Unsplash</a></p></div>

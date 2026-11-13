@@ -91,8 +91,8 @@
 <section class="panel stack">
 <h2>Before you send</h2>
 <label class="check"><input type="checkbox" id="adult"> <span>I am 18 or older.</span></label>
-<label class="check"><input type="checkbox" id="bg"> <span>If we move forward, I agree to a background check. It’s required before anyone works with Porchlight clients.</span></label>
-<p class="small muted">Sitters work with Porchlight as independent contractors, not employees. You choose which requests to accept and you’re responsible for your own taxes. We explain how it works in your conversation with us before you start.</p>
+<div id="consent-mount"></div>
+<p class="small muted">Sitters work with Porchlight as independent contractors, not employees. You choose which requests to accept and you’re responsible for your own taxes. Before your first booking you will review and accept the <a href="/legal/sitter-agreement">Independent Sitter Agreement</a>, which explains how it works.</p>
 <div style="position:absolute;left:-9999px;height:0;overflow:hidden" aria-hidden="true"><label>Website <input id="website" tabindex="-1" autocomplete="off"></label></div>
 </section>
 
@@ -111,6 +111,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="/assets/app.js"></script>
+<script src="/assets/legal-docs.js"></script>
+<script src="/assets/consent.js"></script>
 <script>
 (function () {
   var P = window.Porchlight;
@@ -118,6 +120,9 @@
   var err = $('err');
   function fail(msg, el) { err.textContent = msg; err.hidden = false; if (el) { el.focus(); el.scrollIntoView({ block: 'center' }); } else err.scrollIntoView({ block: 'center' }); }
   function picked(name) { return Array.prototype.map.call(document.querySelectorAll('input[name=' + name + ']:checked'), function (n) { return n.value; }); }
+
+  var consent = PorchlightConsent.box([PorchlightConsent.groups.sitterApplication(), PorchlightConsent.groups.bgcheck()]);
+  $('consent-mount').appendChild(consent.el);
 
   $('apply').addEventListener('submit', function (ev) {
     ev.preventDefault(); err.hidden = true;
@@ -128,14 +133,15 @@
     }
     if (!picked('services').length) return fail('Please choose at least one kind of work you’d like to do.', document.querySelector('input[name=services]'));
     if (!$('adult').checked) return fail('You need to be 18 or older to apply.', $('adult'));
-    if (!$('bg').checked) return fail('Please agree to a background check, which is required before you start.', $('bg'));
+    var missingBox = consent.missing();
+    if (missingBox) return fail('Please check each agreement box. A background check is required before you start.', missingBox);
 
     var btn = $('submit'); btn.disabled = true; btn.textContent = 'Sending…';
-    P.sb.rpc('porchlight_apply_sitter', { p: {
+    P.sb.rpc('porchlight_apply_sitter_consent', { p_consents: consent.items(), p: {
       name: $('name').value, email: $('email').value, phone: $('phone').value, town: $('town').value,
       services: picked('services'), animals: picked('animals'), availability: picked('availability'),
       years_experience: $('years').value, experience: $('experience').value, has_vehicle: $('vehicle').checked,
-      is_adult: $('adult').checked, background_check_ok: $('bg').checked,
+      is_adult: $('adult').checked, background_check_ok: true,
       other_platforms: $('other').value, how_heard: $('heard').value, notes: $('notes').value, website: $('website').value
     } }).then(function (r) {
       if (r.error) throw r.error;

@@ -20,9 +20,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="/assets/app.js"></script>
+<script src="/assets/legal-docs.js"></script>
+<script src="/assets/consent.js"></script>
 <script>
 (function () {
   var P = window.Porchlight, sb = P.sb, h = P.h;
+  var L = (window.PorchlightLegal && window.PorchlightLegal.docs) || {};
   var app = document.getElementById('app');
   var me = null; // { email, is_staff, client_id }
   var arrivedForReset = /type=recovery/.test(location.hash);
@@ -131,7 +134,8 @@
         document.getElementById('who').hidden = false;
         document.getElementById('who-email').textContent = w.email;
         document.getElementById('portal-kind').textContent = w.is_staff ? 'Staff portal' : w.sitter ? 'Sitter portal' : 'Client portal';
-        render();
+        // Everyone accepts the current version of the agreements that apply to them before using the portal.
+        return PorchlightConsent.gate(P).then(render);
       });
     }).catch(showError);
   }
@@ -921,7 +925,7 @@
       var price = {}; res[0].forEach(function (s) { price[s.id] = s.price_cents; });
       var rates = (res[2] || [])[0] || null;
       function waitCharge(m) { return !rates || (m || 0) <= rates.wait_free_min ? 0 : Math.ceil(((m || 0) - rates.wait_free_min) / rates.wait_block_min) * rates.wait_block_cents; }
-      function owedFor(b) { var isT = b.service_id === 'taxi' || b.service_id === 'taxi_rt'; return isT ? (b.fare_cents != null ? b.fare_cents : (price[b.service_id] || 0)) + waitCharge(b.wait_min) : (price[b.service_id] || 0); }
+      function owedFor(b) { var isT = b.service_id === 'taxi' || b.service_id === 'taxi_rt'; return isT ? (b.fare_cents != null ? b.fare_cents : (price[b.service_id] || 0)) + waitCharge(b.wait_min) : (b.fare_cents != null ? b.fare_cents : (price[b.service_id] || 0)); }
       var unpaid = {}, order = [], paid = [], tipsToConfirm = [];
       res[1].forEach(function (b) {
         var pays = Array.isArray(b.porchlight_payments) ? b.porchlight_payments : (b.porchlight_payments ? [b.porchlight_payments] : []);
@@ -1282,6 +1286,23 @@
             h('h2', { text: 'Private notes' }),
             h('label', { class: 'f', for: 'staff-note' }, h('span', { class: 'hint', text: 'Never shown to the client.' }), ta),
             h('div', null, saveNote)));
+          // Agreements this client accepted (the legal record: document, version, time, IP address)
+          var agree = h('section', { class: 'panel stack' }, h('h2', { text: 'Agreements accepted' }));
+          var agreeList = h('div', { class: 'small muted', text: 'Loading…' });
+          agree.appendChild(agreeList);
+          col.appendChild(agree);
+          sb.from('porchlight_consents').select('accepted_at,context,doc_key,doc_version,ip,details,checkbox_text').eq('email', String(c.email || '').toLowerCase())
+            .order('accepted_at', { ascending: false }).limit(200).then(guard).then(function (rows) {
+              P.clear(agreeList);
+              if (!rows.length) { agreeList.textContent = 'Nothing recorded yet. This client has not accepted the new agreements.'; return; }
+              rows.forEach(function (r) {
+                var meta = (L[r.doc_key] ? L[r.doc_key].title : r.doc_key) + ' · version ' + r.doc_version;
+                var when = new Date(r.accepted_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+                var extra = r.details && r.details.animals_total != null ? ' · ' + r.details.animals_total + ' animals in the home' + (r.details.cameras ? ', cameras: ' + r.details.cameras : '') : '';
+                agreeList.appendChild(h('div', { style: 'padding:6px 0;border-top:1px solid var(--line)' },
+                  h('strong', { text: meta }), h('div', { text: when + ' · ' + r.context + (r.ip ? ' · IP ' + r.ip : '') + extra })));
+              });
+            }).catch(function (e) { agreeList.textContent = 'Could not load: ' + P.errMsg(e); });
           // History
           var hist = h('section', { class: 'stack' }, h('h2', { class: 'display', style: 'font-size:24px', text: 'Visits' }));
           var hl = h('div', { class: 'list' });
@@ -1349,6 +1370,13 @@
     }
     if (!c) col.appendChild(notice('info', 'No new client form on file for this booking yet. Ask ' + b.client_name + ' to fill one out at ' + location.origin + '/intake?email=' + b.client_email));
     if (b.notes) col.appendChild(notice('info', 'Client’s note with this request: ' + b.notes));
+    if (b.animals_in_home != null && b.service_id !== 'meet') {
+      col.appendChild(notice('info', 'Animals in the home: ' + b.animals_in_home + (b.animals_note ? ' (' + b.animals_note + ')' : '') + '. Look in on every animal at every visit and report anything that looks wrong. If you find an animal that was not listed, tell Porchlight.'));
+    }
+    if (b.service_id === 'overnight') {
+      col.appendChild(notice('info', 'Overnight: cameras ' + (b.cameras_status === 'disclosed' ? 'disclosed (' + (b.cameras_note || 'see client') + ')' : b.cameras_status === 'none' ? 'none reported' : 'not stated') +
+        (b.people_in_home ? '. Others in the home: ' + b.people_in_home : '') + '. Take start-of-stay and end-of-stay condition photos, and leave any camera you did not expect alone and call Porchlight.'));
+    }
     var needVax = vaxNeeded(pets);
     if (needVax.length) col.appendChild(notice('info', 'Vaccination records needed: ' + needVax.map(function (x) { return x.name + ' (' + vaxWhy(x) + ')'; }).join('; ') + '.'));
 

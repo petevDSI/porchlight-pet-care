@@ -499,8 +499,23 @@ details p{margin-top:12px;color:var(--ink)}
 <div><label class="field-label" for="email">Email</label><input id="email" type="email" autocomplete="email" required maxlength="200"></div>
 <div><label class="field-label" for="address">Street address</label><input id="address" autocomplete="street-address" required maxlength="300"></div>
 <div><label class="field-label" for="pets">Your pets</label><input id="pets" placeholder="e.g. Bailey, 70 lb lab; Miso, cat" maxlength="1000"></div>
+<div class="two-col">
+<div><label class="field-label" for="animal-count">Animals in the home</label><input id="animal-count" type="number" min="0" max="30" step="1" value="1" inputmode="numeric" required aria-describedby="animal-help"></div>
+<div><label class="field-label" for="animal-others">Animals not getting care from us <span style="font-weight:400;text-transform:none;letter-spacing:0">(if any)</span></label><input id="animal-others" maxlength="500" placeholder="e.g. Whiskers, indoor cat, automatic feeder"></div>
+</div>
+<p class="hint" id="animal-help">Count <strong>every</strong> animal in the home, including cats, birds, reptiles, fish tanks and a roommate's dog, even if they aren't getting care from us. The first animal is included in the price. Each additional animal is <strong id="extra-rate-text">$5</strong> per visit or night, and a sitter can't be asked to skip an animal in the home, even with automatic feeders or waterers. <a href="/legal/animals-in-the-home-policy" target="_blank" rel="noopener">How this works</a></p>
+<p class="hint" id="animal-math" aria-live="polite" style="font-weight:600" hidden></p>
 <div><label class="field-label" for="notes">Anything we should know</label><textarea id="notes" placeholder="Feeding, meds, gate codes, quirks" maxlength="2000"></textarea></div>
+<fieldset id="safety-box" hidden style="border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0;display:grid;gap:14px">
+<legend class="field-label" style="padding:0 6px;margin:0">Overnight stay details</legend>
+<div><label class="field-label" for="cam-status">Cameras in or around the home</label>
+<select id="cam-status"><option value="">Choose one</option><option value="none">No cameras anywhere on the property</option><option value="disclosed">Yes, there are cameras (I'll list each one)</option></select></div>
+<div id="cam-notes-wrap" hidden><label class="field-label" for="cam-notes">Where is each camera, and what does it look at?</label><textarea id="cam-notes" maxlength="500" placeholder="e.g. Doorbell camera at the front door, outdoors only"></textarea>
+<p class="hint">Cameras can't be hidden and can't look into a bedroom or bathroom. Any indoor camera that can see where your sitter sleeps must be off, unplugged or covered for the whole stay, and audio recording must be off. <a href="/legal/home-standards-and-safety" target="_blank" rel="noopener">Camera policy</a></p></div>
+<div><label class="field-label" for="people-home">Anyone else who will be in the home during the stay?</label><input id="people-home" maxlength="300" placeholder="e.g. none, or a cleaner on Friday morning"></div>
+</fieldset>
 <label class="check"><input id="new-client" type="checkbox" checked> This is my first time booking with Porchlight</label>
+<div><p class="field-label" style="margin-bottom:0">Agreements</p><div id="consent-mount"></div></div>
 <div id="tip-box" hidden>
 <p class="field-label" style="margin-bottom:8px">Add a tip for your sitter <span style="font-weight:400;color:var(--muted)">(optional)</span></p>
 <div class="choice-row" id="tip-row" role="group" aria-label="Tip amount">
@@ -571,7 +586,7 @@ details p{margin-top:12px;color:var(--ink)}
 <div><dt><b>Flight companion</b><span>Flies with your small pet in the cabin</span></dt><dd><a href="/quote?type=flight">Get a quote</a></dd></div>
 <div><dt><b>Pet transport by car</b><span>Moves, adoptions and long drives</span></dt><dd><a href="/quote?type=transport">Get a quote</a></dd></div>
 <div><dt><b>Wedding &amp; event attendant</b><span>Photos, ceremony and party care. Packages from $300</span></dt><dd><a href="/quote?type=event">Get a quote</a></dd></div>
-<div><dt><b>Each additional pet</b><span>Per visit or night</span></dt><dd>+$5</dd></div>
+<div><dt><b>Each additional animal in the home</b><span>Per visit or night. Counts every animal in the home, including ones not booked for care</span></dt><dd data-extra-rate>+$5</dd></div>
 <div><dt><b>Holidays</b><span>Added per visit / per night</span></dt><dd>+$10 / +$20</dd></div>
 </dl>
 <div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price.</small></div></div>
@@ -637,7 +652,7 @@ details p{margin-top:12px;color:var(--ink)}
 <p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p>
 <p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p>
 </div>
-<div><h4>Porchlight</h4><a href="/about">Our story</a><a href="/blog">Blog</a><a href="/testimonials">Reviews</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">Our story</a><a href="/blog">Blog</a><a href="/testimonials">Reviews</a><a href="/intake">New client form</a><a href="/portal">Client login</a><a href="/legal">Terms &amp; policies</a></div>
 <div><h4>Services</h4><a href="/services/overnight-pet-sitting">Overnight stays</a><a href="/services/dog-walking">Dog walking</a><a href="/services/drop-in-visits">Drop-in visits</a><a href="/services/cat-sitting">Cat sitting</a><a href="/services/exotic-pet-sitting">Birds, reptiles and fish</a><a href="/services/home-check-ins">Home check-ins</a><a href="/services/pet-taxi">Pet taxi</a><a href="/services/flight-companion">Flight companion</a><a href="/services/pet-transport">Pet transport</a></div>
 <div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
@@ -646,6 +661,8 @@ details p{margin-top:12px;color:var(--ink)}
 </footer>
 
 <script src="/assets/address.js"></script>
+<script src="/assets/legal-docs.js"></script>
+<script src="/assets/consent.js"></script>
 <script>
 (function(){
   var SUPABASE_URL = 'https://ngiwnyoxdcycwotxargm.supabase.co';
@@ -679,6 +696,36 @@ details p{margin-top:12px;color:var(--ink)}
   var addBtn = el('add-btn'), addMsg = el('add-msg'), cartBox = el('cart'), cartList = el('cart-list');
   var whereMsg = el('where-msg'), WHERE_HINT = whereMsg.textContent;
   state.place = null; state.sitter = null; state.sitters = [];
+
+  // ---- Animals in the home, overnight details and agreements ----
+  var EXTRA_SVCS = ['walk', 'visit', 'overnight', 'home'];
+  state.extraRate = 500;
+  var animalCount = el('animal-count'), animalOthers = el('animal-others'), animalMath = el('animal-math');
+  var camStatus = el('cam-status'), camNotes = el('cam-notes');
+  var consentBox = null;
+  function animalsN(){ var n = parseInt(animalCount.value, 10); return isNaN(n) || n < 0 ? 0 : Math.min(n, 30); }
+  function extraAnimals(){ return Math.max(animalsN() - 1, 0); }
+  function extraPerVisit(service){ return EXTRA_SVCS.indexOf(service) >= 0 ? extraAnimals() * state.extraRate : 0; }
+  function hasOvernight(){ return state.cart.some(function(c){ return c.service === 'overnight'; }); }
+  function syncAnimals(){
+    el('extra-rate-text').textContent = money(state.extraRate);
+    document.querySelectorAll('[data-extra-rate]').forEach(function(n){ n.textContent = '+' + money(state.extraRate); });
+    var x = extraAnimals();
+    if (x && state.extraRate) { animalMath.hidden = false; animalMath.textContent = animalsN() + ' animals in the home: +' + money(x * state.extraRate) + ' per visit or night (' + x + ' additional at ' + money(state.extraRate) + ').'; }
+    else animalMath.hidden = true;
+    renderCart();
+  }
+  function syncOvernight(){
+    var on = hasOvernight();
+    el('safety-box').hidden = !on;
+    if (consentBox) consentBox.show('overnight', on);
+  }
+  animalCount.addEventListener('input', syncAnimals);
+  camStatus.addEventListener('change', function(){ el('cam-notes-wrap').hidden = camStatus.value !== 'disclosed'; });
+  consentBox = PorchlightConsent.box([PorchlightConsent.groups.owner(), PorchlightConsent.groups.animals(), PorchlightConsent.groups.overnight()]);
+  el('consent-mount').appendChild(consentBox.el);
+  consentBox.show('overnight', false);
+  api('rpc/porchlight_public_rates', { body: {} }).then(function(r){ if (r && r.extra_animal_cents != null) { state.extraRate = r.extra_animal_cents; syncAnimals(); } }).catch(function(){});
   function withGeo(o){ if (state.place) { o.p_lat = state.place.lat; o.p_lng = state.place.lng; } return o; }
   if (window.PorchlightAddress) {
     PorchlightAddress.attach(el('where'), function(place){
@@ -859,6 +906,7 @@ details p{margin-top:12px;color:var(--ink)}
       var info = document.createElement('div');
       var top = document.createElement('span');
       top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (c.service === 'meet' ? ' · Free' : unitPrice(c.service) ? ' · ' + money(unitPrice(c.service)) + (isTaxiSvc(c.service) && state.route ? ' est.' : isTaxiSvc(c.service) ? ' and up' : '') : '');
+      if (extraPerVisit(c.service)) top.textContent += ' + ' + money(extraPerVisit(c.service)) + ' for ' + extraAnimals() + ' additional animal' + (extraAnimals() > 1 ? 's' : '');
       if (c.sitterName) top.textContent += ' · with ' + c.sitterName;
       info.appendChild(top);
       if (c.series) { var sm = document.createElement('small'); sm.textContent = c.series; info.appendChild(sm); }
@@ -877,7 +925,7 @@ details p{margin-top:12px;color:var(--ink)}
   // ---- Tip ----
   state.tip = '0';
   var tipBox = el('tip-box'), tipRow = el('tip-row'), tipCustom = el('tip-custom');
-  function cartTotal(){ return state.cart.reduce(function(t, c){ return t + unitPrice(c.service); }, 0); }
+  function cartTotal(){ return state.cart.reduce(function(t, c){ return t + unitPrice(c.service) + extraPerVisit(c.service); }, 0); }
   function tipCents(){
     if (!state.cart.length) return 0;
     if (state.tip === 'custom') { var d = parseFloat(tipCustom.value); return isNaN(d) || d < 0 ? 0 : Math.min(Math.round(d * 100), 50000); }
@@ -896,6 +944,7 @@ details p{margin-top:12px;color:var(--ink)}
   tipCustom.addEventListener('input', updateButtons);
 
   function updateButtons(){
+    syncOvernight();
     renderTip();
     var hasPick = state.picked.length > 0;
     var weeklyOk = state.often !== 'weekly' || Object.keys(state.dows).length > 0;
@@ -1076,6 +1125,16 @@ details p{margin-top:12px;color:var(--ink)}
         errBox.hidden = false; f.focus(); return;
       }
     }
+    function stop(msg, field){ errBox.textContent = msg; errBox.hidden = false; if (field) { field.focus(); if (field.scrollIntoView) field.scrollIntoView({ block: 'center' }); } }
+    if (!/^[0-9]{1,2}$/.test(animalCount.value.trim())) return stop('Please tell us how many animals will be in the home, counting every animal.', animalCount);
+    if (state.cart.some(function(c){ return EXTRA_SVCS.indexOf(c.service) >= 0; }) && animalsN() < 1) return stop('Tell us how many animals will be in the home. It is at least one for a visit or stay.', animalCount);
+    if (animalsN() > 1 && !animalOthers.value.trim() && !el('pets').value.trim()) return stop('Please list each animal in the home so your sitter knows who to look for.', el('pets'));
+    if (hasOvernight()) {
+      if (!camStatus.value) return stop('Please tell us whether there are any cameras in or around the home.', camStatus);
+      if (camStatus.value === 'disclosed' && !camNotes.value.trim()) return stop('Please say where each camera is and what it looks at.', camNotes);
+    }
+    var missingBox = consentBox.missing();
+    if (missingBox) return stop('Please check the agreement boxes to continue.', missingBox);
     var needsDrop = state.cart.some(function(c){ return c.service === 'taxi' || c.service === 'taxi_rt'; });
     if (needsDrop && !el('dropoff').value.trim()) {
       errBox.textContent = 'Please tell us where your pet is going (the vet, groomer or boarding address).';
@@ -1092,22 +1151,29 @@ details p{margin-top:12px;color:var(--ink)}
     }
     var what = summary.textContent;
     submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
-    api('rpc/porchlight_request_bookings', { body: withGeo({
-      p_town: townSel.value,
-      p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series, sitter: c.sitter || null }; }),
-      p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
-      p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
-      p_new_client: el('new-client').checked,
-      p_dropoff: needsDrop ? el('dropoff').value.trim() : null,
-      p_trip_miles: needsDrop && state.route ? state.route.miles : null,
-      p_trip_minutes: needsDrop && state.route ? state.route.minutes : null,
-      p_tip_cents: tipCents()
-    })}).then(function(res){
+    var geo = withGeo({});
+    api('rpc/porchlight_book_with_consent', { body: { p: {
+      town: townSel.value,
+      items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series, sitter: c.sitter || null }; }),
+      name: el('name').value, email: el('email').value, phone: el('phone').value,
+      address: el('address').value, pets: el('pets').value, notes: el('notes').value,
+      new_client: el('new-client').checked,
+      lat: geo.p_lat != null ? geo.p_lat : null, lng: geo.p_lng != null ? geo.p_lng : null,
+      dropoff: needsDrop ? el('dropoff').value.trim() : null,
+      trip_miles: needsDrop && state.route ? state.route.miles : null,
+      trip_minutes: needsDrop && state.route ? state.route.minutes : null,
+      tip_cents: tipCents(),
+      animals: { total: animalsN(), others: animalOthers.value.trim() },
+      safety: hasOvernight() ? { cameras: camStatus.value, camera_notes: camNotes.value.trim(), no_hidden_cameras: true, people_in_home: el('people-home').value.trim() } : {},
+      consents: consentBox.items()
+    } }}).then(function(res){
+      state.lastBook = res;
+      var extraNote = res && res.extra_animals ? ' Your total includes ' + money(res.extra_animal_cents_per_visit) + ' for ' + res.extra_animals + ' additional animal' + (res.extra_animals > 1 ? 's' : '') + ' for each visit or night.' : '';
       var isNew = el('new-client').checked;
       var hadMeet = state.cart.some(function(c){ return c.service === 'meet'; });
       var names = (res && res.sitters) || [];
       var sitterLine = names.length ? ' Your sitter: ' + names.join(' and ').replace(/\.$/, '') + (names.length > 1 ? ' (depending on the visit).' : '.') : (state.sitters.length ? ' We’ll match you with a free sitter and show who it is in your client portal.' : '');
-      el('success-text').textContent = 'Your request for ' + what + ' is in.' + sitterLine + ' Pay below to lock it in, and you will receive a confirmation by text or email once your payment arrives.' +
+      el('success-text').textContent = 'Your request for ' + what + ' is in.' + sitterLine + extraNote + ' Pay below to lock it in, and you will receive a confirmation by text or email once your payment arrives.' +
         (isNew && !hadMeet ? ' Since you are new, we also do a free meet-and-greet before your first visit. Pick a time below, or we will reach out to set one up.' : '');
       el('book-meet').hidden = !(isNew && !hadMeet);
       showPayment(res && res.group_id, el('email').value);
@@ -1127,6 +1193,12 @@ details p{margin-top:12px;color:var(--ink)}
     if (!group) return;
     api('rpc/porchlight_pay_due', { body: { p_group: group, p_email: email } }).then(function(d){
       if (!d || !d.total_cents) return;
+      var xp = (state.lastBook && state.lastBook.extra_animal_cents_per_visit) || 0;
+      if (xp && d.lines) d.lines.forEach(function(l){
+        if (EXTRA_SVCS.indexOf(l.service) < 0) return;
+        var want = (state.prices[l.service] || 0) + xp;
+        if (l.cents < want) { d.total_cents += want - l.cents; l.cents = want; }
+      });
       var due = d.total_cents + (d.tip_cents || 0), disc = Math.min(d.discount_cents || 0, d.total_cents), dueDisc = due - disc;
       function add(tag, cls, text){ var n = document.createElement(tag); if (cls) n.className = cls; n.textContent = text; box.appendChild(n); return n; }
       add('h4', '', 'Pay now to confirm your booking');

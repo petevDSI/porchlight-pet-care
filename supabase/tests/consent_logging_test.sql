@@ -24,7 +24,7 @@ insert into res select public.porchlight_book_with_consent(jsonb_build_object(
     jsonb_build_object('service','walk','start_at','2026-12-01T14:00:00Z'),
     jsonb_build_object('service','overnight','start_at','2026-12-02T23:00:00Z'),
     jsonb_build_object('service','meet','start_at','2026-11-30T14:00:00Z')),
-  'animals', jsonb_build_object('total', 3, 'others', 'Whiskers, indoor cat, has an automatic feeder'),
+  'animals', jsonb_build_object('total', 3, 'others', 'Whiskers, indoor cat, has an automatic feeder', 'extra_care', true),
   'safety', jsonb_build_object('cameras','disclosed','camera_notes','Doorbell camera at front door, outdoors only','no_hidden_cameras',true,'people_in_home','none'),
   'consents', :'owner_overnight'::jsonb));
 reset role;
@@ -72,6 +72,66 @@ reset role;
 select pg_temp.check((select count(*) from public.porchlight_bookings) = 3, 'failed bookings left no bookings behind');
 select pg_temp.check((select count(*) from public.porchlight_consents) = 6, 'failed bookings left no consent rows behind');
 
+-- ---- exemptions: fish/reptiles that need no care, and walks/drop-ins/check-ins when extra animals need nothing
+set role anon;
+create temp table res2 (j jsonb);
+grant all on res2 to anon;
+-- 2 dogs + cat (nothing needed on visits) + 1 fish tank with no care: walk is base price, overnight charges the cat only
+insert into res2 select public.porchlight_book_with_consent(jsonb_build_object(
+  'town','belmont','name','Lee Owner','email','lee@example.com','phone','7045551213','address','2 Main St','pets','Rex, Ace (dogs); Tom (cat); fish tank',
+  'items', jsonb_build_array(
+    jsonb_build_object('service','walk','start_at','2026-12-08T14:00:00Z'),
+    jsonb_build_object('service','visit','start_at','2026-12-09T14:00:00Z'),
+    jsonb_build_object('service','overnight','start_at','2026-12-10T23:00:00Z')),
+  'animals', jsonb_build_object('total', 4, 'no_care_fr', 1, 'extra_care', false, 'others', 'Tom the cat, automatic feeder; 20 gallon fish tank'),
+  'safety', jsonb_build_object('cameras','none','no_hidden_cameras',true,'people_in_home','none'),
+  'consents', :'owner_overnight'::jsonb));
+reset role;
+select pg_temp.check((select fare_cents from public.porchlight_bookings where client_email='lee@example.com' and service_id='walk') = 3000, 'walk: extra animals need nothing, so no extra charge');
+select pg_temp.check((select fare_cents from public.porchlight_bookings where client_email='lee@example.com' and service_id='visit') = 3000, 'drop-in: extra animals need nothing, so no extra charge');
+select pg_temp.check((select fare_cents from public.porchlight_bookings where client_email='lee@example.com' and service_id='overnight') = 9900 + 2*500, 'overnight: 4 animals minus 1 no-care fish tank = 3, so 2 additional');
+select pg_temp.check((select animals_no_care_fr = 1 and animals_extra_care = false from public.porchlight_bookings where client_email='lee@example.com' and service_id='walk'), 'no-care fish count and care answer are saved');
+select pg_temp.check((select (j->>'extra_animals_visits')::int = 0 and (j#>>'{extra_cents_by_service,overnight}')::int = 1000 and (j#>>'{extra_cents_by_service,walk}')::int = 0 from res2), 'response gives per-service extra amounts');
+select pg_temp.check((select (details->>'fish_reptiles_no_care')::int = 1 from public.porchlight_consents where email='lee@example.com' limit 1), 'fish/reptile count stored with the consent');
+
+-- a client says the extra animals DO need care on visits, and a fish tank that needs feeding is not exempt (no_care_fr = 0)
+set role anon;
+create temp table res3 (j jsonb);
+grant all on res3 to anon;
+insert into res3 select public.porchlight_book_with_consent(jsonb_build_object(
+  'town','belmont','name','Kim Owner','email','kim@example.com','phone','7045551214','address','3 Main St','pets','Rex (dog); fish tank; gecko',
+  'items', jsonb_build_array(jsonb_build_object('service','home','start_at','2026-12-11T14:00:00Z')),
+  'animals', jsonb_build_object('total', 3, 'no_care_fr', 0, 'extra_care', true, 'others', 'fish tank (feed daily); gecko (feed, mist)'),
+  'consents', :'owner_docs'::jsonb));
+reset role;
+select pg_temp.check((select extra_animal_cents from public.porchlight_bookings where client_email='kim@example.com') = 1000, 'care-needed fish and reptiles are charged like any additional animal');
+-- only fish tanks in the home that need nothing: nothing extra, even on an overnight
+set role anon;
+insert into res3 select public.porchlight_book_with_consent(jsonb_build_object(
+  'town','belmont','name','Fin Owner','email','fin@example.com','phone','7045551215','address','4 Main St','pets','Rex (dog); 2 fish tanks; bearded dragon',
+  'items', jsonb_build_array(jsonb_build_object('service','overnight','start_at','2026-12-12T23:00:00Z')),
+  'animals', jsonb_build_object('total', 4, 'no_care_fr', 3, 'others', 'two fish tanks and a bearded dragon on timers'),
+  'safety', jsonb_build_object('cameras','none','no_hidden_cameras',true,'people_in_home','none'),
+  'consents', :'owner_overnight'::jsonb));
+reset role;
+select pg_temp.check((select fare_cents from public.porchlight_bookings where client_email='fin@example.com') = 9900 or (select fare_cents from public.porchlight_bookings where client_email='fin@example.com') is null, 'only no-care fish/reptiles besides the dog: overnight stays at base price');
+select pg_temp.check((select extra_animal_cents from public.porchlight_bookings where client_email='fin@example.com') = 0, 'no extra charge when everything else is a no-care fish/reptile');
+
+set role anon;
+-- the care question must be answered when a visit has additional animals that count
+select pg_temp.expect_error(format($q$ select public.porchlight_book_with_consent(jsonb_build_object('town','belmont','name','A','email','a@b.co','phone','1','address','x','pets','Rex, Tom',
+  'items', jsonb_build_array(jsonb_build_object('service','walk','start_at','2026-12-13T14:00:00Z')),
+  'animals', jsonb_build_object('total',2,'others','cat'), 'consents', %L::jsonb)) $q$, :'owner_docs'), 'need any care');
+-- but it is not needed on an overnight, or when only no-care fish are extra
+select pg_temp.expect_error(format($q$ select public.porchlight_book_with_consent(jsonb_build_object('town','belmont','name','A','email','a@b.co','phone','1','address','x','pets','Rex, fish',
+  'items', jsonb_build_array(jsonb_build_object('service','walk','start_at','2026-12-13T14:00:00Z')),
+  'animals', jsonb_build_object('total',2,'no_care_fr',3,'others','fish'), 'consents', %L::jsonb)) $q$, :'owner_docs'), 'more fish tanks');
+insert into res3 select public.porchlight_book_with_consent(jsonb_build_object('town','belmont','name','Fay Owner','email','fay@example.com','phone','1','address','x','pets','Rex, fish',
+  'items', jsonb_build_array(jsonb_build_object('service','walk','start_at','2026-12-14T14:00:00Z')),
+  'animals', jsonb_build_object('total',2,'no_care_fr',1,'others','fish tank on a timer'), 'consents', :'owner_docs'::jsonb));
+reset role;
+select pg_temp.check((select fare_cents from public.porchlight_bookings where client_email='fay@example.com') = 3000 or (select fare_cents from public.porchlight_bookings where client_email='fay@example.com') is null, 'dog plus a no-care fish tank on a walk is the base price');
+
 -- ---- the log cannot be edited or deleted, even by the database owner
 select pg_temp.expect_error($q$ update public.porchlight_consents set email = 'x@y.z' $q$, 'cannot be changed');
 select pg_temp.expect_error($q$ delete from public.porchlight_consents $q$, 'cannot be changed');
@@ -101,7 +161,7 @@ select pg_temp.check((select count(*) from public.porchlight_consents where lowe
 reset role;
 -- an old version can no longer be accepted
 set role authenticated;
-select pg_temp.expect_error(format($q$ select public.porchlight_record_consents(%L::jsonb) $q$, jsonb_build_array(jsonb_build_object('doc_key','owner','version','2026-11-13','sha256',(select sha256 from public.porchlight_legal_docs where doc_key='owner' and version='2026-11-13'),'text','I agree to the old agreement.'))), 'was updated');
+select pg_temp.expect_error(format($q$ select public.porchlight_record_consents(%L::jsonb) $q$, jsonb_build_array(jsonb_build_object('doc_key','owner','version',(select max(version) from public.porchlight_legal_docs where doc_key='owner' and version < '2027'),'sha256',(select sha256 from public.porchlight_legal_docs where doc_key='owner' and version < '2027'),'text','I agree to the old agreement.'))), 'was updated');
 reset role;
 
 -- ---- staff can read everything

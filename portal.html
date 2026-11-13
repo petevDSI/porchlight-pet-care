@@ -1371,7 +1371,9 @@
     if (!c) col.appendChild(notice('info', 'No new client form on file for this booking yet. Ask ' + b.client_name + ' to fill one out at ' + location.origin + '/intake?email=' + b.client_email));
     if (b.notes) col.appendChild(notice('info', 'Client’s note with this request: ' + b.notes));
     if (b.animals_in_home != null && b.service_id !== 'meet') {
-      col.appendChild(notice('info', 'Animals in the home: ' + b.animals_in_home + (b.animals_note ? ' (' + b.animals_note + ')' : '') + '. Look in on every animal at every visit and report anything that looks wrong. If you find an animal that was not listed, tell Porchlight.'));
+      col.appendChild(notice('info', 'Animals in the home: ' + b.animals_in_home + (b.animals_note ? ' (' + b.animals_note + ')' : '') + (b.animals_no_care_fr ? '. ' + b.animals_no_care_fr + ' fish tank/reptile enclosure(s) need no care' : '') + '. ' +
+        (b.service_id !== 'overnight' && b.animals_in_home > 1 + (b.animals_no_care_fr || 0) ? (b.animals_extra_care ? 'The extra animals need care on this visit and are billed.' : 'The client said the extra animals need nothing from you on this visit. If you end up feeding, watering, medicating or cleaning up after one, tell Porchlight so it can be billed.') + ' ' : '') +
+        'Look in on every animal and report anything that looks wrong. If you find an animal that was not listed, tell Porchlight.'));
     }
     if (b.service_id === 'overnight') {
       col.appendChild(notice('info', 'Overnight: cameras ' + (b.cameras_status === 'disclosed' ? 'disclosed (' + (b.cameras_note || 'see client') + ')' : b.cameras_status === 'none' ? 'none reported' : 'not stated') +

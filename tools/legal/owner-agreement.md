@@ -1,7 +1,7 @@
 ---
 key: owner
 title: Owner Service Agreement and Release
-version: 2026-11-13
+version: 2026-11-13.2
 audience: owners
 summary: What owners promise about their animals and home, what Porchlight and sitters provide, and the release.
 ---
@@ -21,7 +21,7 @@ Visits are confirmed only after a free meet-and-greet at your home with your sit
 You promise that:
 
 - You are the owner of the animals, or you have permission from the owner to book care for them.
-- You have told us about **every animal in the home** as required by the Animals in the Home Policy, and you understand each additional animal is charged for each visit or night.
+- You have told us about **every animal in the home** as required by the Animals in the Home Policy, and you understand each additional animal is charged for each night of an overnight stay, and on walks, drop-ins and check-ins when it needs care from us. Fish and reptiles that need no care are not charged.
 - You have given us accurate information about each animal's health, medications, diet, behavior, bite or aggression history, escape habits, fears, and anything the sitter needs to know to be safe.
 - Dogs and cats are vaccinated against rabies as North Carolina and South Carolina law requires, and you will provide the current certificate and its expiration date. A booking may be paused until we have it.
 - You will tell us right away if an animal's health, behavior or the number of animals in the home changes.

@@ -503,7 +503,11 @@ details p{margin-top:12px;color:var(--ink)}
 <div><label class="field-label" for="animal-count">Animals in the home</label><input id="animal-count" type="number" min="0" max="30" step="1" value="1" inputmode="numeric" required aria-describedby="animal-help"></div>
 <div><label class="field-label" for="animal-others">Animals not getting care from us <span style="font-weight:400;text-transform:none;letter-spacing:0">(if any)</span></label><input id="animal-others" maxlength="500" placeholder="e.g. Whiskers, indoor cat, automatic feeder"></div>
 </div>
-<p class="hint" id="animal-help">Count <strong>every</strong> animal in the home, including cats, birds, reptiles, fish tanks and a roommate's dog, even if they aren't getting care from us. The first animal is included in the price. Each additional animal is <strong id="extra-rate-text">$5</strong> per visit or night, and a sitter can't be asked to skip an animal in the home, even with automatic feeders or waterers. <a href="/legal/animals-in-the-home-policy" target="_blank" rel="noopener">How this works</a></p>
+<div class="two-col">
+<div><label class="field-label" for="animal-fr">Fish tanks and reptile enclosures that need <em>no</em> care from us</label><input id="animal-fr" type="number" min="0" max="30" step="1" value="0" inputmode="numeric"></div>
+<div id="animal-care-wrap" hidden><label class="field-label" for="animal-care">Do your additional animals need care on walks, drop-ins and check-ins?</label><select id="animal-care"><option value="">Choose one</option><option value="no">No, they need nothing from us on those visits</option><option value="yes">Yes, they need feeding, water, litter, medication or letting out</option></select></div>
+</div>
+<p class="hint" id="animal-help">Count <strong>every</strong> animal in the home, including cats, birds, reptiles, fish tanks and a roommate's dog, even if they aren't getting care from us (each tank or enclosure counts once). The first animal is included in the price. On <strong>overnight stays</strong>, each additional animal is <strong id="extra-rate-text">$5</strong> per night, even with automatic feeders or waterers. On <strong>walks, drop-ins and check-ins</strong>, an additional animal is <strong id="extra-rate-text2">$5</strong> per visit only if it needs a service from your sitter. Fish and reptiles that need no care are never charged. <a href="/legal/animals-in-the-home-policy" target="_blank" rel="noopener">How this works</a></p>
 <p class="hint" id="animal-math" aria-live="polite" style="font-weight:600" hidden></p>
 <div><label class="field-label" for="notes">Anything we should know</label><textarea id="notes" placeholder="Feeding, meds, gate codes, quirks" maxlength="2000"></textarea></div>
 <fieldset id="safety-box" hidden style="border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0;display:grid;gap:14px">
@@ -586,7 +590,7 @@ details p{margin-top:12px;color:var(--ink)}
 <div><dt><b>Flight companion</b><span>Flies with your small pet in the cabin</span></dt><dd><a href="/quote?type=flight">Get a quote</a></dd></div>
 <div><dt><b>Pet transport by car</b><span>Moves, adoptions and long drives</span></dt><dd><a href="/quote?type=transport">Get a quote</a></dd></div>
 <div><dt><b>Wedding &amp; event attendant</b><span>Photos, ceremony and party care. Packages from $300</span></dt><dd><a href="/quote?type=event">Get a quote</a></dd></div>
-<div><dt><b>Each additional animal in the home</b><span>Per visit or night. Counts every animal in the home, including ones not booked for care</span></dt><dd data-extra-rate>+$5</dd></div>
+<div><dt><b>Each additional animal in the home</b><span>Each night on overnight stays, and on walks, drop-ins and check-ins when the animal needs care. Fish and reptiles that need no care are free</span></dt><dd data-extra-rate>+$5</dd></div>
 <div><dt><b>Holidays</b><span>Added per visit / per night</span></dt><dd>+$10 / +$20</dd></div>
 </dl>
 <div class="save-banner"><span class="tag">Save $5</span><div><b>Pay by Venmo, Zelle or check and save $5 on your booking.</b><small>Listed prices are the standard (card) price.</small></div></div>
@@ -703,24 +707,39 @@ details p{margin-top:12px;color:var(--ink)}
   var animalCount = el('animal-count'), animalOthers = el('animal-others'), animalMath = el('animal-math');
   var camStatus = el('cam-status'), camNotes = el('cam-notes');
   var consentBox = null;
+  var animalFr = el('animal-fr'), animalCare = el('animal-care');
+  var VISIT_SVCS = ['walk', 'visit', 'home'];
   function animalsN(){ var n = parseInt(animalCount.value, 10); return isNaN(n) || n < 0 ? 0 : Math.min(n, 30); }
-  function extraAnimals(){ return Math.max(animalsN() - 1, 0); }
-  function extraPerVisit(service){ return EXTRA_SVCS.indexOf(service) >= 0 ? extraAnimals() * state.extraRate : 0; }
+  function frN(){ var n = parseInt(animalFr.value, 10); return isNaN(n) || n < 0 ? 0 : Math.min(n, animalsN()); }
+  function extraAnimals(){ return Math.max(animalsN() - frN() - 1, 0); }
+  function hasVisitSvc(){ return state.cart.some(function(c){ return VISIT_SVCS.indexOf(c.service) >= 0; }); }
+  function careYes(){ return animalCare.value === 'yes'; }
+  // Overnights always charge each additional animal. Walks, drop-ins and check-ins charge only if it needs care.
+  function extraCount(service){ return service === 'overnight' ? extraAnimals() : VISIT_SVCS.indexOf(service) >= 0 && careYes() ? extraAnimals() : 0; }
+  function extraPerVisit(service){ return extraCount(service) * state.extraRate; }
   function hasOvernight(){ return state.cart.some(function(c){ return c.service === 'overnight'; }); }
   function syncAnimals(){
     el('extra-rate-text').textContent = money(state.extraRate);
+    el('extra-rate-text2').textContent = money(state.extraRate);
     document.querySelectorAll('[data-extra-rate]').forEach(function(n){ n.textContent = '+' + money(state.extraRate); });
     var x = extraAnimals();
-    if (x && state.extraRate) { animalMath.hidden = false; animalMath.textContent = animalsN() + ' animals in the home: +' + money(x * state.extraRate) + ' per visit or night (' + x + ' additional at ' + money(state.extraRate) + ').'; }
-    else animalMath.hidden = true;
+    el('animal-care-wrap').hidden = !(x > 0 && hasVisitSvc());
+    if (x && state.extraRate) {
+      var parts = ['+' + money(x * state.extraRate) + ' per night on overnight stays'];
+      parts.push(careYes() ? '+' + money(x * state.extraRate) + ' per walk, drop-in or check-in' : 'no charge for the additional animal' + (x > 1 ? 's' : '') + ' on walks, drop-ins and check-ins if they need nothing from us');
+      animalMath.hidden = false; animalMath.textContent = x + ' additional animal' + (x > 1 ? 's' : '') + ': ' + parts.join('; ') + '.';
+    } else animalMath.hidden = true;
     renderCart();
   }
   function syncOvernight(){
     var on = hasOvernight();
     el('safety-box').hidden = !on;
+    el('animal-care-wrap').hidden = !(extraAnimals() > 0 && hasVisitSvc());
     if (consentBox) consentBox.show('overnight', on);
   }
   animalCount.addEventListener('input', syncAnimals);
+  animalFr.addEventListener('input', syncAnimals);
+  animalCare.addEventListener('change', syncAnimals);
   camStatus.addEventListener('change', function(){ el('cam-notes-wrap').hidden = camStatus.value !== 'disclosed'; });
   consentBox = PorchlightConsent.box([PorchlightConsent.groups.owner(), PorchlightConsent.groups.animals(), PorchlightConsent.groups.overnight()]);
   el('consent-mount').appendChild(consentBox.el);
@@ -906,7 +925,7 @@ details p{margin-top:12px;color:var(--ink)}
       var info = document.createElement('div');
       var top = document.createElement('span');
       top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (c.service === 'meet' ? ' · Free' : unitPrice(c.service) ? ' · ' + money(unitPrice(c.service)) + (isTaxiSvc(c.service) && state.route ? ' est.' : isTaxiSvc(c.service) ? ' and up' : '') : '');
-      if (extraPerVisit(c.service)) top.textContent += ' + ' + money(extraPerVisit(c.service)) + ' for ' + extraAnimals() + ' additional animal' + (extraAnimals() > 1 ? 's' : '');
+      if (extraPerVisit(c.service)) top.textContent += ' + ' + money(extraPerVisit(c.service)) + ' for ' + extraCount(c.service) + ' additional animal' + (extraCount(c.service) > 1 ? 's' : '');
       if (c.sitterName) top.textContent += ' · with ' + c.sitterName;
       info.appendChild(top);
       if (c.series) { var sm = document.createElement('small'); sm.textContent = c.series; info.appendChild(sm); }
@@ -1128,6 +1147,9 @@ details p{margin-top:12px;color:var(--ink)}
     function stop(msg, field){ errBox.textContent = msg; errBox.hidden = false; if (field) { field.focus(); if (field.scrollIntoView) field.scrollIntoView({ block: 'center' }); } }
     if (!/^[0-9]{1,2}$/.test(animalCount.value.trim())) return stop('Please tell us how many animals will be in the home, counting every animal.', animalCount);
     if (state.cart.some(function(c){ return EXTRA_SVCS.indexOf(c.service) >= 0; }) && animalsN() < 1) return stop('Tell us how many animals will be in the home. It is at least one for a visit or stay.', animalCount);
+    if (frN() > 0 && !/^[0-9]{1,2}$/.test(animalFr.value.trim())) return stop('Please enter a whole number for fish tanks and reptile enclosures.', animalFr);
+    if (parseInt(animalFr.value || '0', 10) > animalsN()) return stop('You listed more fish tanks or reptile enclosures than animals in the home. Please check the counts.', animalFr);
+    if (extraAnimals() > 0 && hasVisitSvc() && !animalCare.value) return stop('Please tell us whether your additional animals need any care from us on walks, drop-ins and check-ins.', animalCare);
     if (animalsN() > 1 && !animalOthers.value.trim() && !el('pets').value.trim()) return stop('Please list each animal in the home so your sitter knows who to look for.', el('pets'));
     if (hasOvernight()) {
       if (!camStatus.value) return stop('Please tell us whether there are any cameras in or around the home.', camStatus);
@@ -1163,12 +1185,15 @@ details p{margin-top:12px;color:var(--ink)}
       trip_miles: needsDrop && state.route ? state.route.miles : null,
       trip_minutes: needsDrop && state.route ? state.route.minutes : null,
       tip_cents: tipCents(),
-      animals: { total: animalsN(), others: animalOthers.value.trim() },
+      animals: { total: animalsN(), others: animalOthers.value.trim(), no_care_fr: frN(), extra_care: extraAnimals() > 0 && hasVisitSvc() ? careYes() : null },
       safety: hasOvernight() ? { cameras: camStatus.value, camera_notes: camNotes.value.trim(), no_hidden_cameras: true, people_in_home: el('people-home').value.trim() } : {},
       consents: consentBox.items()
     } }}).then(function(res){
       state.lastBook = res;
-      var extraNote = res && res.extra_animals ? ' Your total includes ' + money(res.extra_animal_cents_per_visit) + ' for ' + res.extra_animals + ' additional animal' + (res.extra_animals > 1 ? 's' : '') + ' for each visit or night.' : '';
+      var bs = (res && res.extra_cents_by_service) || {}, xv = Math.max(bs.walk || 0, bs.visit || 0, bs.home || 0), xn = bs.overnight || 0, xl = [];
+      if (xv) xl.push(money(xv) + ' per walk, drop-in or check-in');
+      if (xn) xl.push(money(xn) + ' per night');
+      var extraNote = xl.length ? ' Your total includes additional-animal charges of ' + xl.join(' and ') + '.' : '';
       var isNew = el('new-client').checked;
       var hadMeet = state.cart.some(function(c){ return c.service === 'meet'; });
       var names = (res && res.sitters) || [];
@@ -1193,9 +1218,10 @@ details p{margin-top:12px;color:var(--ink)}
     if (!group) return;
     api('rpc/porchlight_pay_due', { body: { p_group: group, p_email: email } }).then(function(d){
       if (!d || !d.total_cents) return;
-      var xp = (state.lastBook && state.lastBook.extra_animal_cents_per_visit) || 0;
-      if (xp && d.lines) d.lines.forEach(function(l){
-        if (EXTRA_SVCS.indexOf(l.service) < 0) return;
+      var xs = (state.lastBook && state.lastBook.extra_cents_by_service) || {};
+      if (d.lines) d.lines.forEach(function(l){
+        var xp = xs[l.service] || 0;
+        if (!xp) return;
         var want = (state.prices[l.service] || 0) + xp;
         if (l.cents < want) { d.total_cents += want - l.cents; l.cents = want; }
       });

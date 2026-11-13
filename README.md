@@ -57,7 +57,12 @@ Migration `20261114_sitter_availability.sql` (apply after `20261113_sitters.sql`
 - **Apply in this order:** `20261117_consent_logging.sql`, `20261118_legal_doc_versions.sql` (generated), deploy the site, then `20261119_require_consent.sql`, which closes the original functions to the web so a booking cannot be made without a consent record. Re-run `node tools/build-legal.js` and apply the new `20261118` file after every document change.
 - Tests: `supabase/tests/run_consent_tests.sh` runs the migrations against a throwaway local Postgres (stand-in tables in `stub_schema.sql`) and checks pricing, consent capture, rejection cases, and that the log cannot be edited.
 
-**Additional animals.** Every animal in the home beyond the first is charged `porchlight_pay_settings.extra_animal_cents` (default 500) per visit or night on walks, drop-ins, overnights and home check-ins, whether or not the animal is being booked for care. The booking form asks for the number of animals in the home; the database stores it on each booking (`animals_in_home`, `animals_note`, `extra_animal_cents`) and raises `fare_cents` to price plus the extra, which is the amount the card checkout, the client portal and the Payments tab bill. Sitters see the count on the visit screen. To change the rate, update `extra_animal_cents`.
+**Additional animals.** Every animal in the home beyond the first is charged `porchlight_pay_settings.extra_animal_cents` (default 500), whether or not the animal is being booked for care, with two exemptions:
+- **Overnights** always charge each additional animal per night (automatic feeders do not change that).
+- **Walks, drop-ins and home check-ins** charge an additional animal per visit only if it needs a service from the sitter. The booking form asks (`animals.extra_care`).
+- **Fish tanks and reptile enclosures that need no care** are never charged (`animals.no_care_fr`, the count of tanks/enclosures needing nothing). If a tank or reptile needs feeding, leave it out of that count and it is charged like any other animal.
+
+The database stores the answers on each booking (`animals_in_home`, `animals_no_care_fr`, `animals_extra_care`, `animals_note`, `extra_animal_cents`) and raises `fare_cents` to price plus the extra, which is the amount the card checkout, the client portal and the Payments tab bill. Sitters see the count and the care answer on the visit screen and are told to report it if they end up caring for an animal the client said needed nothing. To change the rate, update `extra_animal_cents`.
 
 ## Changing prices
 

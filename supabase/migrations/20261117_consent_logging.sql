@@ -8,8 +8,10 @@
 --                               the front end calls these instead of the original functions. They do the original job
 --                               AND save the consents in the same transaction, so there is never a booking without a record.
 --  * porchlight_consent_status  tells the portal which agreements a signed-in person still needs to accept.
---  * Additional animals         every animal in the home beyond the first is charged per visit/night
---                               (porchlight_pay_settings.extra_animal_cents, default $5), see policy "Animals in the Home".
+--  * Additional animals         every animal in the home beyond the first is charged per night on overnights, and on
+--                               walks/drop-ins/check-ins only when it needs care from us. Fish and reptiles that need
+--                               no care are never charged (porchlight_pay_settings.extra_animal_cents, default $5),
+--                               see policy "Animals in the Home".
 --
 -- ORDER: apply this, then 20261118_legal_doc_versions.sql (generated), then deploy the site, then 20261119_require_consent.sql.
 
@@ -75,6 +77,8 @@ alter table public.porchlight_pay_settings add column if not exists extra_animal
 
 alter table public.porchlight_bookings add column if not exists animals_in_home int check (animals_in_home between 0 and 30);
 alter table public.porchlight_bookings add column if not exists animals_note text;
+alter table public.porchlight_bookings add column if not exists animals_no_care_fr int check (animals_no_care_fr between 0 and 30);
+alter table public.porchlight_bookings add column if not exists animals_extra_care boolean;
 alter table public.porchlight_bookings add column if not exists extra_animal_cents int not null default 0 check (extra_animal_cents >= 0);
 alter table public.porchlight_bookings add column if not exists cameras_status text check (cameras_status in ('none', 'disclosed'));
 alter table public.porchlight_bookings add column if not exists cameras_note text;
@@ -100,7 +104,9 @@ returns text[] language sql immutable as $$
     else array[]::text[] end
 $$;
 
--- Services where the sitter is inside the home and therefore must look in on every animal there.
+-- Services where the sitter is inside the home. Overnight stays always charge for each additional animal.
+-- Walks, drop-ins and home check-ins charge for an additional animal only when it needs a service from the sitter
+-- (feeding, water, litter, medication, letting out). Fish and reptiles that need no care are never charged.
 create or replace function public.porchlight_extra_animal_services()
 returns text[] language sql immutable as $$ select array['walk', 'visit', 'overnight', 'home'] $$;
 
@@ -242,7 +248,7 @@ returns jsonb language plpgsql security definer set search_path to 'public' as $
 declare
   res jsonb; gid uuid;
   items jsonb := p->'items';
-  v_total int; v_extra int; v_rate int;
+  v_total int; v_fr int; v_extra int; v_extra_visit int; v_care boolean; v_rate int;
   has_overnight boolean; needs_animals boolean;
   svcs text[] := public.porchlight_extra_animal_services();
   v_cam text; v_cam_note text; v_people text; v_others text;
@@ -276,9 +282,25 @@ begin
   end if;
   if v_cam is not null and v_cam not in ('none', 'disclosed') then v_cam := null; end if;
 
+  -- Fish tanks and reptile enclosures that need no care from us are disclosed but never charged.
+  if coalesce(p#>>'{animals,no_care_fr}', '0') !~ '^[0-9]{1,2}$' then raise exception 'Tell us how many fish tanks or reptile enclosures need no care from us'; end if;
+  v_fr := coalesce(nullif(p#>>'{animals,no_care_fr}', ''), '0')::int;
+  if v_fr > v_total then raise exception 'You listed more fish tanks or reptile enclosures than animals in the home'; end if;
+  v_extra := greatest(v_total - v_fr - 1, 0);
+
+  -- On walks, drop-ins and home check-ins, an additional animal is charged only if it needs care from us.
+  if exists (select 1 from jsonb_array_elements(items) x where x->>'service' in ('walk', 'visit', 'home')) and v_extra > 0 then
+    if jsonb_typeof(p#>'{animals,extra_care}') is distinct from 'boolean' then
+      raise exception 'Tell us whether your additional animals need any care from us on walks, drop-ins and check-ins';
+    end if;
+    v_care := (p#>>'{animals,extra_care}')::boolean;
+  else
+    v_care := coalesce((p#>>'{animals,extra_care}') = 'true', false);
+  end if;
+  v_extra_visit := case when v_care then v_extra else 0 end;
+
   select coalesce(extra_animal_cents, 500) into v_rate from public.porchlight_pay_settings where id = 'main';
   v_rate := coalesce(v_rate, 500);
-  v_extra := greatest(v_total - 1, 0);
 
   res := public.porchlight_request_bookings(
     p_town := p->>'town', p_items := items, p_name := p->>'name', p_email := p->>'email', p_phone := p->>'phone',
@@ -295,19 +317,26 @@ begin
   update public.porchlight_bookings b
      set animals_in_home = v_total,
          animals_note = v_others,
+         animals_no_care_fr = v_fr,
+         animals_extra_care = v_care,
          cameras_status = v_cam, cameras_note = v_cam_note, people_in_home = v_people,
-         extra_animal_cents = case when b.service_id = any (svcs) then v_extra * v_rate else 0 end,
-         fare_cents = case when b.service_id = any (svcs) and v_extra > 0 then sv.price_cents + v_extra * v_rate else b.fare_cents end
+         extra_animal_cents = case b.service_id when 'overnight' then v_extra * v_rate when 'walk' then v_extra_visit * v_rate when 'visit' then v_extra_visit * v_rate when 'home' then v_extra_visit * v_rate else 0 end,
+         fare_cents = case when b.service_id = any (svcs) and (case when b.service_id = 'overnight' then v_extra else v_extra_visit end) > 0
+                           then sv.price_cents + (case when b.service_id = 'overnight' then v_extra else v_extra_visit end) * v_rate
+                           else b.fare_cents end
     from public.porchlight_services sv
    where b.group_id = gid and sv.id = b.service_id;
 
   perform public.porchlight_record_consents_core(p->>'email', 'booking', p->'consents', gid,
-    jsonb_build_object('animals_total', v_total, 'extra_animals', v_extra, 'extra_animal_rate_cents', v_rate,
+    jsonb_build_object('animals_total', v_total, 'fish_reptiles_no_care', v_fr, 'extra_animals', v_extra, 'extra_animals_care_needed_on_visits', v_care,
+                       'extra_animal_rate_cents', v_rate,
                        'cameras', v_cam, 'camera_notes', v_cam_note, 'people_in_home', v_people,
                        'no_hidden_cameras', (p#>>'{safety,no_hidden_cameras}') = 'true', 'overnight', has_overnight),
     null, null, null);
 
-  return res || jsonb_build_object('animals_in_home', v_total, 'extra_animals', v_extra, 'extra_animal_cents_per_visit', v_extra * v_rate);
+  return res || jsonb_build_object('animals_in_home', v_total, 'extra_animals', v_extra, 'extra_animals_visits', v_extra_visit,
+    'extra_animal_cents_per_night', v_extra * v_rate, 'extra_animal_cents_per_visit', v_extra_visit * v_rate,
+    'extra_cents_by_service', jsonb_build_object('overnight', v_extra * v_rate, 'walk', v_extra_visit * v_rate, 'visit', v_extra_visit * v_rate, 'home', v_extra_visit * v_rate));
 end $$;
 revoke all on function public.porchlight_book_with_consent(jsonb) from public;
 grant execute on function public.porchlight_book_with_consent(jsonb) to anon, authenticated;

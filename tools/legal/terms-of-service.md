@@ -1,7 +1,7 @@
 ---
 key: terms
 title: Terms of Service
-version: 2026-11-13
+version: 2026-11-13.2
 audience: everyone
 summary: The rules for using the Porchlight website, portals and booking system.
 ---
@@ -33,10 +33,10 @@ You must be at least 18 years old and able to form a contract to create an accou
 
 ## 4. Prices, charges and payments
 
-- Prices are the prices posted on our site at the time you book, plus any additional-animal charge and any holiday charge, all shown before you pay. A tip is optional and goes entirely to the Sitter.
+- Prices are the prices posted on our site at the time you book, plus any additional-animal charge (every animal beyond the first on overnights; on walks, drop-ins and check-ins only animals that need care; never fish or reptiles that need no care) and any holiday charge, all shown before you pay. A tip is optional and goes entirely to the Sitter.
 - Payment is due in full when you book. We accept the payment methods shown at checkout. Card payments are processed by Stripe when card payments are turned on. We do not store full card numbers.
 - Pet taxi waiting time and other charges that are billed afterward are due when billed.
-- If we find an animal that was not disclosed, we will bill the additional-animal charge for every visit and night affected, as the Animals in the Home Policy explains.
+- If we find an animal that was not disclosed, we will bill the additional-animal charge for every night and every visit affected, as the Animals in the Home Policy explains.
 - You authorize us to charge the payment method you choose for the amounts you agreed to. Repeating visits are charged for the dates you choose and do not renew on their own unless you set up a recurring series, in which case we will show the schedule and the amount and let you stop it at any time before the next charge.
 
 ## 5. Cancellations and refunds

@@ -3,8 +3,8 @@ window.PorchlightLegal = {
   "docs": {
     "animals": {
       "title": "Animals in the Home Policy",
-      "version": "2026-11-13",
-      "hash": "4e3a0334bfd1f17a22ebf19bd91a360fcb6b0985d3019203c5008363b73626fc",
+      "version": "2026-11-13.2",
+      "hash": "c9af53223cb4a0edd826b109f6cf6c58b000d4ee16f84a82f356c7ad9d73098f",
       "url": "/legal/animals-in-the-home-policy"
     },
     "bgcheck": {
@@ -21,14 +21,14 @@ window.PorchlightLegal = {
     },
     "overnight": {
       "title": "Overnight Stay Addendum",
-      "version": "2026-11-13",
-      "hash": "03bf30fc819e2f6509540788f3c2dbf795c330db684b0bf3ade92633534398c4",
+      "version": "2026-11-13.2",
+      "hash": "3d024f63ceb99417cd1574f73c4cf2f0ec378870037806a4f2c9882a9c3006e5",
       "url": "/legal/overnight-addendum"
     },
     "owner": {
       "title": "Owner Service Agreement and Release",
-      "version": "2026-11-13",
-      "hash": "d690c1fa04d36299793cab1692b914c0e1952cc44a4d75685dc49a8abf4c1b58",
+      "version": "2026-11-13.2",
+      "hash": "e2548fc9eded695452bd14c4d934f5a86b9f917b536b3349eb903ef784748cc0",
       "url": "/legal/owner-agreement"
     },
     "privacy": {
@@ -45,8 +45,8 @@ window.PorchlightLegal = {
     },
     "terms": {
       "title": "Terms of Service",
-      "version": "2026-11-13",
-      "hash": "75d57e7a5d22288825109a302bcd4f5c8a14516ac45b271e2976c8c627eeba26",
+      "version": "2026-11-13.2",
+      "hash": "31ca507db5cea0f1e801d9c1b4f961a77a1e719c39d8b090b730f8501a4eaa93",
       "url": "/legal/terms-of-service"
     }
   }

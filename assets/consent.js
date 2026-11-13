@@ -97,7 +97,7 @@
     },
     animals: function () {
       return { id: 'animals', docs: ['animals'],
-        parts: ['I have counted every animal that will be in the home, including animals I am not booking care for. I understand each additional animal is charged for every visit or night, and that a sitter cannot be asked to ignore an animal in the home, even with automatic feeders or waterers. (', { doc: 'animals', label: 'Animals in the Home Policy' }, ')'] };
+        parts: ['I have counted every animal that will be in the home, including animals I am not booking care for. I understand each additional animal is charged for every night of an overnight stay, and on walks, drop-ins and check-ins when it needs care from my sitter (fish and reptiles that need no care are not charged), and that a sitter cannot be asked to ignore an animal in the home, even with automatic feeders or waterers. (', { doc: 'animals', label: 'Animals in the Home Policy' }, ')'] };
     },
     overnight: function () {
       return { id: 'overnight', docs: ['overnight'],

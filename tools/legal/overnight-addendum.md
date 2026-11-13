@@ -1,7 +1,7 @@
 ---
 key: overnight
 title: Overnight Stay Addendum
-version: 2026-11-13
+version: 2026-11-13.2
 audience: owners and sitters
 summary: The clear-cut rules for any stay where a sitter sleeps at the owner's home.
 ---
@@ -67,4 +67,4 @@ The rules in the Home Standards, Cameras and Safety Policy apply fully, and for 
 
 ## 10. Price
 
-The price is the published overnight price, plus any additional-animal charges and any published holiday charge, shown before you pay. A tip is optional and goes entirely to the sitter.
+The price is the published overnight price, plus an additional-animal charge for each animal in the home beyond the first (fish and reptiles that need no care are not charged), plus any published holiday charge, shown before you pay. A tip is optional and goes entirely to the sitter.

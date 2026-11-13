@@ -1,7 +1,7 @@
 ---
 key: animals
 title: Animals in the Home Policy
-version: 2026-11-13.2
+version: 2026-11-13.3
 audience: owners and sitters
 summary: Every animal in the home is disclosed and counted, whether or not it is the one you booked for.
 ---
@@ -56,7 +56,8 @@ A sitter who enters a home is responsible for noticing hazards, including an ani
 ## 6. If we find an animal you did not tell us about
 
 - The sitter will report it to Porchlight and to you right away, with a photo if it is safe and appropriate.
-- You will be billed the additional-animal rate for that animal for **every night of every overnight stay** in the booking and in any earlier booking in the past 12 months where it was in the home, and for every walk, drop-in or check-in where the sitter gave it a service or where you had said additional animals needed no care and they did.
+- If an additional animal was present and not included in your booking, we may invoice the additional-animal rate shown when you booked for each visit or night that we can substantiate. A photo from Tuesday supports Tuesday's charge. Earlier dates need their own evidence, such as your confirmation, dated visit records or other reliable documentation. We look back no further than 12 months, and only to bookings where the animal was present.
+- The invoice shows the dates, the rate, the basis for the correction, and how to dispute it. At launch we send an itemized payment request. We will not charge a saved card for an adjustment unless you have given express authorization that covers these adjustments, including how we calculate them and when we charge.
 - If the animal is a safety concern, the sitter may decline to continue, leave the home, or ask for the animal to be separated. The visit is still billed in full if the sitter had to stop because an animal was not disclosed.
 - Repeated or intentional non-disclosure is a breach of your agreement. Porchlight may pause or end your account.
 

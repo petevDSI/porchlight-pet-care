@@ -1,7 +1,7 @@
 ---
 key: overnight
 title: Overnight Stay Addendum
-version: 2026-11-13.2
+version: 2026-11-13.3
 audience: owners and sitters
 summary: The clear-cut rules for any stay where a sitter sleeps at the owner's home.
 ---
@@ -10,7 +10,7 @@ This addendum applies to every overnight stay and is part of the Owner Service A
 
 ## 1. What an overnight stay is
 
-An overnight stay means a Porchlight sitter sleeps at the **owner's home** for the night to care for the animals there. It runs from the arrival time in the booking (normally evening) to the departure time in the booking (normally morning). Boarding an animal in the sitter's home is **not** part of this addendum and is not offered unless Porchlight approves it in writing for a specific booking.
+An overnight stay means a Porchlight sitter sleeps at the **owner's home** for the night to care for the animals there. It runs from the arrival time in the booking (normally evening) to the departure time in the booking (normally morning). Porchlight does not offer boarding in a sitter's home.
 
 ## 2. Who may be in the home
 
@@ -36,9 +36,9 @@ An overnight stay means a Porchlight sitter sleeps at the **owner's home** for t
 
 The rules in the Home Standards, Cameras and Safety Policy apply fully, and for overnight stays:
 
-- Any indoor camera that can see the sleeping area, a bathroom, or a place the sitter changes clothes must be off, unplugged or covered for the whole stay.
-- Indoor microphones and audio recording are off for the whole stay.
-- The owner confirms at booking that no hidden camera or recording device is in the home and lists every disclosed camera and where it points.
+- All indoor surveillance is off, unplugged or covered for the whole stay. That includes indoor cameras, pet cams, and smart displays or speakers with a camera or microphone. No camera may be aimed into a sleeping, changing or bathroom area.
+- Indoor microphones, audio recording and two-way talk are off for the whole stay.
+- The owner confirms at booking that no hidden camera or recording device is in the home and lists every disclosed camera, including outdoor and doorbell cameras, and where it points.
 
 ## 6. Condition of the home
 

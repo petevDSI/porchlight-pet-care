@@ -1,7 +1,7 @@
 ---
 key: home-safety
 title: Home Standards, Cameras and Safety Policy
-version: 2026-11-13
+version: 2026-11-13.3
 audience: owners and sitters
 summary: Home condition before and after a stay, no hidden cameras, privacy, safety and damage reports.
 ---
@@ -12,14 +12,15 @@ This policy applies to owners and sitters. It is part of the Owner Service Agree
 
 We want pets cared for at home, and we want everyone in the home to be able to trust it. Our rule is simple.
 
-1. **No hidden recording devices. Ever.** No camera, microphone or other recording device may be hidden, disguised, or placed where it cannot be seen. This applies to owners, sitters, and anyone else, and it applies to the owner's home and to a sitter's own home.
-2. **All cameras must be disclosed before booking.** An owner who has a camera anywhere on the property (indoors, outdoors, doorbell, driveway, nanny or pet cam) must disclose each camera in the booking and say where it points. A sitter who hosts a pet in the sitter's own home must do the same.
-3. **No cameras in private spaces.** No camera or recording device may be in, or pointed into, a bathroom, a bedroom, or any place a sitter sleeps, changes clothes or keeps personal belongings. On overnight stays, any indoor camera that can see the sitter's sleeping area must be switched off, unplugged or covered for the duration of the stay, and the owner must say so in the booking.
-4. **Audio recording is not allowed indoors.** Owners must turn off the microphone and any audio recording or two-way talk feature on any indoor camera for the duration of any visit or stay. Recording a conversation you are not part of can violate state and federal law.
-5. **Outdoor and doorbell cameras** that are disclosed are fine, as long as they do not look into a bathroom, bedroom, or other private space.
-6. **Sitters do not record or photograph the inside of a home** except the photos and short videos made for the visit report and for the check-in and check-out condition photos described below. Sitters do not post photos or video of a home, its contents, mail, documents, or an owner's pets or family on social media without the owner's written permission.
-7. A sitter who finds an undisclosed camera or recording device should leave it alone, step out of its view if possible, and tell Porchlight right away. A sitter may end the stay at once, with pay for the visit or night, and the owner is not entitled to a refund.
-8. A violation of this section can lead to immediate removal from Porchlight and may also be a crime.
+1. **No hidden recording devices. Ever.** No camera, microphone or other recording device may be hidden, disguised, or placed where it cannot be seen. This applies to owners, sitters, and anyone else, in the owner's home and anywhere a sitter is working.
+2. **All cameras must be disclosed before booking.** An owner who has a camera anywhere on the property (indoors, outdoors, doorbell, driveway, nanny or pet cam, or a smart display) must disclose each camera in the booking and say where it points.
+3. **No cameras in private spaces.** No camera or recording device may be in, or pointed into, a bathroom, a bedroom, or any place a sitter sleeps, changes clothes or keeps personal belongings.
+4. **No indoor audio.** Owners must turn off the microphone, audio recording, two-way talk and remote listening on every indoor camera and smart device for the whole visit or stay. Recording a conversation you are not part of can violate state and federal law.
+5. **Outdoor and doorbell cameras** that are disclosed and visible are fine, as long as they record video only. Their microphones and remote listening must be turned off during care, and they must not look into a bathroom, bedroom, or other private space.
+6. **Drop-ins, walks and check-ins:** disclosed, visible, video-only cameras in common areas are allowed. **Overnight stays:** all indoor cameras and other indoor surveillance must be off, unplugged or covered for the whole stay, and the owner says so in the booking.
+7. **Sitters' devices.** A sitter may carry an ordinary phone or smartwatch without listing it. A sitter must disclose, and get the owner's permission in advance for, any device the sitter intends to use to monitor or record. Sitters do not record or photograph the inside of a home except the visit-report photos and the agreed condition photos of unoccupied areas, and do not post photos or video of a home, its contents, mail, documents, or an owner's pets or family on social media without the owner's written permission. Nothing in this section stops anyone from making an emergency call, reporting a crime or safety concern to the proper authority, or keeping lawfully obtained evidence.
+8. A sitter who finds an undisclosed camera or recording device should leave it alone, step out of its view if possible, and tell Porchlight right away. A sitter may end the stay at once, with pay for the visit or night, and the owner is not entitled to a refund.
+9. A violation of this section can lead to immediate removal from Porchlight and may also be a crime.
 
 ## 2. Home condition before a visit or stay (owner)
 
@@ -47,7 +48,7 @@ The sitter agrees that, before leaving at the end of each visit and at the end o
 ## 4. Condition photos and damage reports
 
 - At the start and end of every overnight stay, the sitter takes timestamped photos of the main living areas, the sleeping area, the kitchen and bathroom, and the doors, and uploads them to the visit report. For shorter visits, the sitter photographs any existing damage or mess found on arrival.
-- Anyone who finds damage, loss, or a mess must report it in writing within 24 hours of the end of the stay, with photos. A report made later, or without photos, may not be accepted.
+- Anyone who finds damage, loss, or a mess should tell Porchlight in writing as soon as possible, ideally within 24 hours of the end of the stay, with photos if they have them. Prompt notice helps us investigate. A loss found later can still be reported and will still be looked into, though older reports may be harder to confirm.
 - Porchlight will ask both sides for their account and photos and will work toward a fair result. Ordinary wear and tear, and damage caused by an animal that the owner told us about and that was kept to the rules in the booking, are not a sitter's responsibility unless the sitter was careless.
 
 ## 5. Keys, codes and access

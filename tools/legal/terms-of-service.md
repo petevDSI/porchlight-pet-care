@@ -1,7 +1,7 @@
 ---
 key: terms
 title: Terms of Service
-version: 2026-11-13.2
+version: 2026-11-13.3
 audience: everyone
 summary: The rules for using the Porchlight website, portals and booking system.
 ---
@@ -10,7 +10,7 @@ Welcome to Porchlight Pet & Home Care ("Porchlight," "we," "us"), a business bas
 
 ## 1. Who we are and what we do
 
-Porchlight connects pet owners ("Owners") with local, vetted, independent pet sitters and dog walkers ("Sitters"), and handles scheduling, payments, visit reports, and support. **Porchlight is a marketplace and coordinator. Sitters are independent contractors and are not employees or agents of Porchlight.** We screen Sitters (see "How we vet sitters" on our site), but we do not control how a Sitter performs the work in an Owner's home.
+Porchlight connects pet owners ("Owners") with local, vetted, independent pet sitters and dog walkers ("Sitters"), and handles scheduling, payments, visit reports, and support. **Porchlight is a marketplace and coordinator. Sitters are independent contractors and are not employees or agents of Porchlight.** We screen Sitters (see "How we vet sitters" on our site), but we do not control how a Sitter performs the work in an Owner's home. Your booking confirmation names the Sitter who is the care provider for that booking, and says that Porchlight handles payment, refunds and support.
 
 Other agreements also apply to you:
 
@@ -36,8 +36,9 @@ You must be at least 18 years old and able to form a contract to create an accou
 - Prices are the prices posted on our site at the time you book, plus any additional-animal charge (every animal beyond the first on overnights; on walks, drop-ins and check-ins only animals that need care; never fish or reptiles that need no care) and any holiday charge, all shown before you pay. A tip is optional and goes entirely to the Sitter.
 - Payment is due in full when you book. We accept the payment methods shown at checkout. Card payments are processed by Stripe when card payments are turned on. We do not store full card numbers.
 - Pet taxi waiting time and other charges that are billed afterward are due when billed.
-- If we find an animal that was not disclosed, we will bill the additional-animal charge for every night and every visit affected, as the Animals in the Home Policy explains.
-- You authorize us to charge the payment method you choose for the amounts you agreed to. Repeating visits are charged for the dates you choose and do not renew on their own unless you set up a recurring series, in which case we will show the schedule and the amount and let you stop it at any time before the next charge.
+- If an additional animal was present and not included in a booking, we may invoice the additional-animal rate shown when you booked for each affected visit or night we can substantiate. The invoice shows the dates, the rate, the basis for the correction and how to dispute it, as the Animals in the Home Policy explains.
+- You authorize us to charge the payment method you choose for the amounts you agreed to at checkout.
+- You choose and confirm each service date. A series ends after its last confirmed date. You can add dates by confirming a new booking.
 
 ## 5. Cancellations and refunds
 
@@ -60,7 +61,7 @@ You agree to:
 
 ## 7. Reviews and content
 
-Reviews and content you post must be honest, be about a real experience, and not include another person's private information. Do not post fake or paid reviews, and do not offer or accept anything in exchange for a review. You give us permission to display reviews and photos you submit on our site and social media, but we will never post photos of the inside of an Owner's home or of a client's family without written permission. You can ask us to remove content you posted. We may remove content that breaks these Terms.
+Reviews and content you post must be honest, be about a real experience, and not include another person's private information. Do not post fake or paid reviews, and do not offer or accept anything in exchange for a review. You give us permission to display reviews you submit on our site and social media. We use photos of an Owner's animals publicly only with the Owner's written opt-in (see the Owner Service Agreement), and we never post photos of the inside of an Owner's home or of a client's family without written permission. You can ask us to remove content you posted. We may remove content that breaks these Terms.
 
 ## 8. Our promises and what we do not promise
 
@@ -70,26 +71,25 @@ Reviews and content you post must be honest, be about a real experience, and not
 
 ## 9. Limit of liability
 
-To the fullest extent allowed by North Carolina law:
-
-- Porchlight is not responsible for a Sitter's acts or omissions, because Sitters are independent contractors. This does not limit your right to bring a claim directly against a Sitter, and it does not limit a claim against Porchlight for Porchlight's own gross negligence or intentional wrongdoing.
-- Our total liability to you for anything arising from the Service is limited to the amount you paid Porchlight for the booking that the claim relates to.
-- We are not liable for indirect, special or consequential damages (such as lost income or emotional distress that is not an actual out-of-pocket loss), except where the law does not allow that exclusion.
-- Some of these limits may not apply to you if your state does not allow them.
+- Sitters are independent businesses. Porchlight is not responsible for a Sitter's acts or omissions except to the extent Porchlight's own fault caused or contributed to them. You keep your right to bring a claim directly against a Sitter.
+- For ordinary errors in the Service itself, such as scheduling, availability or billing mistakes, our liability to you is limited to the amount you paid Porchlight for the booking the error relates to.
+- That limit does not cap reasonable direct losses caused by negligence or a broken promise in the care itself, such as emergency veterinary bills, costs to find and recover a lost animal, repair of damaged property, and rekeying or changing access after lost or misused keys or codes.
+- We are not liable for indirect, special or consequential damages (such as lost income) that are not actual out-of-pocket losses.
+- The release, liability cap, and damages exclusions in these documents do not apply to fraud, gross negligence, willful or intentional misconduct, bodily injury to a person, or any liability or remedy that applicable law protects from limitation.
+- Some of these limits may not apply to you if the law of your state does not allow them.
 
 ## 10. Indemnity
 
-You agree to cover Porchlight for losses and costs (including reasonable attorney's fees) from a third-party claim that is caused by your breach of these Terms, by information you gave us that was false or incomplete, or by your animals' behavior, unless a Sitter's negligence caused the problem.
+You agree to cover Porchlight for third-party losses and costs (including reasonable attorney's fees) to the extent they are caused by your breach of these Terms, by false or incomplete information you gave us, or by your animals' behavior. This does not cover losses to the extent they are caused by a Sitter's or Porchlight's negligence or misconduct.
 
 ## 11. Safety, reports and removal
 
-We may suspend or end your account, or refuse a booking, if we believe it is needed to protect an animal, a person, our Sitters, or the Service, or if you break these Terms or a policy. We will explain why when we reasonably can. You may close your account any time by contacting us. Amounts owed remain due.
+We may suspend or end your account, or refuse a booking, if we have a documented reason: it is needed to protect an animal, a person, our Sitters, or the Service, or fraud, or a material breach of these Terms or a policy. We will explain why when we reasonably can. You may close your account any time by contacting us. Amounts owed remain due.
 
 ## 12. Disputes
 
-- **Talk to us first.** Email hello@porchlightpetcare.com or call 470-424-3183 and give us 30 days to try to fix the problem.
-- **Where disputes go.** North Carolina law governs these Terms. Disputes that are not resolved will be heard in the state or federal courts that serve Gaston County, North Carolina, and you and we agree to those courts. Either of us may bring a claim in small claims court.
-- **Time limit.** To the extent the law allows, a claim must be brought within one year after the event that caused it.
+- **Talk to us first.** We would like the chance to fix a problem. Email hello@porchlightpetcare.com or call 470-424-3183. You may still file a claim at any time within the time the law allows, and you may seek urgent relief or file with a government agency without waiting.
+- **Where disputes go.** North Carolina law governs these Terms, and consumer, worker and other mandatory protections that apply to you remain available. Disputes that are not resolved will be heard in the state or federal courts that serve Gaston County, North Carolina. For a booking at a home in South Carolina, a competent South Carolina court is also available. Either of us may use small claims court where jurisdiction and venue are proper.
 
 ## 13. Changes to these Terms
 

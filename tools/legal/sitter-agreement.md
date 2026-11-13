@@ -1,7 +1,7 @@
 ---
 key: sitter
 title: Independent Sitter Agreement
-version: 2026-11-13
+version: 2026-11-13.3
 audience: sitters
 summary: The independent-contractor terms for sitters working through Porchlight, including conduct, insurance, pay and removal.
 ---
@@ -13,8 +13,8 @@ This agreement is between you (the "Sitter") and Porchlight Pet & Home Care, a b
 - You are an independent business, not an employee, partner, joint venturer or agent of Porchlight. Nothing here creates an employment relationship.
 - You choose whether to accept any request, and when and where you are available. You may work for other clients and other platforms. Porchlight does not require exclusivity. You may give a booking back up to 24 hours before it starts.
 - You decide how to do the work, using your own judgment, tools, vehicle, phone and supplies. You follow the owner's written care instructions, the safety rules in our policies, and the law. Porchlight's visit-report requirement, check-in and check-out, and photo requirements exist to protect animals and owners and to document the care.
-- You are responsible for your own taxes, including self-employment tax, and for any business license or registration your town or state requires. Porchlight will report payments to you as the law requires and may ask for your tax form (Form W-9).
-- You are not covered by Porchlight's insurance, workers' compensation or unemployment benefits. You are responsible for your own health and accident coverage.
+- You are responsible for your own taxes, including self-employment tax, and for any business license or registration your town or state requires. Porchlight will report payments to you as the law requires and may ask for your tax form (Form W-9). You will tell us the state where you live and the state where you do each booking. Porchlight may withhold state income tax from payments where the law requires it, for example for certain nonresidents working in South Carolina, and will show it on your payout record.
+- You are responsible for your own health and accident coverage, and you are not covered by workers' compensation or unemployment benefits through Porchlight. Section 6 says which insurance you must carry and when, if ever, a Porchlight policy applies.
 
 ## 2. Qualifying and staying on Porchlight
 
@@ -25,7 +25,9 @@ You promise that:
 - You agree to, and have passed, a background check, a reference check, and an interview, and you will tell us promptly if anything about your background changes (including any criminal charge or conviction, or a change to your driving record if you drive animals).
 - You have the experience you described, and you will only accept animals and services you are able to care for safely.
 
-We may screen you with a third-party company. We will give you a separate disclosure and ask for your authorization before any consumer report is ordered, and we will follow the law if we decide not to work with you because of a report.
+We screen you with a third-party consumer reporting agency. Before any report is ordered, we give you a separate disclosure and ask for your written authorization (see the Background Check Disclosure). Porchlight makes the final decision, and a person reviews the report. We do not reject or remove you automatically because of a vendor's flag.
+
+If we are considering not working with you, or removing you, because of a report, we will first send you a copy of the report and the Summary of Your Rights Under the Fair Credit Reporting Act, and give you a reasonable chance to respond. If you tell us the report is wrong, we will pause the decision while the dispute is reviewed. If we make a final decision based on the report, we will send you a notice that names the reporting agency and its address and phone number, says the agency did not make the decision, and explains your right to dispute the report and get a free copy within 60 days.
 
 ## 3. How you work
 
@@ -50,7 +52,7 @@ You agree to:
 - Never harass, threaten, or discriminate against an owner, another sitter, or Porchlight staff.
 - Follow all laws, including leash laws, animal-care laws, and any local licensing or pet-limit rules.
 - Never lose, copy, or share a key or code.
-- Not take a booking away from the platform. For clients you first meet through Porchlight, you will book and be paid through Porchlight for as long as you work with them and for 12 months after your last Porchlight booking with them. This does not stop you from working for clients you already had before they found you through Porchlight, or from clients who find you independently.
+- Not divert a booking. Once a client has booked you through Porchlight, you will not ask or encourage that client to cancel or move that booking so you can do the job outside Porchlight to avoid the fee. This does not stop you from working for clients you already had before they found you through Porchlight, or from clients who find you independently.
 
 ## 5. Pay
 
@@ -58,12 +60,15 @@ You agree to:
 - Your Keep % is fixed when a visit is assigned to you. If we change it later, it does not change visits already assigned.
 - The meet-and-greet is unpaid.
 - Staff record a payout after the visit is marked complete and the owner's payment is recorded. Each visit is paid once.
-- If an owner disputes a charge, if a visit is not completed, or if you are found to have broken this agreement or a safety rule, Porchlight may hold, reduce or reverse the payout for that visit. Porchlight will explain why.
+- Payouts are made on the schedule shown in your portal. Each payout shows the visit, the amount collected, your Keep %, any adjustment and your tips.
+- Porchlight may adjust a payout only for a specific, documented reason: the owner is refunded because the visit was not completed, the owner's payment is reversed or charged back, or you broke a safety rule or this agreement. We will send you the amount and the reason in writing. You can dispute an adjustment within 14 days, and a person at Porchlight will review it and answer you.
 
 ## 6. Insurance and your responsibility
 
 - You are responsible for any harm you cause through your own negligence, to an animal, a person or property.
-- Before your first booking, you must either (a) hold your own pet-sitter's liability policy with care, custody and control coverage, or (b) tell us if Porchlight offers or requires a specific policy. You will show proof if we ask.
+- Before you are activated and at each renewal, you must show proof of your own pet-sitter liability policy. It must include animal care, custody and control coverage, damage to a client's property, and lost-key or rekey coverage. It must cover the services you are booked for in both North Carolina and South Carolina, including owner-home overnights. If you drive animals, it must cover that transport and you must also carry business-use auto coverage.
+- Porchlight's own insurance: [Porchlight to complete once coverage is bound: which Porchlight policies apply to a booking, their limits and exclusions.] Until Porchlight confirms in writing that a specific policy covers a booking, assume it does not and rely on your own coverage.
+- Report any claim, injury, loss or damage to Porchlight right away, and to your insurer as its policy requires.
 - You tell Porchlight and the owner promptly about any injury, illness, escape, bite, damage or loss, and follow the Home Standards, Cameras and Safety Policy to document it.
 - You agree to cover Porchlight for losses and costs (including reasonable attorney's fees) from a third-party claim caused by your negligence, intentional misconduct, or breach of this agreement.
 
@@ -78,12 +83,12 @@ You will keep client information and Porchlight's non-public information confide
 ## 9. Ending the relationship
 
 - You may leave Porchlight at any time. Finish bookings you have accepted, or give them back at least 24 hours in advance.
-- Porchlight may pause or remove you at any time, with or without notice, if we have a safety concern, a client complaint, a policy violation, or any reason we believe protects animals, owners or the network. For anything other than an urgent safety concern, we will tell you why and give you a chance to respond.
+- Porchlight may pause or remove you for documented reasons: a safety concern, fraud, or a material breach of this agreement or a policy. For anything other than an urgent safety concern, we will tell you why and give you a chance to respond.
 - On ending, you return keys and delete client information. Payouts that are owed for completed visits are paid, less any amount you owe.
 
 ## 10. Disputes and law
 
-North Carolina law applies. Disputes are handled as the Terms of Service describe.
+North Carolina law applies, and worker and other mandatory protections that apply to you remain available. Disputes are handled as the Terms of Service describe, including a South Carolina court for work in South Carolina and small claims where jurisdiction and venue are proper.
 
 ## 11. Your acceptance
 

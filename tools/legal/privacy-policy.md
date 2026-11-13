@@ -1,7 +1,7 @@
 ---
 key: privacy
 title: Privacy Policy
-version: 2026-11-13
+version: 2026-11-13.3
 audience: everyone
 summary: What information we collect, why, who sees it, and your choices.
 ---
@@ -22,7 +22,7 @@ This Privacy Policy explains how Porchlight Pet & Home Care ("Porchlight," "we,"
 
 **Information collected automatically**
 
-- Visit check-in and check-out: when a Sitter starts or ends a visit in the portal, we may record the time and the device's location so you can see that the visit happened.
+- Visit check-in and check-out: when a Sitter taps Check in or Check out, Porchlight uses the device's location to verify that visit. The owner sees the visit time and verification status. Porchlight limits access to precise coordinates to staff who need them to resolve a visit or safety issue. If location is unavailable, the Sitter contacts support to verify the visit. A Sitter can dispute a verification by contacting us.
 - Technical information: IP address, browser, device and pages visited, kept to run and secure the Service.
 - Address suggestions: when you type an address, the box may use Google to suggest addresses and to estimate drive times (see "Who we share with").
 
@@ -40,7 +40,7 @@ We do not use your information to sell advertising and we do not sell your perso
 
 ## 3. Who sees your information
 
-- **Sitters** see an Owner's name, address, phone, codes, and pet and home details only for a visit that is assigned to them and confirmed, and until 3 days after the visit. Before that, open requests show only the town, the dates, and the animals.
+- **Sitters** see an Owner's name, address, phone, and pet and home details only for a visit that is assigned to them and confirmed, and until 3 days after the visit so they can finish the report. Access codes are shown only to the assigned Sitter for the time needed for the visit and are kept out of messages, analytics and routine exports. Before a visit is confirmed, open requests show only the town, the dates, and the animals.
 - **Owners** see a Sitter's first name and last initial, photo and short bio. After booking, you may see more information that the Sitter has chosen to share.
 - **Porchlight staff** can see information they need to do their jobs.
 - **Service providers** that help us run Porchlight, including: Supabase (database and sign-in), Vercel (website hosting), Google (address suggestions and drive times), Resend (email delivery, when turned on), Stripe (card payments, when turned on), and a background-check company (for Sitter screening). They may use your information only to provide services to us.
@@ -68,7 +68,8 @@ Our Home Standards, Cameras and Safety Policy forbids hidden recording devices a
 - Booking and payment records: as long as we need them for taxes, accounting and disputes, usually at least seven years.
 - Consent records: for as long as the agreement they relate to could matter, and for at least seven years.
 - Sitter application and background-check information: as the law requires and for a reasonable time after we close your file.
-- Access codes and keys: removed or returned when you stop using Porchlight or ask us to.
+- Precise check-in and check-out coordinates: [90 days], and longer only while a visit is disputed.
+- Access codes: removed from our records [30 days] after your last booking or when you ask, whichever is first. Keys are returned when you stop using Porchlight or ask.
 
 You can ask us to delete information, and we will delete what we are not required or permitted to keep.
 

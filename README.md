@@ -8,7 +8,7 @@ Plain static site, no build step. Hosted on Vercel; data and logins in Supabase.
 |---|---|
 | `index.html` | Public homepage with drive-time-aware booking requests |
 | `intake.html` (`/intake`) | New client form: household, pets, vet, home access, agreement |
-| `portal.html` (`/portal`) | Sitter portal (schedule, requests, clients, visit reports) and client portal (visits, reports, pets & home) |
+| `portal.html` (`/portal`) | Sitter portal (schedule, requests, quotes, sitter applications, clients, visit reports) and client portal (visits, reports, pets & home) |
 | `assets/app.js` | Shared Supabase client, form field definitions, helpers |
 | `assets/porchlight.css` | Styles for the intake form and portal |
 
@@ -21,6 +21,25 @@ Supabase tables are all prefixed `porchlight_` (towns, services, bookings, clien
 - Staff (emails in `porchlight_staff`) see everything.
 
 To give someone sitter access, add their email to `porchlight_staff` after they create a portal login.
+
+## Contracted sitters and payouts
+
+Migration `20261113_sitters.sql` adds `porchlight_sitters`, `porchlight_payouts` and `sitter_id` / `sitter_keep_pct` / `payout_id` on bookings.
+
+- **Onboarding:** an applicant is approved in Portal > Sitters (towns + keep %). That creates the sitter row; they then sign up at /portal with the same email.
+- **Claiming:** sitters see open requests (no client names or addresses) and accept first-come. Claims are race-safe and reject overlapping visits. A sitter can give a visit back up to 24 hours before it starts.
+- **Privacy:** a sitter sees client details only for assigned, confirmed visits, until 3 days after the visit.
+- **Pay:** the sitter keeps `keep_pct` (default 88) of cash actually collected, plus 100% of tips. The percentage is snapshotted when the visit is assigned. Staff record payouts in Portal > Sitters > Payouts after sending the money; each visit is paid once.
+
+### Availability and choosing a sitter
+
+Migration `20261114_sitter_availability.sql` (apply after `20261113_sitters.sql`).
+
+- Each sitter has weekly hours and days off (portal > Availability). New sitters start Mon-Fri 8-6. A sitter with no hours can't be booked.
+- `porchlight_sitter_conflict()` is the one rule: active, in their towns/services, inside hours, not on time off, and no clash or drive-time problem with their own visits. The booking calendar, "open requests" and "accept" all use it.
+- The booking page shows "Who would you like?" (Anyone, or a named sitter). If the named sitter is busy at a time, that time shows dashed with a free sitter's name. Picks are stored as `sitter_id` on each visit. "Anyone" leaves it open for any free sitter to accept.
+- Visits nobody has accepted yet use up capacity, so the site can't sell more simultaneous "anyone" visits than there are free sitters.
+- Until at least one sitter is active, the old single-provider logic runs, so booking keeps working during the switch.
 
 ## Changing prices
 
@@ -45,7 +64,7 @@ Prices come from the `porchlight_services` table (`price_cents`). Change them th
 
 - **Pet taxi** (`taxi` one way, `taxi_rt` round trip) books on the normal calendar. The client gives a pickup address and a drop-off address; the drop-off is stored on the booking (`dropoff_address`) and shown to Kraig on the schedule and the visit screen. Prices live in `porchlight_services` and are editable there.
 - **Flight companion** and **pet transport** are quoted per trip. `/quote` sends a request to `porchlight_quotes` through the `porchlight_request_quote` function; Kraig sees them in the portal's **Quotes** tab, records the price he quoted, and moves each through new, quoted, booked, declined or closed.
-- **Payments are due up front.** After booking, clients see the amount and how to pay (Venmo, Zelle or check take a discount; card pays the posted price). Kraig sets his Venmo username, Zelle contact, discount and the card on/off switch in the Payments tab ("How clients pay you"). When money arrives he records it in the Payments tab, then confirms the visits. Unpaid requested, confirmed and completed visits all show there. Taxi waiting time is billed after the ride as a balance. The free meet and greet is never charged.
+- **Payments are due up front.** After booking, clients see the amount and how to pay (Venmo, Zelle, check or card all pay the posted price; the old payment discount is set to $0 and can still be changed in Portal > Payments settings, but sitter shares are calculated on cash collected, so keep it at $0). Kraig sets his Venmo username, Zelle contact, discount and the card on/off switch in the Payments tab ("How clients pay you"). When money arrives he records it in the Payments tab, then confirms the visits. Unpaid requested, confirmed and completed visits all show there. Taxi waiting time is billed after the ride as a balance. The free meet and greet is never charged.
 - **Tips.** A tip can be added at booking (paid with the booking) or after a completed visit: the portal shows a "Leave a tip" button with 10/15/20% suggestions. Venmo, Zelle or cash tips are reported by the client and confirmed by Kraig ("Tips to confirm"). Card tips have no extra fee.
 - **Cards (Stripe) are built but switched off.** The `porchlight-pay` edge function creates Stripe Checkout sessions and records payments from Stripe's signed webhook. To turn it on: create a Stripe account, add the secrets `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` in Supabase, point a Stripe webhook for `checkout.session.completed` at `https://ngiwnyoxdcycwotxargm.supabase.co/functions/v1/porchlight-pay`, test with Stripe test keys, then tick "Accept cards". Cards pay the posted (standard) price. Venmo, Zelle, check and cash get a discount (default $5 per booking, set in the Payments tab), which avoids card-network surcharge limits. The discount is stored on each payment (`discount_cents`) so balances add up.
 - Page content for all seven services is in `tools/build-services.js`. Edit there and run `node tools/build-services.js`.

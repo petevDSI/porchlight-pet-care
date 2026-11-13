@@ -113,6 +113,12 @@ textarea{min-height:88px;resize:vertical}
 .slot:disabled{border-style:dashed;border-color:var(--line);background:var(--mist);color:#6B768C;text-decoration:line-through;cursor:not-allowed}
 .hint{font-size:14px;color:var(--muted);margin-top:10px}
 .slot-status{font-size:15px;color:var(--muted)}
+.slot.alt{border-style:dashed;border-color:var(--navy)}
+.slot small{display:block;font-weight:500;font-size:12px;line-height:1.2;color:inherit;opacity:.8}
+.sitter-bio{margin-top:6px}
+.choice .av{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;background:var(--mist)}
+.sitter-card{display:flex;gap:12px;align-items:center;margin-top:10px}
+.sitter-card img{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--mist)}
 .summary{background:var(--mist);border-radius:16px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
 .summary strong{font-size:18px}
 .addr-wrap{position:relative}
@@ -227,8 +233,8 @@ details p{margin-top:12px;color:var(--ink)}
 <div class="wrap">
 <div class="hero-copy">
 <p class="eyebrow">Belmont · Mt. Holly · Cramerton · Lake Wylie</p>
-<h1 class="display">Someone's home when you can't be.</h1>
-<p class="lede">Dog walking, pet sitting, overnight stays and home check-ins, done in your home by one person you've met first.</p>
+<h1 class="display">Care we'd trust with our own pets.</h1>
+<p class="lede">Dog walking, pet sitting, overnight stays and home check-ins, done in your home by a sitter you've met first. Your pets keep their couch, their beds and their routine.</p>
 <div class="cta-row">
 <a class="btn btn-amber" href="#booking">Book a visit</a>
 <a class="btn btn-ghost" href="#pricing">See services &amp; pricing</a>
@@ -240,13 +246,25 @@ details p{margin-top:12px;color:var(--ink)}
 </ul>
 </div>
 <div class="hero-media">
-<img src="https://images.unsplash.com/photo-1530700131180-d43d9b8cc41f?auto=format&fit=crop&w=1100&q=75" alt="A golden retriever on a leash walking down a neighborhood sidewalk" width="520" height="580" fetchpriority="high">
+<img src="/assets/img/pack/eden-maizy-couch.jpg" alt="Three dogs resting on a living room couch" width="520" height="580" fetchpriority="high" style="object-position:50% 40%">
 <div class="report" aria-label="Sample visit report">
 <p class="eyebrow" style="font-size:12px">Sample visit report</p>
 <p class="display" style="font-size:19px;font-weight:600">Midday walk, done</p>
 <ul><li>30 minutes around the block</li><li>Water bowl refilled</li><li>Photo sent to your phone</li></ul>
 </div>
 </div>
+</div>
+</section>
+
+<section class="section" id="story">
+<div class="wrap" style="max-width:760px">
+<div class="section-head" style="margin-bottom:12px">
+<p class="eyebrow">Why we started Porchlight</p>
+<h2 class="display">We boarded our dogs once. Never again.</h2>
+</div>
+<p class="lede">Our four pets are family. The kennel we tried had good reviews and a friendly tour, but the TV in the room didn't work, the dogs were shut in a small room almost all day, and they came home without a minute on their couch or with their toys, smelling like urine. We vowed never to do that to them again.</p>
+<p class="lede" style="margin-top:14px">Porchlight is the care we wished we'd found: your pets stay home, with their own things around them, looked after by someone you've met, with photos to prove it.</p>
+<p style="margin-top:18px"><a class="btn btn-ghost" href="/about">Read our story</a></p>
 </div>
 </section>
 
@@ -434,6 +452,12 @@ details p{margin-top:12px;color:var(--ink)}
 <div><label class="field-label" for="date">Day</label><input id="date" type="date" required></div>
 </div>
 
+<div id="sitter-box" hidden>
+<p class="field-label" id="sitter-label">Who would you like?</p>
+<div class="choice-row" role="group" aria-labelledby="sitter-label" id="sitter-row"></div>
+<p class="hint sitter-bio" id="sitter-bio"></p>
+</div>
+
 <div>
 <p class="field-label" id="slots-label">Open times <span style="text-transform:none;letter-spacing:0;font-weight:600">(pick one or more)</span></p>
 <div class="slot-grid" id="slots" role="group" aria-labelledby="slots-label"></div>
@@ -521,7 +545,7 @@ details p{margin-top:12px;color:var(--ink)}
 <h2 class="display">Local, and small on purpose.</h2>
 </div>
 <ul>
-<li><h3>The same face at your door</h3><p>You meet your sitter before the first visit, and that's who shows up. No rotating roster of strangers. <a href="/about">Meet Kraig</a>.</p></li>
+<li><h3>The same face at your door</h3><p>You meet your sitter before the first visit, and that's who shows up. No rotating roster of strangers, and every sitter is someone we'd trust with our own pets. <a href="/about">Read our story</a>.</p></li>
 <li><h3>Every size of dog</h3><p>Great Danes, shepherds and strong pullers are welcome. We'll talk through handling at the meet-and-greet.</p></li>
 <li><h3>Overnights in your own home</h3><p>No kennel, no car ride. Your pets sleep where they always sleep and your house isn't left empty.</p></li>
 <li><h3>Based in Belmont</h3><p>We live here, so we're minutes away, not coming in from across Charlotte.</p></li>
@@ -613,7 +637,7 @@ details p{margin-top:12px;color:var(--ink)}
 <p class="display" style="font-size:24px;color:#fff">Porchlight Pet &amp; Home Care</p>
 <p style="margin-top:8px">Dog walking, pet sitting and home care in Belmont, NC and nearby.</p>
 </div>
-<div><h4>Porchlight</h4><a href="/about">About Kraig</a><a href="/blog">Blog</a><a href="/testimonials">Reviews</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
+<div><h4>Porchlight</h4><a href="/about">Our story</a><a href="/blog">Blog</a><a href="/testimonials">Reviews</a><a href="/intake">New client form</a><a href="/portal">Client login</a></div>
 <div><h4>Services</h4><a href="/services/overnight-pet-sitting">Overnight stays</a><a href="/services/dog-walking">Dog walking</a><a href="/services/drop-in-visits">Drop-in visits</a><a href="/services/cat-sitting">Cat sitting</a><a href="/services/exotic-pet-sitting">Birds, reptiles and fish</a><a href="/services/home-check-ins">Home check-ins</a><a href="/services/pet-taxi">Pet taxi</a><a href="/services/flight-companion">Flight companion</a><a href="/services/pet-transport">Pet transport</a></div>
 <div><h4>Contact</h4><a href="tel:+14704243183">470-424-3183</a><a href="mailto:hello@porchlightpetcare.com">hello@porchlightpetcare.com</a><p style="padding:4px 0">Belmont, NC 28012</p></div>
 </div>
@@ -654,7 +678,7 @@ details p{margin-top:12px;color:var(--ink)}
   var details = el('details'), submitBtn = el('submit'), summary = el('summary'), errBox = el('form-error');
   var addBtn = el('add-btn'), addMsg = el('add-msg'), cartBox = el('cart'), cartList = el('cart-list');
   var whereMsg = el('where-msg'), WHERE_HINT = whereMsg.textContent;
-  state.place = null;
+  state.place = null; state.sitter = null; state.sitters = [];
   function withGeo(o){ if (state.place) { o.p_lat = state.place.lat; o.p_lng = state.place.lng; } return o; }
   if (window.PorchlightAddress) {
     PorchlightAddress.attach(el('where'), function(place){
@@ -676,7 +700,7 @@ details p{margin-top:12px;color:var(--ink)}
         whereMsg.textContent = WHERE_HINT;
       }
       if (state.cart.length) { state.cart = []; renderCart(); addMsg.textContent = 'Your list was cleared because the address changed.'; }
-      loadSlots();
+      loadSitters().then(loadSlots);
     });
   }
 
@@ -712,7 +736,7 @@ details p{margin-top:12px;color:var(--ink)}
     el('often-label').hidden = el('often-row').hidden = id === 'meet';
     if (id === 'meet' && state.often !== 'once') { state.often = 'once'; oftenButtons.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.often === 'once' ? 'true' : 'false'); }); syncRepeat(true); }
     document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.trip === id ? 'true' : 'false'); });
-    loadSlots();
+    loadSitters().then(loadSlots);
   }
   document.querySelectorAll('#taxi-trip .choice').forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.trip); }); });
   // ---- Pet taxi fare, metered by distance ----
@@ -764,7 +788,7 @@ details p{margin-top:12px;color:var(--ink)}
   if (window.PorchlightAddress) PorchlightAddress.attach(el('dropoff'), function(){ fetchRoute(); });
   el('dropoff').addEventListener('change', fetchRoute);
   el('dropoff').addEventListener('blur', function(){ setTimeout(fetchRoute, 250); });
-  townSel.addEventListener('change', function(){ if (el('dropoff').value.trim()) fetchRoute(); });
+  townSel.addEventListener('change', function(){ if (el('dropoff').value.trim()) fetchRoute(); loadSitters().then(loadSlots); });
   renderRoute();
   serviceButtons.forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.service); }); });
   document.querySelectorAll('[data-pick]').forEach(function(a){
@@ -772,7 +796,6 @@ details p{margin-top:12px;color:var(--ink)}
   });
   townSel.addEventListener('change', function(){
     if (state.cart.length) { state.cart = []; renderCart(); addMsg.textContent = 'Your list was cleared because the town changed.'; }
-    loadSlots();
   });
   dateIn.addEventListener('change', function(){ syncRepeat(true); loadSlots(); });
 
@@ -836,6 +859,7 @@ details p{margin-top:12px;color:var(--ink)}
       var info = document.createElement('div');
       var top = document.createElement('span');
       top.textContent = dayText(c.start_at) + ' · ' + c.time + ' · ' + state.labels[c.service] + (c.service === 'meet' ? ' · Free' : unitPrice(c.service) ? ' · ' + money(unitPrice(c.service)) + (isTaxiSvc(c.service) && state.route ? ' est.' : isTaxiSvc(c.service) ? ' and up' : '') : '');
+      if (c.sitterName) top.textContent += ' · with ' + c.sitterName;
       info.appendChild(top);
       if (c.series) { var sm = document.createElement('small'); sm.textContent = c.series; info.appendChild(sm); }
       var x = document.createElement('button');
@@ -894,21 +918,24 @@ details p{margin-top:12px;color:var(--ink)}
     if (!dates.length) { addMsg.textContent = 'None of those days fall before your end date.'; return Promise.resolve(); }
     var job;
     if (state.often === 'once') {
-      job = Promise.resolve(picked.map(function(p){ return { day: dateIn.value, slot_label: p.label, start_at: p.start_at, available: true }; }));
+      job = Promise.resolve(picked.map(function(p){ return { day: dateIn.value, slot_label: p.label, start_at: p.start_at, available: true, sitter: p.sitter, sitterName: p.sitterName }; }));
     } else {
       addBtn.disabled = true; addMsg.textContent = 'Checking ' + dates.length + ' day' + (dates.length > 1 ? 's' : '') + '…';
       var primeAll = state.place && window.PorchlightAddress ? PorchlightAddress.prime(dates[0], state.place, dates.length) : Promise.resolve();
       job = primeAll.then(function(){
-        return api('rpc/porchlight_check_slots', { body: withGeo({ p_service: svc, p_town: townSel.value, p_dates: dates, p_times: picked.map(function(p){ return p.label; }) }) });
+        return api('rpc/porchlight_check_slots', { body: withGeo({ p_service: svc, p_town: townSel.value, p_dates: dates, p_times: picked.map(function(p){ return p.label; }), p_sitter: state.sitter }) });
       });
     }
     return job.then(function(rows){
       var added = 0, skipped = [];
       (rows || []).forEach(function(r){
         var when = shortDay(r.day) + ' ' + r.slot_label;
+        var rowSitter = state.sitter ? state.sitter : null;
+        if (state.sitter && r.sitter_ok === false) { skipped.push(when + ' (' + (sitterName(state.sitter) || 'your sitter') + ' is busy)'); return; }
         if (!r.available) { skipped.push(when); return; }
         if (inCart(r.start_at)) { skipped.push(when + ' (already listed)'); return; }
-        state.cart.push({ service: svc, start_at: r.start_at, time: r.slot_label, series: series });
+        if (state.often === 'once' && r.sitter !== undefined) rowSitter = r.sitter;
+        state.cart.push({ service: svc, start_at: r.start_at, time: r.slot_label, series: series, sitter: rowSitter, sitterName: state.often === 'once' && r.sitter !== undefined ? r.sitterName : sitterName(rowSitter) });
         added++;
       });
       var msg = added ? 'Added ' + added + ' visit' + (added > 1 ? 's' : '') + '.' : 'Nothing new was added.';
@@ -926,6 +953,43 @@ details p{margin-top:12px;color:var(--ink)}
     slotsBox.querySelectorAll('.slot[aria-pressed]').forEach(function(x){ x.setAttribute('aria-pressed', 'false'); });
   }
 
+  // ---- Choosing a sitter ----
+  var sitterBox = el('sitter-box'), sitterRow = el('sitter-row'), sitterBio = el('sitter-bio');
+  function renderSitters(){
+    sitterRow.innerHTML = '';
+    function mk(id, label, photo){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'choice';
+      if (photo) { var im = document.createElement('img'); im.className = 'av'; im.alt = ''; im.src = photoUrl(photo); im.loading = 'lazy'; b.appendChild(im); }
+      b.appendChild(document.createTextNode(label));
+      b.setAttribute('aria-pressed', state.sitter === id ? 'true' : 'false');
+      b.addEventListener('click', function(){ state.sitter = id; renderSitters(); loadSlots(); });
+      sitterRow.appendChild(b);
+    }
+    mk(null, 'Anyone available');
+    state.sitters.forEach(function(s){ mk(s.id, s.display_name, s.photo_path); });
+    var cur = state.sitters.filter(function(s){ return s.id === state.sitter; })[0];
+    sitterBio.innerHTML = '';
+    if (cur && (cur.photo_path || cur.bio)) {
+      var card = document.createElement('div'); card.className = 'sitter-card';
+      if (cur.photo_path) { var big = document.createElement('img'); big.alt = 'Photo of ' + cur.display_name; big.src = photoUrl(cur.photo_path); card.appendChild(big); }
+      var tx = document.createElement('span'); tx.textContent = cur.bio || ''; card.appendChild(tx);
+      sitterBio.appendChild(card);
+    } else if (!cur) sitterBio.textContent = 'We’ll match you with a sitter who’s free at the time you pick.';
+  }
+  function photoUrl(path){ return SUPABASE_URL + '/storage/v1/object/public/porchlight-sitter-photos/' + path; }
+  var sitterToken = 0;
+  function loadSitters(){
+    var token = ++sitterToken;
+    return api('rpc/porchlight_public_sitters', { body: { p_town: townSel.value, p_service: state.service } }).then(function(rows){
+      if (token !== sitterToken) return;
+      state.sitters = rows || [];
+      if (!state.sitters.some(function(s){ return s.id === state.sitter; })) state.sitter = null;
+      sitterBox.hidden = !state.sitters.length;
+      renderSitters();
+    }).catch(function(){ state.sitters = []; state.sitter = null; sitterBox.hidden = true; });
+  }
+  function sitterName(id){ var m = state.sitters.filter(function(s){ return s.id === id; })[0]; return m ? m.display_name : null; }
+
   var loadToken = 0;
   function loadSlots(){
     var token = ++loadToken;
@@ -936,7 +1000,7 @@ details p{margin-top:12px;color:var(--ink)}
     slotsBox.innerHTML = '<p class="slot-status">Checking the schedule…</p>';
     var primed = state.place && window.PorchlightAddress ? PorchlightAddress.prime(dateIn.value, state.place) : Promise.resolve();
     primed.then(function(){
-      return api('rpc/porchlight_available_slots', { body: withGeo({ p_date: dateIn.value, p_service: state.service, p_town: townSel.value }) });
+      return api('rpc/porchlight_available_slots', { body: withGeo({ p_date: dateIn.value, p_service: state.service, p_town: townSel.value, p_sitter: state.sitter }) });
     })
       .then(function(rows){
         if (token !== loadToken) return;
@@ -945,22 +1009,33 @@ details p{margin-top:12px;color:var(--ink)}
         (rows || []).forEach(function(s){
           var b = document.createElement('button');
           b.type = 'button'; b.className = 'slot'; b.textContent = s.slot_label;
+          var alt = state.sitter && !s.sitter_ok && s.available && s.sitters && s.sitters[0] ? s.sitters[0] : null;
           if (!s.available || inCart(s.start_at)) {
             b.disabled = true;
             b.setAttribute('aria-label', s.slot_label + (s.available ? ', already in your list' : ', unavailable'));
           } else {
             open++;
+            if (alt) {
+              b.classList.add('alt');
+              var sm = document.createElement('small'); sm.textContent = 'with ' + alt.name; b.appendChild(sm);
+              b.setAttribute('aria-label', s.slot_label + ', ' + (sitterName(state.sitter) || 'your sitter') + ' is busy; ' + alt.name + ' is free');
+            }
             b.setAttribute('aria-pressed', 'false');
             b.addEventListener('click', function(){
               var on = b.getAttribute('aria-pressed') !== 'true';
               b.setAttribute('aria-pressed', on ? 'true' : 'false');
-              if (on) state.picked.push({ label: s.slot_label, start_at: s.start_at });
+              if (on) state.picked.push({ label: s.slot_label, start_at: s.start_at, sitter: alt ? alt.id : state.sitter, sitterName: alt ? alt.name : sitterName(state.sitter) });
               else state.picked = state.picked.filter(function(p){ return p.start_at !== s.start_at; });
               updateButtons();
             });
           }
           slotsBox.appendChild(b);
         });
+        if (state.sitter && slotsBox.querySelector('.slot.alt')) {
+          var ap = document.createElement('p'); ap.className = 'slot-status'; ap.style.gridColumn = '1 / -1';
+          ap.textContent = 'Dashed times: ' + (sitterName(state.sitter) || 'your sitter') + ' isn’t free then, but the sitter shown is.';
+          slotsBox.appendChild(ap);
+        }
         if (!open) {
           var p = document.createElement('p');
           p.className = 'slot-status'; p.style.gridColumn = '1 / -1';
@@ -1019,7 +1094,7 @@ details p{margin-top:12px;color:var(--ink)}
     submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
     api('rpc/porchlight_request_bookings', { body: withGeo({
       p_town: townSel.value,
-      p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series }; }),
+      p_items: state.cart.map(function(c){ return { service: c.service, start_at: c.start_at, series: c.series, sitter: c.sitter || null }; }),
       p_name: el('name').value, p_email: el('email').value, p_phone: el('phone').value,
       p_address: el('address').value, p_pets: el('pets').value, p_notes: el('notes').value,
       p_new_client: el('new-client').checked,
@@ -1030,7 +1105,9 @@ details p{margin-top:12px;color:var(--ink)}
     })}).then(function(res){
       var isNew = el('new-client').checked;
       var hadMeet = state.cart.some(function(c){ return c.service === 'meet'; });
-      el('success-text').textContent = 'Your request for ' + what + ' is in. Pay below to lock it in, and you will receive a confirmation by text or email once your payment arrives.' +
+      var names = (res && res.sitters) || [];
+      var sitterLine = names.length ? ' Your sitter: ' + names.join(' and ').replace(/\.$/, '') + (names.length > 1 ? ' (depending on the visit).' : '.') : (state.sitters.length ? ' We’ll match you with a free sitter and show who it is in your client portal.' : '');
+      el('success-text').textContent = 'Your request for ' + what + ' is in.' + sitterLine + ' Pay below to lock it in, and you will receive a confirmation by text or email once your payment arrives.' +
         (isNew && !hadMeet ? ' Since you are new, we also do a free meet-and-greet before your first visit. Pick a time below, or we will reach out to set one up.' : '');
       el('book-meet').hidden = !(isNew && !hadMeet);
       showPayment(res && res.group_id, el('email').value);
@@ -1104,7 +1181,7 @@ details p{margin-top:12px;color:var(--ink)}
   var qs = new URLSearchParams(location.search), preset = qs.get('service'), presetTown = qs.get('town');
   if (presetTown && townSel.querySelector('option[value="' + presetTown + '"]')) townSel.value = presetTown;
   syncRepeat(true);
-  if (preset && state.labels[preset]) setService(preset); else loadSlots();
+  if (preset && state.labels[preset]) setService(preset); else loadSitters().then(loadSlots);
 })();
 </script>
 <script>

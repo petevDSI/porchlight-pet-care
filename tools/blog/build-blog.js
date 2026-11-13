@@ -88,6 +88,10 @@ const IMG = {
   "exotic-and-small-pet-care": { src: U("1758206411649-1e4e76ac0e1d"), alt: "A bearded dragon resting on a branch" },
   "senior-pet-care-while-traveling": { src: U("1608469926865-b2d2200bb2f6"), alt: "A senior dog resting calmly" },
   "puppy-and-kitten-care": { ...L("eden-puppy", "50% 68%"), alt: "A happy puppy running across the grass" },
+  "cat-sitter-cost": { ...L("cat-kitten-dish", "50% 45%"), alt: "A gray tabby kitten licking a red dish clean" },
+  "leave-cat-alone-weekend": { ...L("cat-kitten-eating", "50% 40%"), alt: "A kitten eating from a dish on the living room floor" },
+  "shy-cat-and-sitters": { ...L("akita-cat", "50% 50%"), alt: "A dog and a cat meeting nose to nose on a porch" },
+  "cat-with-medical-needs-sitter": { ...L("cat-silver-longhair", "50% 45%"), alt: "A silver long-haired cat sitting upright" },
   "holiday-pet-sitting-planning": { ...L("maizy-car", "50% 65%"), alt: "A dog riding in the front seat of a car" },
 };
 const imgTag = (p, hero) => {

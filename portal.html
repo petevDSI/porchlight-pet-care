@@ -107,6 +107,7 @@
         err.textContent = m; err.hidden = false; btn.disabled = false;
       });
     });
+    box.appendChild(h('p', { class: 'small muted' }, 'Trouble signing in? Email ', h('a', { href: 'mailto:support@porchlightpetcare.com', text: 'support@porchlightpetcare.com' }), '.'));
     setTimeout(function () { (mode === 'reset' ? pass : email.value ? pass : email).focus(); }, 0);
     return box;
   }
@@ -726,7 +727,7 @@
           .catch(function (e) { P.toast(P.errMsg(e)); save.disabled = false; });
       } });
       box.appendChild(h('p', null, h('strong', { text: s.name }), ' · ' + s.email));
-      box.appendChild(h('p', { class: 'small muted', text: 'Towns: ' + (s.towns.length ? s.towns.map(P.townName).join(', ') : 'all') + ' · You keep ' + s.keep_pct + '%. To change either, contact Porchlight.' }));
+      box.appendChild(h('p', { class: 'small muted', text: 'Towns: ' + (s.towns.length ? s.towns.map(P.townName).join(', ') : 'all') + ' · You keep ' + s.keep_pct + '%. To change either, email support@porchlightpetcare.com.' }));
       box.appendChild(h('label', { class: 'f', for: 'sp-phone' }, 'Phone', phone));
       box.appendChild(h('label', { class: 'f', for: 'sp-method' }, 'How should we pay you?', method));
       box.appendChild(h('label', { class: 'f', for: 'sp-handle' }, 'Payout details', handle));

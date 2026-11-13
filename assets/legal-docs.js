@@ -3,50 +3,50 @@ window.PorchlightLegal = {
   "docs": {
     "animals": {
       "title": "Animals in the Home Policy",
-      "version": "2026-11-13.3",
-      "hash": "d505e5571a2446f20ca14027a763de4f033df14c507b1440f29527df7430eafb",
+      "version": "2026-11-13.5",
+      "hash": "69388d7a16c7059aea19870ab1f9ee744b9ddc4013f0a647ac6d870016be370a",
       "url": "/legal/animals-in-the-home-policy"
     },
     "bgcheck": {
       "title": "Background Check Disclosure and Authorization",
-      "version": "2026-11-13.3",
-      "hash": "f63ed92b17a75d7e3984c81e9a4441a3cfda474abf6549d8db449852e2fd6b3b",
+      "version": "2026-11-13.5",
+      "hash": "4da0b4093e3f7e225ed5c3388151683ed09954ceb16f08149eab72a37fe9886d",
       "url": "/legal/background-check-disclosure"
     },
     "home-safety": {
       "title": "Home Standards, Cameras and Safety Policy",
-      "version": "2026-11-13.3",
-      "hash": "238ac00f9dd3db614bababd14d05f3fa560ac9c62035689ea040dad01158de85",
+      "version": "2026-11-13.5",
+      "hash": "990e95c7d19cde8fc4c2728221f4be5d31f12d2a1290b99b9c6d20a32937908a",
       "url": "/legal/home-standards-and-safety"
     },
     "overnight": {
       "title": "Overnight Stay Addendum",
-      "version": "2026-11-13.3",
-      "hash": "bfbe47e9cda258e1527fa2984019a8a9230a2e0d58676cbf914b96a092baf068",
+      "version": "2026-11-13.5",
+      "hash": "1524c18d99f84b15de5ce60ca4b0edcca7974035b8fb821fc2d2a417e7749ab4",
       "url": "/legal/overnight-addendum"
     },
     "owner": {
       "title": "Owner Service Agreement and Release",
-      "version": "2026-11-13.4",
-      "hash": "aade417b2f12a7cb4446a69b3ff92fcb0c4b082054ad9248eec4e7928f2f7788",
+      "version": "2026-11-13.5",
+      "hash": "c8cced4d527e60f24f5b2e02af4e6fe3f95915e01bfeed7082c98fd5e9668a47",
       "url": "/legal/owner-agreement"
     },
     "privacy": {
       "title": "Privacy Policy",
-      "version": "2026-11-13.4",
-      "hash": "e97fe8ee67ff65391b79e9acc009cfb63cf9e10ce0b27611219fe36d05378cee",
+      "version": "2026-11-13.5",
+      "hash": "61c3fa48a54bc905a2352af7d899bc6bb4f28193c1e35305177a7e10153a960a",
       "url": "/legal/privacy-policy"
     },
     "sitter": {
       "title": "Independent Sitter Agreement",
-      "version": "2026-11-13.4",
-      "hash": "b39c5b8678a4ab304fdf3dbc67b7194d80d1cfdc3ca9b2499ed7cceb042f7b29",
+      "version": "2026-11-13.5",
+      "hash": "a12b9e692301257362299af19921fd6f6bd7b0fe3aaff8f68a373106a28d38ad",
       "url": "/legal/sitter-agreement"
     },
     "terms": {
       "title": "Terms of Service",
-      "version": "2026-11-13.4",
-      "hash": "339793e45ff49ee29d25999d5ea148ee8c29d2b76651bd192f3e06f9bed1c312",
+      "version": "2026-11-13.5",
+      "hash": "22f7bf180fadd1bdbf9fbe2df8e7c33982c91ff8947c651168f327b6678fa84a",
       "url": "/legal/terms-of-service"
     }
   }

@@ -1,7 +1,7 @@
 ---
 key: animals
 title: Animals in the Home Policy
-version: 2026-11-13.3
+version: 2026-11-13.5
 audience: owners and sitters
 summary: Every animal in the home is disclosed and counted, whether or not it is the one you booked for.
 ---
@@ -67,4 +67,4 @@ We do not accept animals that are venomous or dangerous to handle, animals that 
 
 ## 8. Questions
 
-If you are not sure whether something counts, count it and ask us. Call 470-424-3183 or email hello@porchlightpetcare.com.
+If you are not sure whether something counts, count it and ask us. Email support@porchlightpetcare.com.

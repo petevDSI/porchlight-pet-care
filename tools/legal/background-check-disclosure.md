@@ -1,7 +1,7 @@
 ---
 key: bgcheck
 title: Background Check Disclosure and Authorization
-version: 2026-11-13.3
+version: 2026-11-13.5
 audience: sitters
 summary: Stand-alone notice and permission for the background check required before you work with Porchlight clients.
 ---
@@ -15,3 +15,5 @@ Porchlight Pet & Home Care ("Porchlight") may obtain a consumer report about you
 ## Your authorization
 
 By checking the box, you authorize Porchlight and the consumer reporting agency it uses to obtain these reports about you.
+
+Questions about this disclosure or your report: support@porchlightpetcare.com.

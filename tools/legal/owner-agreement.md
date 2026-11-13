@@ -1,7 +1,7 @@
 ---
 key: owner
 title: Owner Service Agreement and Release
-version: 2026-11-13.4
+version: 2026-11-13.5
 audience: owners
 summary: What owners promise about their animals and home, what Porchlight and sitters provide, and the release.
 ---
@@ -94,3 +94,7 @@ North Carolina law applies, mandatory protections that apply to you remain avail
 ## 15. Your acceptance
 
 By checking the box next to this agreement, you confirm that you have read it, that you are an adult who can enter into it, and that you agree to it. We record the date, time, and version of what you accepted.
+
+## 16. Contact us
+
+Questions, safety reports or disputes: support@porchlightpetcare.com. Privacy requests: privacy@porchlightpetcare.com. General questions: hello@porchlightpetcare.com.

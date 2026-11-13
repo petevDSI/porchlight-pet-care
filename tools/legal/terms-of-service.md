@@ -1,7 +1,7 @@
 ---
 key: terms
 title: Terms of Service
-version: 2026-11-13.4
+version: 2026-11-13.5
 audience: everyone
 summary: The rules for using the Porchlight website, portals and booking system.
 ---
@@ -88,7 +88,7 @@ We may suspend or end your account, or refuse a booking, if we have a documented
 
 ## 12. Disputes
 
-- **Talk to us first.** We would like the chance to fix a problem. Email hello@porchlightpetcare.com or call 470-424-3183. You may still file a claim at any time within the time the law allows, and you may seek urgent relief or file with a government agency without waiting.
+- **Talk to us first.** We would like the chance to fix a problem. Email support@porchlightpetcare.com. You may still file a claim at any time within the time the law allows, and you may seek urgent relief or file with a government agency without waiting.
 - **Where disputes go.** North Carolina law governs these Terms, and consumer, worker and other mandatory protections that apply to you remain available. Disputes that are not resolved will be heard in the state or federal courts that serve Gaston County, North Carolina. For a booking at a home in South Carolina, a competent South Carolina court is also available. Either of us may use small claims court where jurisdiction and venue are proper.
 
 ## 13. Changes to these Terms
@@ -101,4 +101,4 @@ When you accept these Terms or any policy or agreement, we record the date and t
 
 ## 15. Contact
 
-Porchlight Pet & Home Care, Belmont, NC 28012. Phone 470-424-3183. Email hello@porchlightpetcare.com.
+Porchlight Pet & Home Care, Belmont, NC 28012. General questions: hello@porchlightpetcare.com. Support and disputes: support@porchlightpetcare.com. Privacy requests: privacy@porchlightpetcare.com.

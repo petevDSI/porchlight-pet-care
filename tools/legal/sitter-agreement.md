@@ -1,7 +1,7 @@
 ---
 key: sitter
 title: Independent Sitter Agreement
-version: 2026-11-13.4
+version: 2026-11-13.5
 audience: sitters
 summary: The independent-contractor terms for sitters working through Porchlight, including conduct, insurance, pay and removal.
 ---
@@ -95,3 +95,7 @@ North Carolina law applies, and worker and other mandatory protections that appl
 ## 11. Your acceptance
 
 By checking the box next to this agreement, you confirm that you have read it, that you are at least 18 years old, and that you agree to it. We record the date, time and version of what you accepted. You will be asked to accept a new version if we make a material change.
+
+## 12. Contact us
+
+Questions, safety reports or disputes: support@porchlightpetcare.com. Privacy requests: privacy@porchlightpetcare.com. General questions: hello@porchlightpetcare.com.

@@ -1,7 +1,7 @@
 ---
 key: privacy
 title: Privacy Policy
-version: 2026-11-13.4
+version: 2026-11-13.5
 audience: everyone
 summary: What information we collect, why, who sees it, and your choices.
 ---
@@ -79,7 +79,7 @@ We use reasonable measures to protect information, including encrypted connectio
 
 ## 9. Your choices and rights
 
-You can view and update your pets, home and contact details in your portal. You may ask us to access, correct or delete your information, or to stop using it for certain purposes, by emailing hello@porchlightpetcare.com. Residents of some states have additional privacy rights, and we will honor them where they apply. We will not treat you differently for using your rights.
+You can view and update your pets, home and contact details in your portal. You may ask us to access, correct or delete your information, or to stop using it for certain purposes, by emailing privacy@porchlightpetcare.com. Residents of some states have additional privacy rights, and we will honor them where they apply. We will not treat you differently for using your rights.
 
 ## 10. Children
 
@@ -95,4 +95,4 @@ We may update this policy. We will post the new version with its date, and for a
 
 ## 13. Contact
 
-Porchlight Pet & Home Care, Belmont, NC 28012. Phone 470-424-3183. Email hello@porchlightpetcare.com.
+Porchlight Pet & Home Care, Belmont, NC 28012. Privacy questions and requests: privacy@porchlightpetcare.com. General questions: hello@porchlightpetcare.com.

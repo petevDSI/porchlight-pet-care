@@ -1,7 +1,7 @@
 ---
 key: home-safety
 title: Home Standards, Cameras and Safety Policy
-version: 2026-11-13.3
+version: 2026-11-13.5
 audience: owners and sitters
 summary: Home condition before and after a stay, no hidden cameras, privacy, safety and damage reports.
 ---
@@ -73,4 +73,4 @@ Owners and sitters treat each other with courtesy. Porchlight does not accept ha
 
 ## 8. Reporting a problem
 
-Report a problem to Porchlight at 470-424-3183 or hello@porchlightpetcare.com as soon as you can. In an emergency, call 911 first.
+Report a problem to Porchlight at support@porchlightpetcare.com as soon as you can. In an emergency, call 911 first.

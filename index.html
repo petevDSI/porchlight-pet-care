@@ -116,6 +116,9 @@ textarea{min-height:88px;resize:vertical}
 .slot.alt{border-style:dashed;border-color:var(--navy)}
 .slot small{display:block;font-weight:500;font-size:12px;line-height:1.2;color:inherit;opacity:.8}
 .sitter-bio{margin-top:6px}
+.choice .av{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;background:var(--mist)}
+.sitter-card{display:flex;gap:12px;align-items:center;margin-top:10px}
+.sitter-card img{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--mist)}
 .summary{background:var(--mist);border-radius:16px;padding:18px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
 .summary strong{font-size:18px}
 .addr-wrap{position:relative}
@@ -954,17 +957,26 @@ details p{margin-top:12px;color:var(--ink)}
   var sitterBox = el('sitter-box'), sitterRow = el('sitter-row'), sitterBio = el('sitter-bio');
   function renderSitters(){
     sitterRow.innerHTML = '';
-    function mk(id, label){
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'choice'; b.textContent = label;
+    function mk(id, label, photo){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'choice';
+      if (photo) { var im = document.createElement('img'); im.className = 'av'; im.alt = ''; im.src = photoUrl(photo); im.loading = 'lazy'; b.appendChild(im); }
+      b.appendChild(document.createTextNode(label));
       b.setAttribute('aria-pressed', state.sitter === id ? 'true' : 'false');
       b.addEventListener('click', function(){ state.sitter = id; renderSitters(); loadSlots(); });
       sitterRow.appendChild(b);
     }
     mk(null, 'Anyone available');
-    state.sitters.forEach(function(s){ mk(s.id, s.display_name); });
+    state.sitters.forEach(function(s){ mk(s.id, s.display_name, s.photo_path); });
     var cur = state.sitters.filter(function(s){ return s.id === state.sitter; })[0];
-    sitterBio.textContent = cur ? (cur.bio || '') : 'We’ll match you with a sitter who’s free at the time you pick.';
+    sitterBio.innerHTML = '';
+    if (cur && (cur.photo_path || cur.bio)) {
+      var card = document.createElement('div'); card.className = 'sitter-card';
+      if (cur.photo_path) { var big = document.createElement('img'); big.alt = 'Photo of ' + cur.display_name; big.src = photoUrl(cur.photo_path); card.appendChild(big); }
+      var tx = document.createElement('span'); tx.textContent = cur.bio || ''; card.appendChild(tx);
+      sitterBio.appendChild(card);
+    } else if (!cur) sitterBio.textContent = 'We’ll match you with a sitter who’s free at the time you pick.';
   }
+  function photoUrl(path){ return SUPABASE_URL + '/storage/v1/object/public/porchlight-sitter-photos/' + path; }
   var sitterToken = 0;
   function loadSitters(){
     var token = ++sitterToken;

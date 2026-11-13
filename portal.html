@@ -591,11 +591,18 @@
     root.appendChild(h('p', { class: 'muted', style: 'margin-bottom:16px', text: 'Pet owners can only book you inside these hours, and never on days you’re off. Visits you already have stay on your schedule, so use Give back on any you can’t keep.' }));
     var box = h('div', { class: 'stack narrow' }, h('p', { class: 'muted', text: 'Loading…' }));
     root.appendChild(box);
-    var sid = me.sitter.id;
+    availabilityForm(me.sitter.id, box, false);
+  }
+
+  var SITTER_PHOTOS = 'porchlight-sitter-photos';
+  function sitterPhotoUrl(path) { return path ? P.SUPABASE_URL + '/storage/v1/object/public/' + SITTER_PHOTOS + '/' + path : null; }
+
+  // Hours, days off, photo and public text for one sitter. Used by the sitter (own) and by staff (anyone).
+  function availabilityForm(sid, box, isStaff) {
     Promise.all([
       sb.from('porchlight_sitter_hours').select('*').eq('sitter_id', sid).then(guard),
       sb.from('porchlight_sitter_timeoff').select('*').eq('sitter_id', sid).gte('end_date', new Date().toISOString().slice(0, 10)).order('start_date').then(guard),
-      sb.from('porchlight_sitters').select('display_name,bio,name').eq('id', sid).single().then(guard)
+      sb.from('porchlight_sitters').select('display_name,bio,name,photo_path').eq('id', sid).single().then(guard)
     ]).then(function (res) {
       P.clear(box);
       var hours = res[0], off = res[1], prof = res[2];
@@ -665,9 +672,34 @@
       var bio = h('textarea', { rows: 3, maxlength: '400', placeholder: 'A sentence or two: your pets, your experience, what you love about the job', 'aria-label': 'About you' }); bio.value = prof.bio || '';
       var saveProf = h('button', { class: 'btn ghost sm', type: 'button', text: 'Save', onclick: function () {
         saveProf.disabled = true;
-        sb.rpc('porchlight_sitter_set_public', { p_display: dn.value, p_bio: bio.value }).then(guard)
-          .then(function () { P.toast('Saved'); saveProf.disabled = false; }).catch(function (e) { P.toast(P.errMsg(e)); saveProf.disabled = false; });
+        var call = isStaff
+          ? sb.from('porchlight_sitters').update({ display_name: dn.value.trim().slice(0, 40) || null, bio: bio.value.trim().slice(0, 400) || null, updated_at: new Date().toISOString() }).eq('id', sid).then(guard)
+          : sb.rpc('porchlight_sitter_set_public', { p_display: dn.value, p_bio: bio.value }).then(guard);
+        call.then(function () { P.toast('Saved'); saveProf.disabled = false; }).catch(function (e) { P.toast(P.errMsg(e)); saveProf.disabled = false; });
       } });
+      // photo
+      var img = h('img', { alt: '', width: '96', height: '96', style: 'width:96px;height:96px;border-radius:50%;object-fit:cover;background:#e6eaf1' });
+      function showPhoto(path) { var u = sitterPhotoUrl(path); if (u) { img.src = u; img.alt = 'Photo of ' + prof.name; img.style.display = ''; } else { img.removeAttribute('src'); img.style.display = 'none'; } }
+      showPhoto(prof.photo_path);
+      var file = h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/*', 'aria-label': 'Choose a headshot' });
+      var upBtn = h('button', { class: 'btn ghost sm', type: 'button', text: 'Upload photo', onclick: function () {
+        var f = file.files && file.files[0];
+        if (!f) { P.toast('Choose a photo first'); return; }
+        upBtn.disabled = true;
+        P.shrinkImage(f, 600, 0.85).then(function (blob) {
+          var path = sid + '/photo-' + Date.now() + '.jpg';
+          return sb.storage.from(SITTER_PHOTOS).upload(path, blob, { contentType: 'image/jpeg', upsert: false }).then(function (r) {
+            if (r.error) throw r.error;
+            return isStaff ? sb.from('porchlight_sitters').update({ photo_path: path }).eq('id', sid).then(guard) : sb.rpc('porchlight_sitter_set_photo', { p_path: path }).then(guard);
+          }).then(function () { prof.photo_path = path; showPhoto(path); file.value = ''; P.toast('Photo saved'); });
+        }).catch(function (e) { P.toast(P.errMsg(e)); }).then(function () { upBtn.disabled = false; });
+      } });
+      var rmBtn = h('button', { class: 'btn ghost sm', type: 'button', text: 'Remove photo', onclick: function () {
+        (isStaff ? sb.from('porchlight_sitters').update({ photo_path: null }).eq('id', sid).then(guard) : sb.rpc('porchlight_sitter_set_photo', { p_path: null }).then(guard))
+          .then(function () { prof.photo_path = null; showPhoto(null); P.toast('Photo removed'); }).catch(function (e) { P.toast(P.errMsg(e)); });
+      } });
+      box.appendChild(h('p', { class: 'small muted', text: 'A friendly headshot helps owners choose. It is shown publicly on the booking page, so only use one you are comfortable sharing.' }));
+      box.appendChild(h('div', { class: 'row', style: 'gap:14px;align-items:center' }, img, h('div', { class: 'stack', style: 'gap:6px' }, file, h('div', { class: 'row' }, upBtn, rmBtn))));
       box.appendChild(h('label', { class: 'f' }, 'Name shown on the booking page', dn));
       box.appendChild(h('label', { class: 'f' }, 'About you', bio));
       box.appendChild(saveProf);
@@ -716,6 +748,7 @@
     var v = query.get('v');
     if (v === 'roster') return staffRoster();
     if (v === 'payouts') return staffPayouts();
+    if (v === 'hours' && query.get('id')) return staffSitterHours(query.get('id'));
     return staffSitters(query.get('s') || 'open');
   }
 
@@ -772,6 +805,16 @@
     return panel;
   }
 
+  function staffSitterHours(id) {
+    var root = page();
+    root.appendChild(staffTabs('sitters'));
+    root.appendChild(h('p', { style: 'margin-bottom:12px' }, h('a', { href: '#/sitters?v=roster', text: '← Back to roster' })));
+    root.appendChild(h('h1', { class: 'display', style: 'font-size:30px;margin-bottom:6px', text: 'Sitter hours, days off & photo' }));
+    var box = h('div', { class: 'stack narrow' }, h('p', { class: 'muted', text: 'Loading…' }));
+    root.appendChild(box);
+    availabilityForm(id, box, true);
+  }
+
   function staffRoster() {
     var root = page();
     root.appendChild(staffTabs('sitters'));
@@ -808,7 +851,8 @@
         h('div', { class: 'small muted', text: s.payout_method ? 'Pay by ' + s.payout_method + (s.payout_handle ? ': ' + s.payout_handle : '') : 'No payout method yet' }),
         h('div', { class: 'small', style: 'margin-top:8px', text: 'Towns' }), towns,
         h('div', { class: 'small', style: 'margin-top:8px', text: 'Services' }), svcs,
-        h('div', { class: 'row', style: 'margin-top:8px' }, status, h('label', { class: 'small' }, 'Keeps ', keep, ' %'), save),
+        h('div', { class: 'row', style: 'margin-top:8px' }, status, h('label', { class: 'small' }, 'Keeps ', keep, ' %'), save,
+          h('a', { class: 'btn ghost sm', href: '#/sitters?v=hours&id=' + s.id, text: 'Hours, days off & photo' })),
         h('div', { style: 'margin-top:8px' }, notes)));
   }
 

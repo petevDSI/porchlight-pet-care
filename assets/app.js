@@ -1,7 +1,7 @@
 /* Porchlight shared helpers: Supabase client, field definitions, small DOM builders. */
 (function () {
-  var SUPABASE_URL = 'https://ngiwnyoxdcycwotxargm.supabase.co';
-  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naXdueW94ZGN5Y3dvdHhhcmdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjQzOTEsImV4cCI6MjA5NzMwMDM5MX0.qcK6CUQkMzxoCZ2Dk8682It2honSch-blEyDXZEt9dc';
+  var SUPABASE_URL = 'https://vnwifihyyivxjsdvxlsv.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZud2lmaWh5eWl2eGpzZHZ4bHN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2MjcxNDcsImV4cCI6MjExMDIwMzE0N30.niE-ejnfYbPk6GqyH2ZlNtXtiBlrZxvSi-mcLmW9Lck';
 
   var P = window.Porchlight = {};
   P.SUPABASE_URL = SUPABASE_URL;

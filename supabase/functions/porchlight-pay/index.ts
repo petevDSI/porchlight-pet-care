@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
       const tip = due.reduce((t: number, b: any) => t + (b.tip_cents ?? 0), 0);
       if (tip) { p.set(`line_items[${n}][price_data][currency]`, "usd"); p.set(`line_items[${n}][price_data][product_data][name]`, "Tip for your Porchlight sitter"); p.set(`line_items[${n}][price_data][unit_amount]`, String(tip)); p.set(`line_items[${n}][quantity]`, "1"); n++; }
       if (st.card_fee_cents > 0) { p.set(`line_items[${n}][price_data][currency]`, "usd"); p.set(`line_items[${n}][price_data][product_data][name]`, "Card processing fee"); p.set(`line_items[${n}][price_data][unit_amount]`, String(st.card_fee_cents)); p.set(`line_items[${n}][quantity]`, "1"); }
-      if (due.length > 480) return json({ error: "That is a large request. Please split it into two bookings or call us." }, 400);
+      if (due.length > 480) return json({ error: "That is a large request. Please split it into two bookings or email support@porchlightpetcare.com." }, 400);
       p.set("metadata[kind]", "visits"); p.set("metadata[fee_cents]", String(st.card_fee_cents));
       for (let i = 0; i * 12 < due.length; i++) p.set(`metadata[b${i}]`, due.slice(i * 12, i * 12 + 12).map((b: any) => b.id).join(","));
     }
